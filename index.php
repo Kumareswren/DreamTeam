@@ -4,77 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #FAFAD2;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: #FFF6D9; /* Orange 50 */
         }
-        
+        .error {
+        color: red; /* Set the text color to red */
+        }
         .login-container {
-            background-color:#EEE8AA;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            max-width: 400px;
+            margin: auto;
+            margin-top: 10%;
         }
-        
-        h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
+        .login-logo {
+            display: block;
+            margin: auto;
+            margin-bottom: 20px;
+            width: 100px;
         }
-        
-        .input-group {
+        .login-card {
+            padding: 20px;
+        }
+        .login-form {
             margin-bottom: 20px;
         }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        
-        .input-group input {
+        .login-btn {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            transition: border-color 0.3s ease;
         }
-        
-        .input-group input:focus {
-            border-color: #007bff;
-        }
-        
-        .submit-btn {
-            width: 105%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-        
-        .error{
-            color: red;
-            text-align: center;
-            margin-top: 20px;
+        .forgot-password {
+            text-align: right;
         }
     </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 login-container">
+                <div class="login-card card shadow">
+                    <img src="icons/online-learning.png" alt="Education Logo" class="login-logo">
+                    <h2 class="text-center mb-4">Login</h2>
+                    <?php if(isset($_GET['error'])) { ?>
+                        <p class="error"><?php echo htmlspecialchars($_GET['error']); ?></p>
+                    <?php } ?>
+                    <form action="loginBackend.php" method="post" onsubmit="return validateForm()" class="login-form" name="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                        </div>
+                        <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token']); ?>">
+                        <button type="submit" class="btn btn-primary login-btn">Login</button>
+                    </form>
+                    <div class="forgot-password">
+                        <a href="resetPassword.php" class="text-decoration-none">Forgot password?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script>
+    <!-- Bootstrap JavaScript (optional, for certain components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
         function validateForm() {
             var password = document.forms["loginForm"]["password"].value;
 
@@ -86,28 +82,5 @@
             return true;
         }
     </script>
-
-</head>
-<body>
-    <div class="login-container">
-    <form action="loginBackend.php" method="post" onsubmit="return validateForm()" name="loginForm">
-        <h2>Login</h2>
-        <?php if(isset($_GET['error'])) { ?>
-            <p class="error"> <?php echo htmlspecialchars($_GET['error']); ?></p>
-        <?php } 
-        ?>
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_SESSION['token']); ?>">
-            <button type="submit" class="submit-btn">Login</button>
-        </form>
-        
-    </div>
 </body>
 </html>
