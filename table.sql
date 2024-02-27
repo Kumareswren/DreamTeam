@@ -39,3 +39,5 @@ VALUES ("Abby", "James", "123abby@gmail.com", "601947589632", "admin123");
 SELECT * FROM Student;
 SELECT * FROM Tutor;
 SELECT * FROM Admin;
+
+update student set SPass = "cs_1010" where SID = 1;
