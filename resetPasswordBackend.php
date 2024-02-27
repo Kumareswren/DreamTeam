@@ -1,5 +1,6 @@
 <?php
 include "db.php";
+require_once 'vendor/autoload.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
@@ -52,14 +53,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (mysqli_query($conn, $update_sql)) {
         // Password updated successfully
         // Send email with the new password (you need to implement email functionality)
-        $email_subject = "Password Reset";
-        $email_body = "Your new password is: $new_password"; // Customize the email message as needed
-        // Replace 'youremail@example.com' with your email address
-        mail($email, $email_subject, $email_body, 'From: kumareswren@gmail.com');
+        $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) // Replace with your SMTP server details
+            ->setUsername('venturesrsk@gmail.com')
+            ->setPassword('zohh take gpri knhn');
 
-        // Redirect to reset success page
-        header("Location: index.php");
-        exit();
+            //****************here************************** */
+        $mailer = new Swift_Mailer($transport);
+
+        $message = (new Swift_Message('Password Reset'))
+            ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
+            ->setTo([$email])
+            ->setBody("Your new password is: $new_password");
+
+        // Send the message
+        $result = $mailer->send($message);
+        if ($result) {
+            // Email sent successfully
+            echo '<script>alert("Password reset successful. Check your email for the new password.");';
+            echo 'window.location.href = "index.php";</script>';
+            exit();
+        } else {
+            // Error sending email
+            header("Location: resetPassword.php?error=Error%20sending%20email.%20Please%20try%20again.");
+            exit();
+        }
     } else {
         // Error updating password
         header("Location: resetPassword.php?error=Error%20resetting%20password.%20Please%20try%20again.");
