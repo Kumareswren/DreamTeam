@@ -36,6 +36,7 @@
             <div class="col-md-6 reset-container">
                 <div class="reset-card card shadow">
                     <h2 class="text-center mb-4">Reset Password</h2>
+                    <p class="error"><?php echo htmlspecialchars($_GET['error']); ?></p>
                     <div class="card-body">
                         <!-- Reset password form -->
                         <form action="resetPasswordBackend.php" method="post" class="reset-form">
