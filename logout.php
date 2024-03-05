@@ -26,7 +26,9 @@ if(isset($_COOKIE['token'])) {
             // Token not expired, blacklist the token and redirect to login page
             setcookie('token', '', $pastExpirationTime, '/');
             
-            header("Location: index.php?message=Logout%20successful");
+            header("Location: index.php");
+            //include logout message
+            /* header("Location: index.php"); */
             exit();
         }
     } catch (Exception $e) {
