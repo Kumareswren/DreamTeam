@@ -41,3 +41,19 @@ SELECT * FROM Tutor;
 SELECT * FROM Admin;
 
 update student set SPass = "cs_1010" where SID = 1;
+
+/* Below this is the new updated queries  */
+
+CREATE TABLE StudentAssignment (
+    assignID INT PRIMARY KEY AUTO_INCREMENT,
+    SID INT,
+    TID INT,
+    FOREIGN KEY (SID) REFERENCES Student(SID),
+    FOREIGN KEY (TID) REFERENCES Tutor(TID)
+);
+
+INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES ('Emily', 'Brown', 'emily@example.com', '1231231234', 'pass1234');
+
+INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES ('Daniel', 'Wilson', 'daniel@example.com', '9879879876', 'tutorpass');
+
+INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES ('Sophia', 'Martinez', 'sophia@example.com', '5555555555', 'securepassword');
