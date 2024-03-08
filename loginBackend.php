@@ -17,14 +17,24 @@ function generateToken($email, $role, $expirationTime) {
 }
 
 // SQL query to check if the email and password exist in the database
-$sqlStudent = "SELECT * FROM student WHERE Email='$email' AND SPass='$pass'";
-$resultStudent = $conn->query($sqlStudent);
+$sqlStudent = "SELECT * FROM student WHERE Email=? AND SPass=?";
+$stmtStudent = $conn->prepare($sqlStudent);
+$stmtStudent->bind_param("ss", $email, $pass);
+$stmtStudent->execute();
+$resultStudent = $stmtStudent->get_result();
 
-$sqlTutor = "SELECT * FROM tutor WHERE Email='$email' AND TPass='$pass'";
-$resultTutor = $conn->query($sqlTutor);
+$sqlTutor = "SELECT * FROM tutor WHERE Email=? AND TPass=?";
+$stmtTutor = $conn->prepare($sqlTutor);
+$stmtTutor->bind_param("ss", $email, $pass);
+$stmtTutor->execute();
+$resultTutor = $stmtTutor->get_result();
 
-$sqlAdmin = "SELECT * FROM admin WHERE Email='$email' AND APass='$pass'";
-$resultAdmin = $conn->query($sqlAdmin);
+$sqlAdmin = "SELECT * FROM admin WHERE Email=? AND APass=?";
+$stmtAdmin = $conn->prepare($sqlAdmin);
+$stmtAdmin->bind_param("ss", $email, $pass);
+$stmtAdmin->execute();
+$resultAdmin = $stmtAdmin->get_result();
+
 
 if ($resultStudent->num_rows > 0) {
     // Student found, generate JWT token for student

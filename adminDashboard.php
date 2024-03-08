@@ -2,6 +2,8 @@
 require_once 'tokenVerify.php';
 session_start();
 
+include "db.php";
+
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -91,6 +93,11 @@ header("Expires: 0");
     transform: translateY(32px);
 }
 
+.custom-div {
+    background-color: #fff6d9;
+    padding: 20px;
+}
+
   </style>
 </head>
 <body>
@@ -124,6 +131,15 @@ header("Expires: 0");
                             <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 register-link">
+                                    <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
+                                </a>
+                            </li>
+
+
+
                     <li class="nav-item">
                         <a href="logout.php" class="nav-link align-middle px-10">
                             <i class="fs-4 bi-box-arrow-left"></i> <span class="ms-1 d-none d-sm-inline">Logout</span>
@@ -132,6 +148,7 @@ header("Expires: 0");
                 </ul>
             </div>
         </div>
+        
             <script>
                 // Call the function when the assignment link is clicked
                 $(document).ready(function() {
@@ -152,10 +169,11 @@ header("Expires: 0");
 
                 function handleAssignmentFormSubmission() {
                     // Attach event listener to form submission
+                    $('#componentContainer').off('submit', 'form');
+                    $('#alertMessageAssign').hide();
                     $('#componentContainer').on('submit', 'form', function(event) {
                         // Prevent default form submission
                         event.preventDefault();
-                        
                         // Collect form data
                         var formData = $(this).serialize();
                         
@@ -173,8 +191,9 @@ header("Expires: 0");
                                     $.get('assStudentTutorComp.php', function(data) {
                                         $('.container').replaceWith(data); // Replace the container content with the updated one
                                     });
+                                    
                                 } else {
-                                    $('<div class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form');
+                                    $('<div id="alertMessageAssign" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
                                 }
                             },
                             error: function(xhr, status, error) {
@@ -184,6 +203,62 @@ header("Expires: 0");
                         });
                     });
                 }
+            </script>
+            <script>
+                    // Call the function when the register link is clicked
+                    $(document).ready(function() {
+                    $('.register-link').click(function(event) {
+                        
+                        event.preventDefault();
+                        $.ajax({
+                            url: 'adminRegister.php',
+                            success: function(data) {
+                                $('#componentContainer').html(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('An error occurred:', error);
+                            }
+                        });
+                        handleRegisterFormSubmission();
+                    });
+                });
+
+                function handleRegisterFormSubmission() {
+                    // Attach event listener to form submission
+                    $('#alertMessage').hide();
+                    $('#componentContainer').on('submit', 'form', function(event) {
+                        // Prevent default form submission
+                        event.preventDefault();
+                        
+                        // Collect form data
+                        var formData = $(this).serialize();
+                        // Send form data to backend using AJAX
+                        $.ajax({
+                            type: 'POST',
+                            url: 'adminRegisterBackend.php',
+                            data: formData,
+                            success: function(response) {
+                                // Handle the response
+                                $('.alert').remove();
+                                $('#alertMessage').hide();
+                                if (response === 'success') {
+                                    alert("Register successful.");
+                                    // Reload the component
+                                    $.get('adminRegister.php', function(data) {
+                                        $('.container').replaceWith(data); // Replace the container content with the updated one
+                                    });
+                                } else {
+                                    $('<div id="alertMessage" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle errors
+                                alert("An error occurred: " + error);
+                            }
+                        });
+                    });
+                }
+
             </script>
 
             <div class="col py-3 custom-div">
@@ -201,10 +276,12 @@ header("Expires: 0");
         </div>
     </div>
 
+    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- for charts? --> <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-     </body>
+     </body>
 </html>
