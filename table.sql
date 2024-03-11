@@ -61,24 +61,3 @@ CREATE TABLE Course (
     TID INT,
     FOREIGN KEY (TID) REFERENCES Tutor(TID)
 );
-
--- add for tutor view courses :
-CREATE TABLE TutorCourse (
-    TutorID INT,
-    CourseID INT,
-    PRIMARY KEY (TutorID, CourseID),
-    FOREIGN KEY (TutorID) REFERENCES Tutor(TID),
-    FOREIGN KEY (CourseID) REFERENCES Course(courseID)
-);
-
-INSERT INTO TutorCourse (TutorID, CourseID)
-VALUES (1, 1); 
-
-INSERT INTO TutorCourse (TutorID, CourseID)
-VALUES (1, 2); 
-
-INSERT INTO TutorCourse (TutorID, CourseID)
-VALUES (1, 3); 
-
-INSERT INTO TutorCourse (TutorID, CourseID)
-VALUES (1, 4); 

@@ -8,7 +8,7 @@ use \Firebase\JWT\JWT;
 header("Content-Type: text/html"); // Set content type to HTML
 
 function generateCourseList($conn, $result) {
-    $output = '<h2 class="mt-5 mb-4">Courses List</h2>'; 
+    $output = '<h2 class="mt-5 mb-4">Courses List</h2>'; // Add the heading
     $output .= '<table class="table">';
     $output .= '<thead>';
     $output .= '<tr>';
@@ -23,10 +23,10 @@ function generateCourseList($conn, $result) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $output .= '<tr>';
-            $output .= '<td><a href="view_course.php?courseID=' . $row['courseID'] . '">' . (isset($row['courseName']) ? htmlspecialchars($row['courseName']) : '') . '</a></td>';
+            $output .= '<td>' . (isset($row['courseName']) ? $row['courseName'] : '') . '</td>';
             $output .= '<td>' . (isset($row['startDate']) ? $row['startDate'] : '') . '</td>';
             $output .= '<td>' . (isset($row['endDate']) ? $row['endDate'] : '') . '</td>';
-            $output .= '<td>' . (isset($row['courseDesc']) ? htmlspecialchars($row['courseDesc']) : '') . '</td>';
+            $output .= '<td>' . (isset($row['courseDesc']) ? $row['courseDesc'] : '') . '</td>';
             $output .= '</tr>';
         }
     } else {
@@ -66,9 +66,7 @@ if (isset($_COOKIE['token'])) {
             $tid = $rowTutor['TID'];
 
             // Query to get the courses assigned to the tutor's TID
-            $sql = "SELECT Course.* FROM Course
-            INNER JOIN TutorCourse ON Course.courseID = TutorCourse.CourseID
-            WHERE TutorCourse.TutorID = ?";
+            $sql = "SELECT * FROM Course WHERE TID = ?";
             $stmt = $conn->prepare($sql);
 
             if (!$stmt) {
