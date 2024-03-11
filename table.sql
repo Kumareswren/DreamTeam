@@ -38,7 +38,7 @@ VALUES ("Abby", "James", "123abby@gmail.com", "601947589632", "admin123");
 
 SELECT * FROM Student;
 SELECT * FROM Tutor;
-SELECT * FROM Admin;
+SELECT * FROM Admin;
 
 update student set SPass = "cs_1010" where SID = 1;
 
@@ -52,8 +52,12 @@ CREATE TABLE StudentAssignment (
     FOREIGN KEY (TID) REFERENCES Tutor(TID)
 );
 
-INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES ('Emily', 'Brown', 'emily@example.com', '1231231234', 'pass1234');
-
-INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES ('Daniel', 'Wilson', 'daniel@example.com', '9879879876', 'tutorpass');
-
-INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES ('Sophia', 'Martinez', 'sophia@example.com', '5555555555', 'securepassword');
+CREATE TABLE Course (
+    courseID INT AUTO_INCREMENT PRIMARY KEY,
+    courseName VARCHAR(255),
+    startDate DATE,
+    endDate DATE,
+    courseDesc TEXT,
+    TID INT,
+    FOREIGN KEY (TID) REFERENCES Tutor(TID)
+);
