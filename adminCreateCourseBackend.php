@@ -38,6 +38,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmtCourse->bind_param("ssssi", $courseName, $startDate, $endDate, $courseDescription, $tutorID);
 
     if ($stmtCourse->execute()) {
+
+        // Fetch the tutor's email address from the database
+        $getTutorEmailSQL = "SELECT email FROM Tutor WHERE TID = ?";
+        $getTutorEmailStmt = $conn->prepare($getTutorEmailSQL);
+        $getTutorEmailStmt->bind_param("i", $tutorID);
+        $getTutorEmailStmt->execute();
+        $getTutorEmailResult = $getTutorEmailStmt->get_result();
+
+        if ($getTutorEmailResult->num_rows > 0) {
+            $tutorData = $getTutorEmailResult->fetch_assoc();
+            $tutorEmail = $tutorData['email'];
+
+            // Create and send the email to the tutor
+            $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) // Replace with your SMTP server details
+                ->setUsername('venturesrsk@gmail.com')
+                ->setPassword('zohh take gpri knhn');
+            
+            $mailer = new Swift_Mailer($transport);
+            
+            $message = (new Swift_Message('Course Assigned'))
+                ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
+                ->setTo([$tutorEmail]) // Use the tutor's email fetched from the database
+                ->setBody($courseName . " has been assigned to you. You can check it in your dashboard");
+            
+            // Send the message
+            $mailer->send($message);
+        }
+
+
         echo "<script>alert('Course created successfully.');</script>";
         unset($_SESSION['message_type']);
         unset($_SESSION['course_creation_error']);

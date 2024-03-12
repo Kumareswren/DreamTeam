@@ -148,7 +148,7 @@ $tutorResult = mysqli_query($conn, $tutorQuery);
                         <?php unset($_SESSION['course_creation_error']); ?>
                     <?php endif; ?>
 
-                    <form method="post" action="adminCreateCourse.php" class="form" name="adminCreateCourseForm">
+                    <form method="post" action="adminCreateCourseBackend.php" class="form" name="adminCreateCourseForm">
                         <label for="course_name">Course Name:</label>
                         <input type="text" name="course_name" class="form-control mb-3" required>
 

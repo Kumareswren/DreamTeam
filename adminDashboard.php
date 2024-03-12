@@ -167,13 +167,13 @@ header("Expires: 0");
                                 console.error('An error occurred:', error);
                             }
                         });
+                        $('#componentContainer').off('submit', 'form');
                         handleAssignmentFormSubmission();
                     });
                 });
 
                 function handleAssignmentFormSubmission() {
                     // Attach event listener to form submission
-                    $('#componentContainer').off('submit', 'form');
                     $('#alertMessageAssign').hide();
                     $('#componentContainer').on('submit', 'form', function(event) {
                         // Prevent default form submission
@@ -223,13 +223,14 @@ header("Expires: 0");
                                 console.error('An error occurred:', error);
                             }
                         });
+                        $('#componentContainer').off('submit', 'form');
                         handleRegisterFormSubmission();
                     });
                 });
 
                 function handleRegisterFormSubmission() {
                     // Attach event listener to form submission
-                    $('#alertMessage').hide();
+                    $('#alertMessageRegister').hide();
                     $('#componentContainer').on('submit', 'form', function(event) {
                         // Prevent default form submission
                         event.preventDefault();
@@ -252,7 +253,7 @@ header("Expires: 0");
                                         $('.container').replaceWith(data); // Replace the container content with the updated one
                                     });
                                 } else {
-                                    $('<div id="alertMessage" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
+                                    $('<div id="alertMessageRegister" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
                                 }
                             },
                             error: function(xhr, status, error) {
@@ -275,12 +276,13 @@ header("Expires: 0");
                                 console.error('An error occurred:', error);
                             }
                         });
+                        $('#componentContainer').off('submit', 'form');
                       handleCourseFormSubmission();
                     });
                 });
                 function handleCourseFormSubmission() {
                     // Attach event listener to form submission
-                    $('#alertMessage').hide();
+                    $('#alertMessageCourse').hide();
                     $('#componentContainer').on('submit', 'form', function(event) {
                         // Prevent default form submission
                         event.preventDefault();
@@ -303,7 +305,7 @@ header("Expires: 0");
                                         $('.container').replaceWith(data); // Replace the container content with the updated one
                                     });
                                 } else {
-                                    $('<div id="alertMessage" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
+                                    $('<div id="alertMessageCourse" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
                                 }
                             },
                             error: function(xhr, status, error) {
