@@ -22,7 +22,7 @@ function generateCourseList($conn, $result) {
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $output .= '<tr>';
+            $output .= '<tr class="course-row" data-courseid="' . $row['courseID'] . '" data-coursename="' . $row['courseName'] . '" data-startdate="' . $row['startDate'] . '" data-enddate="' . $row['endDate'] . '">';
             $output .= '<td>' . (isset($row['courseName']) ? $row['courseName'] : '') . '</td>';
             $output .= '<td>' . (isset($row['startDate']) ? $row['startDate'] : '') . '</td>';
             $output .= '<td>' . (isset($row['endDate']) ? $row['endDate'] : '') . '</td>';
@@ -97,3 +97,51 @@ if (isset($_COOKIE['token'])) {
     echo "Token not found.";
 }
 ?>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsonwebtoken/8.5.1/jsonwebtoken.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Add click event listener to course rows
+        $(document).on('click', '.course-row', function() {
+            console.log('Course row clicked');
+            // Retrieve course details from the row
+            const courseId = $(this).data('courseid');
+            const courseName = $(this).data('coursename');
+            const startDate = $(this).data('startdate');
+            const endDate = $(this).data('enddate');
+
+            // AJAX request to set session variables
+            $.ajax({
+                url: 'setCourseSession.php', // Path to the PHP script that sets session variables
+                type: 'POST', // Use POST method to send data to server
+                data: {
+                    courseId: courseId,
+                    courseName: courseName,
+                    startDate: startDate,
+                    endDate: endDate
+                },
+                success: function(response) {
+                    console.log('Session variables set successfully.');
+                    // AJAX request to load the inCourse.php component
+                    $.ajax({
+                        url: 'inCourse.php',
+                        type: 'GET',
+                        success: function(response) {
+                            // Replace the content of componentContainer with inCourse.php content
+                            $('#componentContainer').html(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(error);
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error setting session variables:', error);
+                }
+            });
+        });
+    });
+</script>
+

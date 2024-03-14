@@ -61,3 +61,14 @@ CREATE TABLE Course (
     TID INT,
     FOREIGN KEY (TID) REFERENCES Tutor(TID)
 );
+
+/* Add this table  */
+
+CREATE TABLE CourseStudent (
+    csID INT AUTO_INCREMENT PRIMARY KEY,
+    courseID INT,
+    SID INT,
+    FOREIGN KEY (courseID) REFERENCES Course(courseID),
+    FOREIGN KEY (SID) REFERENCES Student(SID),
+    UNIQUE KEY (courseId, SID)
+);

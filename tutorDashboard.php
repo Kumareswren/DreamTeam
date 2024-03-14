@@ -18,22 +18,6 @@ header("Expires: 0");
 
     <title>Tutor Dashboard</title>
 
-    <!-- <script>
-        
-        function verifyToken(token) {
-        }
-
-        var jwtToken = getCookie('token');
-
-        if (jwtToken && verifyToken(jwtToken)) {
-
-        } 
-        else {
-        
-            window.location.href = 'index.php';
-        }
-    </script>
- -->
     <style>
 
   /* for e-Tutor */ .min-vh-100 .fs-5 {
