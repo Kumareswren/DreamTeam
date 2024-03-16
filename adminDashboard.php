@@ -1,14 +1,52 @@
 <?php
 require_once 'tokenVerify.php';
-session_start();
-
-include "db.php";
+require_once 'db.php'; // Include your database connection file
 
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
-?>
 
+use \Firebase\JWT\JWT;
+
+// Retrieve the JWT token from the cookie
+$token = $_COOKIE['token'];
+
+// Decode the JWT token to extract the email
+$decoded = JWT::decode($token, 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8=', array('HS256'));
+$user_email = $decoded->email;
+
+// Check if the user exists in the database
+$sql_check_user = "SELECT * FROM Admin WHERE Email = '$user_email'";
+$result_check_user = $conn->query($sql_check_user);
+
+$welcome_message = "";
+$last_login_time = ""; // Initialize the variable to avoid errors
+
+if ($result_check_user && $result_check_user->num_rows > 0) {
+    // User exists in the database
+    $row = $result_check_user->fetch_assoc();
+    
+    // Check if it's the user's first login (last login time is NULL)
+    if ($row['last_login'] === null) {
+        // Update last login time
+        $current_time = date('Y-m-d H:i:s');
+        $update_query = "UPDATE Admin SET last_login = '$current_time' WHERE Email = '$user_email'";
+        $conn->query($update_query);
+
+        // Display welcome message for the first login
+        $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
+    } else {
+        // User has logged in before, fetch the last login time
+        $last_login_time = $row['last_login'];
+        $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
+    }
+} else {
+    // User doesn't exist in the database
+    $welcome_message = "Unknown User";
+}
+
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,6 +134,11 @@ header("Expires: 0");
 .custom-div {
     background-color: #fff6d9;
     padding: 20px;
+}
+.col-md-12 {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
   </style>
@@ -321,13 +364,20 @@ header("Expires: 0");
                 
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
+                    <h4><?php echo $welcome_message; ?></h4>
                       <div class="row">
                         <div class="col-md-12" id="componentContainer">
 
                         </div>
                       </div>
                       <br>
-
+                      <div class="col-md-12">
+                
+                <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
+            </div>
+        </div>
+        <br>
+    </div>   
             </div>
         </div>
     </div>
