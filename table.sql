@@ -26,6 +26,20 @@ CREATE TABLE Admin (
 	APass varchar(255)
 );
 
+CREATE TABLE BlogPost (
+    PostID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(255),
+    Content TEXT,
+    StudentID INT,
+    TutorID INT,
+    ImagePath VARCHAR(255),
+    UserRole ENUM('student', 'tutor'),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (StudentID) REFERENCES Student(SID) ON DELETE CASCADE,
+    FOREIGN KEY (TutorID) REFERENCES Tutor(TID) ON DELETE CASCADE
+);
+
+
 
 INSERT INTO Student (FName, LName, Email, Contact, SPass)
 VALUES ("Cardinal", "Smith", "cardinal10@gmail.com", "60142637985", "cs_10");
