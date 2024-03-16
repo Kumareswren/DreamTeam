@@ -14,7 +14,7 @@ if(isset($_COOKIE['token'])) {
 
     // Decode the token to extract the payload
     try {
-        $secretKey = 'your_secret_key';
+        $secretKey = 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8=';
         $decoded = JWT::decode($token, $secretKey, array('HS256'));
 
         // Check if the token is expired

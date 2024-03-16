@@ -22,7 +22,7 @@ if (isset($_COOKIE['token'])) {
     $token = $_COOKIE['token'];
     
     // Your secret key
-    $secretKey = 'your_secret_key';
+    $secretKey = 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8=';
     
     // Verify the token
     $decodedToken = verifyToken($token, $secretKey);
