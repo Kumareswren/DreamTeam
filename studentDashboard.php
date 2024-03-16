@@ -160,7 +160,7 @@ header("Expires: 0");
                     </li>
 
                     <li>
-                      <a href="#" class="nav-link px-10 align-middle">
+                      <a href="studentBlog" class="nav-link px-10 align-middle">
                           <i class="fs-4 bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Blog</span> </a>
                     </li>
 
