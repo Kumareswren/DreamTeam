@@ -37,7 +37,39 @@ if (isset($_GET['id'])) {
     echo "PostID not passed in the URL.";
     exit; // Stop further execution
 }
+
+// Delete button
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $sql = "DELETE FROM BlogPost WHERE PostID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $postID);
+    
+    // Execute the SQL query
+    if (!$stmt->execute()) {
+        die("Error executing SQL query: " . $stmt->error);
+    } else {
+        // Decode JWT token
+        $secretKey = 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8=';
+        $token = $_COOKIE['token'];
+        $decoded = JWT::decode($token, $secretKey, array('HS256'));
+
+        // Redirect based on user role
+        switch ($decoded->role) {
+            case 'student':
+                header('Location: studentBlog.php');
+                break;
+            case 'tutor':
+                header('Location: tutorBlog.php');
+                break;
+            default:
+                header('Location: index.php');
+                break;
+        }
+        exit;
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -328,7 +360,10 @@ $(init);
     <input type="hidden" name="postID" value="<?php echo $post['PostID']; ?>">
     <input type="submit" value="Edit blog">
 </form>
-
+<br>
+<form method="post">
+    <input type="submit" value="Delete blog">
+</form>
 </div>
 <br>
             </div>
