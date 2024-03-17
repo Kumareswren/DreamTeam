@@ -477,44 +477,47 @@ button.publish:hover, button.update:hover {
               <div class="main-container new-blog">
               <h2>Create a new blog post</h2>
               <div class="new-blog-form">
-        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
-            <?php if(isset($_GET['id'])): ?>
-                <!-- Your existing code for when $_GET['id'] is set -->
-                <input type="hidden" name="PostID" value="<?php echo $post['PostID']; ?>">
-                <div class="form-field">
-                    <label for="blog-title">Blog Title</label>
-                    <input id="blog-title" type="text" name="Title" value="<?php echo $post['Title']; ?>" required>
-                </div>
-                <div class="form-field">
-                    <label for="blog-description">Blog Description</label>
-                    <textarea id="blog-description" rows="3" name="Content" required><?php echo $post['Content']; ?></textarea>
-                </div>
-                <div class="form-field">
-                    <label for="upload-image">Upload Image</label>
-                    <input id="upload-image" type="file" name="ImagePath" accept="image/*" required>
-                </div>
-            <?php else: ?>
-                <!-- Your existing code for when $_GET['id'] is not set -->
-                <input type="hidden" name="PostID" value="0">
-                <div class="form-field">
-                    <label for="blog-title">Blog Title</label>
-                    <input id="blog-title" type="text" name="Title" required>
-                </div>
-                <div class="form-field">
-                    <label for="blog-description">Blog Description</label>
-                    <textarea id="blog-description" rows="3" name="Content" required></textarea>
-                </div>
-                <div class="form-field">
-                    <label for="upload-image">Upload Image</label>
-                    <input id="upload-image" type="file" name="ImagePath" accept="image/*" required>
-                </div>
-            <?php endif; ?>
-            <!-- Hidden fields for user role and email -->
-            <input type="hidden" name="user-role" value="<?php echo $userRole; ?>">
-            <input type="hidden" name="user-email" value="<?php echo $userEmail; ?>">
-            
-            <button class="publish" type="submit">Publish</button>
-        </form>
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+        <?php if(isset($_GET['id'])): ?>
+            <!-- Your existing code for when $_GET['id'] is set -->
+            <input type="hidden" name="PostID" value="<?php echo $post['PostID']; ?>">
+            <div class="form-field">
+                <label for="blog-title">Blog Title</label>
+                <input id="blog-title" type="text" name="Title" value="<?php echo $post['Title']; ?>" required>
+            </div>
+            <div class="form-field">
+                <label for="blog-description">Blog Description</label>
+                <textarea id="blog-description" rows="3" name="Content" required><?php echo $post['Content']; ?></textarea>
+            </div>
+            <div class="form-field">
+                <!-- Display the current image -->
+                <img src="<?php echo $post['ImagePath']; ?>" alt="Current Image" style="width: 100px; height: 100px;">
+                <label for="upload-image">Upload Image</label>
+                <input id="upload-image" type="file" name="ImagePath" accept="image/*" required>
+            </div>
+        <?php else: ?>
+            <!-- Your existing code for when $_GET['id'] is not set -->
+            <input type="hidden" name="PostID" value="0">
+            <div class="form-field">
+                <label for="blog-title">Blog Title</label>
+                <input id="blog-title" type="text" name="Title" required>
+            </div>
+            <div class="form-field">
+                <label for="blog-description">Blog Description</label>
+                <textarea id="blog-description" rows="3" name="Content" required></textarea>
+            </div>
+            <div class="form-field">
+                <label for="upload-image">Upload Image</label>
+                <input id="upload-image" type="file" name="ImagePath" accept="image/*" required>
+            </div>
+        <?php endif; ?>
+        <!-- Hidden fields for user role and email -->
+        <input type="hidden" name="user-role" value="<?php echo $userRole; ?>">
+        <input type="hidden" name="user-email" value="<?php echo $userEmail; ?>">
+        
+        <button class="publish" type="submit">Publish</button>
+    </form>
+</div>
 </div>
 
 
