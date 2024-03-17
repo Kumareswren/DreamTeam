@@ -408,7 +408,7 @@ a.createStudentBlog:hover {
                     <div class="container-fluid">
                       <div class="row">
                         <div class="col-md-12">
-                          <h4>Welcome to your Dashboard, </h4>
+                          <h4>Welcome to your blog </h4>
                           
                         </div>
                       </div>
