@@ -30,13 +30,14 @@ if (isset($_GET['id'])) {
     } else {
         // Post not found
         echo "Post not found.";
+        exit; // Stop further execution
     }
 } else {
     // PostID not passed in the URL
     echo "PostID not passed in the URL.";
+    exit; // Stop further execution
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -167,6 +168,7 @@ $(init);
     width: 40px;
     height: 40px;
     transform: translateY(32px);
+    
 }.viewBlogContainer {
   margin: 0 auto;
   padding: 20px;
@@ -316,9 +318,14 @@ $(init);
     <br><br><br>
     <div class="viewBlogDescriptionDetailed"><?php echo $post['Content']; ?></div>
     <div class="viewBlogImageDetailed"><img src="<?php echo $post['ImagePath']; ?>" alt="<?php echo $post['Title']; ?>"></div>
+<!-- Edit button -->
+<form action="editBlog.php?id=<?php echo $post['PostID']; ?>" method="post">
+    <input type="hidden" name="postID" value="<?php echo $post['PostID']; ?>">
+    <input type="submit" value="Edit blog">
+</form>
+
 </div>
 <br>
-
             </div>
         </div>
     </div>
