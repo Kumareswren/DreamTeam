@@ -213,6 +213,11 @@ $(init);
   object-fit: contain;
   margin-bottom: 15px;
 }
+.viewBlogImageDetailed img {
+  width: 100%;  
+  height: auto;
+  object-fit: contain;
+}
 
 @media (max-width: 768px) {
   .viewBlogDetailed {

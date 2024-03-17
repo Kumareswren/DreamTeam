@@ -369,10 +369,15 @@ button.publish:hover, button.update:hover {
 
 .blog-image-preview {
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: 100%;
+  overflow: hidden; /* This will hide any part of the image that exceeds the size of the container */
 }
 
+.blog-image-preview img {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* This will make the image cover the entire area of the container */
+}
 @media (max-width: 768px) {
   .preview-blog {
     padding: 20px;
