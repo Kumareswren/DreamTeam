@@ -11,6 +11,7 @@ header("Expires: 0");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
    
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -138,7 +139,7 @@ header("Expires: 0");
                       </li>
 
                       <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-10">
+                                <a href="#" class="nav-link align-middle px-10 courses-link">
                             <i class="fs-4 bi-journal-text"></i> <span class="ms-1 d-none d-sm-inline">Courses</span>
                         </a>
                     </li>
@@ -183,7 +184,7 @@ header("Expires: 0");
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
                       <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12" id="componentContainer">
                           <h4>Welcome to your Dashboard, </h4>
                           
                         </div>
@@ -199,5 +200,24 @@ header("Expires: 0");
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- for charts? --> <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script> 
     <script src="script.js"></script>
+
+    <script> 
+    $(document).ready(function() {
+    
+    $('.courses-link').click(function(event) {
+        //event.preventDefault();
+        $.ajax({
+            url: 'studentCourses.php',
+            success: function(data) {
+                $('#componentContainer').html(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+                });
+                
+            });
+        });
+    </script>
   </body>
 </html>
