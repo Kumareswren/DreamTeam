@@ -59,13 +59,14 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
  
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <title>Student Dashboard</title>
+
 
     <script>
         
@@ -81,8 +82,32 @@ $conn->close();
         
             window.location.href = 'index.php';
         }
-    </script>
+        ;(function ($, window, document, undefined) {
 
+// ########################################
+// # Define Functions
+// ########################################
+
+function func() {
+  
+};
+
+// ########################################
+// # Initialize all necessary event handlers
+// ########################################
+
+var init = function () {
+  func();
+};
+
+// ########################################
+// # Call init on Document Ready
+// ########################################
+
+$(init);
+
+})(window.jQuery, this, this.document);
+    </script>
     <style>
 
   /* Styling for e-Tutor */ .min-vh-100 .fs-5 {
@@ -166,7 +191,141 @@ $conn->close();
   bottom: 0;
 }
 
-  </style>
+.button-container {
+  text-align: left;
+}
+
+a.createStudentBlog {
+  display: inline-block;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  margin: 0px;
+  background: #333;
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+a.createStudentBlog:hover {
+  background-color: #fac821;
+  border-color: #fac821;
+}
+
+.component-card {
+    position: relative;
+    margin: 5px; /* Adjust this value according to your needs */
+    max-width: 300px; /* Adjust this value according to your needs */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.component-card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.component-card:hover img {
+    transform: scale(1.1);
+}
+
+.component-card .component-card_image {
+    background: #fff;
+    height: 0;
+    overflow: hidden;
+    padding-bottom: 56.2%;
+    position: relative;
+}
+
+.component-card .component-card_image .component-card_image-inside {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.component-card .component-card_image .component-card_image-inside img {
+    background-size: cover;
+    height: auto !important;
+    transform: scale(1);
+    transition: all .25s ease-in-out;
+    width: 100%;
+}
+
+.component-card .blog-detail {
+    background: #fff;
+    padding: 10px; /* Adjust this value to reduce space around the content */
+    position: relative;
+    top: -20px;
+    max-height: 200px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.component-card .blog-detail h3 {
+    font-size: 18px;
+    margin: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.component-card .blog-detail label {
+    color: #737373;
+    font-size: 14px;
+}
+
+.component-card .blog-detail p {
+    margin-bottom: 1rem;
+    margin-top: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.component-card .blog-detail .btn {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    color: #212529;
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: .375rem .75rem;
+    text-align: center;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.component-card .blog-detail .btn:hover {
+    background-color: #fac821;
+    color: #212529;
+    text-decoration: none;
+}
+
+.component-card .blog-detail .btn-read-more {
+    background: transparent;
+    border-radius: 0;
+    border: 2px solid #fac821;
+    outline: none;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.component-card .blog-detail .btn-read-more:hover {
+    background-color: #fac821;
+    border-color: #333;
+}
+.swiper-container {
+    overflow: hidden; /* Ensure that the Swiper container does not overflow its parent */
+}
+</style>
 </head>
 
 <body>
@@ -237,7 +396,17 @@ $conn->close();
                     <div class="container-fluid">
                       <div class="row">
                       <h4><?php echo $welcome_message; ?></h4>
-                          
+                      <div class="swiper-container">
+  <div class="swiper-wrapper" id="blogPostsContainer">
+
+                   </div>
+</div>
+
+                      <div class="new-post-actions">
+                <div class="button-container">
+                    <a class="createStudentBlog" href="createStudentBlog.php">Click to Create New Blog</a>
+                </div>
+            </div>
                       <div class="row">
             <div class="col-md-12">
            
@@ -253,13 +422,141 @@ $conn->close();
         </div>
     </div>
     <script>
+    // Function to fetch student blog posts via AJAX
+    function getStudentBlog() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'StudentBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    document.getElementById('blogPostsContainer').innerHTML = xhr.responseText;
+                    initializeSwiper(); // Initialize Swiper after loading content
+                    addDeleteButtonListeners();
+                    addEditButtonListeners();
+                } else {
+                    console.error('Error fetching student blog posts:', xhr.status);
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to initialize Swiper
+    function initializeSwiper() {
+    var swiper = new Swiper(".swiper-container", {
+        slidesPerView: 'auto', // Set to 'auto' to display as many slides as possible based on container size
+        spaceBetween: 10,
+        loop: true,
+    });
+}
+
+    // Function to add event listeners to delete buttons
+    function addDeleteButtonListeners() {
+        document.querySelectorAll('.delete-blog-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let postID = this.querySelector('input[name="postID"]').value;
+                sendDeleteRequest(postID);
+            });
+        });
+    }
+
+    // Function to send delete blog post request via AJAX
+    function sendDeleteRequest(postID) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'studentBlog.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log(xhr.responseText);
+                getStudentBlog(); // Reload the blog posts after deletion
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send('action=deleteBlogPost&postID=' + encodeURIComponent(postID));
+    }
+
+    // Function to add event listeners to edit buttons
+    function addEditButtonListeners() {
+        document.querySelectorAll('.edit-blog-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                let postID = this.dataset.postid;
+                editBlog(postID);
+            });
+        });
+    }
+
+    // Function to call editBlog function via AJAX
+    function editBlog(postID) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'editBlog.php?id=' + encodeURIComponent(postID), true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                document.getElementById('blogPostsContainer').innerHTML = xhr.responseText;
+                addEditFormListener(postID); // Add listener for edit form submission
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to add event listener for edit form submission
+    function addEditFormListener(postID) {
+        document.getElementById('editForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            formData.append('PostID', postID);
+            sendEditRequest(formData);
+        });
+    }
+
+    // Function to send edit blog post request via AJAX
+    function sendEditRequest(formData) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'editBlog.php', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    window.location.href = response.redirect_url; // Redirect to viewBlog page after successful edit
+                } else {
+                    console.error('Edit failed:', response.message);
+                }
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send(formData);
+    }
+
+    // Call the getStudentBlog function when the page loads
+    window.onload = function() {
+        getStudentBlog();
+    };
+</script>
+
+
+    <script>
         // Check if it's the user's first login and display the alert
         <?php if ($is_first_login): ?>
             var welcomeMessage = "<?php echo addslashes($welcome_message); ?>";
             alert(welcomeMessage);
         <?php endif; ?>
     </script>
-
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var swiper = new Swiper(".swiper-container", {
+                slidesPerView: 3,
+                spaceBetween: 10,
+                loop: true,
+            });
+        });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
