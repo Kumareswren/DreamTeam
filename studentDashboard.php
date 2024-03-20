@@ -425,7 +425,7 @@ a.createStudentBlog:hover {
     // Function to fetch student blog posts via AJAX
     function getStudentBlog() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'StudentBlog.php', true);
+        xhr.open('GET', 'studentBlog.php', true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
