@@ -196,7 +196,11 @@ $(init);
 }
 
 a.createStudentBlog {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Add this line */
+  text-align: center; /* Add this line */
   font-size: 0.9em;
   text-transform: uppercase;
   padding: 10px 20px;
@@ -324,6 +328,8 @@ a.createStudentBlog:hover {
 }
 .swiper-container {
     overflow: hidden; /* Ensure that the Swiper container does not overflow its parent */
+    width: 100%; /* Set the width to 100% to fill the parent container */
+ 
 }
 </style>
 </head>
@@ -401,11 +407,12 @@ a.createStudentBlog:hover {
 
                    </div>
 </div>
+<div class="new-post-actions">
+    <div class="button-container">
+        <a class="createStudentBlog" onclick="createStudentBlog()" style="cursor: pointer;">Click to Create New Blog</a>
+    </div>
+</div>
 
-                      <div class="new-post-actions">
-                <div class="button-container">
-                    <a class="createStudentBlog" href="createStudentBlog.php">Click to Create New Blog</a>
-                </div>
             </div>
                       <div class="row">
             <div class="col-md-12">
@@ -424,6 +431,7 @@ a.createStudentBlog:hover {
     <script>
     // Function to fetch student blog posts via AJAX
     function getStudentBlog() {
+        document.querySelector('.createStudentBlog').style.display = 'none'; // Hide the button
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'studentBlog.php', true);
         xhr.onreadystatechange = function() {
@@ -433,6 +441,7 @@ a.createStudentBlog:hover {
                     initializeSwiper(); // Initialize Swiper after loading content
                     addDeleteButtonListeners();
                     addEditButtonListeners();
+                    document.querySelector('.createStudentBlog').style.display = 'block'; // Show the button
                 } else {
                     console.error('Error fetching student blog posts:', xhr.status);
                 }
@@ -440,15 +449,32 @@ a.createStudentBlog:hover {
         };
         xhr.send();
     }
+// Function to fetch the createStudentBlog form via AJAX
+function createStudentBlog() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'createStudentBlog.php', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                // Replace the content of a specific element with the form HTML
+                document.getElementById('blogPostsContainer').innerHTML = xhr.responseText;
+            } else {
+                console.error('Error fetching createStudentBlog form:', xhr.status);
+            }
+        }
+    };
+    xhr.send();
+}
+
 
     // Function to initialize Swiper
     function initializeSwiper() {
-    var swiper = new Swiper(".swiper-container", {
-        slidesPerView: 'auto', // Set to 'auto' to display as many slides as possible based on container size
-        spaceBetween: 10,
-        loop: true,
-    });
-}
+        var swiper = new Swiper(".swiper-container", {
+            slidesPerView: 'auto', // Set to 'auto' to display as many slides as possible based on container size
+            spaceBetween: 10,
+            loop: true,
+        });
+    }
 
     // Function to add event listeners to delete buttons
     function addDeleteButtonListeners() {
@@ -490,6 +516,7 @@ a.createStudentBlog:hover {
 
     // Function to call editBlog function via AJAX
     function editBlog(postID) {
+        document.querySelector('.createStudentBlog').style.display = 'none'; // Hide the button
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'editBlog.php?id=' + encodeURIComponent(postID), true);
         xhr.onload = function() {
@@ -536,6 +563,7 @@ a.createStudentBlog:hover {
     window.onload = function() {
         getStudentBlog();
     };
+
 </script>
 
 

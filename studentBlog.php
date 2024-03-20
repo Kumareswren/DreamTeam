@@ -97,9 +97,12 @@ function getStudentBlog() {
                   }
               }
 // Output HTML markup for blog component
+ 
+
 echo '<div class="swiper-container">';
 echo '<div class="swiper-wrapper">';
 foreach ($blogPosts as $post) {
+
     echo '<div class="swiper-slide col-md-4">';
     echo '<div class="component-card">';
     echo '<div class="component-card_image">';
