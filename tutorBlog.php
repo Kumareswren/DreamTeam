@@ -56,8 +56,49 @@ function getTutorBlog() {
                     $row['UserRole'] = $userRole;
                     $blogPosts[] = $row;
                 }
-
-                // Output HTML markup for blog component
+                function deleteBlogPost() {
+                    global $conn; // Declare $conn as global
+                
+                    // Check if postID is set
+                    if (isset($_POST['postID'])) {
+                        $postID = $_POST['postID'];
+                
+                        // Prepare SQL query to delete blog post
+                        $sql = "DELETE FROM BlogPost WHERE PostID = ?";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("s", $postID);
+                
+                        // Execute the SQL query
+                        if (!$stmt->execute()) {
+                            die("Error executing SQL query: " . $stmt->error);
+                        }
+                
+                        // Check if any rows were affected
+                        if ($stmt->affected_rows > 0) {
+                            echo "Blog post deleted successfully.";
+                        } else {
+                            echo "Error deleting blog post.";
+                        }
+                    } else {
+                        echo "No postID provided.";
+                    }
+                }
+                
+                // Check if action is set
+                if (isset($_POST['action'])) {
+                    $action = $_POST['action'];
+                
+                    // Call the appropriate function based on the action
+                    switch ($action) {
+                        case 'getStudentBlog':
+                            getStudentBlog();
+                            break;
+                        case 'deleteBlogPost':
+                            deleteBlogPost();
+                            break;
+                    }
+                }
+  // Output HTML markup for blog component
                 echo '<div class="swiper-container" id="blogPostsContainer">';
                 echo '<div class="swiper-wrapper">';
                 foreach ($blogPosts as $post) {
@@ -76,7 +117,6 @@ function getTutorBlog() {
 
                     // Edit button
                     echo '<a class="edit-blog-btn btn btn-primary" data-postid="' . $post['PostID'] . '">Edit blog</a>';
-                    
                     // Delete button
                     echo '<form class="delete-blog-form" method="post" style="display: inline;">';
                     echo '<input type="hidden" name="postID" value="' . $post['PostID'] . '">';

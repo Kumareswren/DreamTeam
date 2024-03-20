@@ -109,7 +109,9 @@ $(init);
 })(window.jQuery, this, this.document);
     </script>
     <style>
-
+body {
+    overflow-x: hidden;
+}
   /* Styling for e-Tutor */ .min-vh-100 .fs-5 {
     color: rgb(255, 255, 255); 
     font-family: "garamond"; 
@@ -219,11 +221,13 @@ a.createStudentBlog:hover {
 }
 
 .component-card {
+
     position: relative;
     margin: 5px; /* Adjust this value according to your needs */
     max-width: 300px; /* Adjust this value according to your needs */
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
+    box-sizing: border-box; /* Add this line */
 }
 
 .component-card:hover {
