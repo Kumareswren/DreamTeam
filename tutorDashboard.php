@@ -138,148 +138,6 @@ $conn->close();
     height: 40px;
     transform: translateY(32px);
 }
-.col-md-12 {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-}
-
-.button-container {
-  text-align: left;
-}
-
-a.createTutorBlog {
-  display: inline-block;
-  font-size: 0.9em;
-  text-transform: uppercase;
-  padding: 10px 20px;
-  margin: 0px;
-  background: #333;
-  border: 1px solid #333;
-  border-radius: 5px;
-  color: #fff;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-a.createTutorBlog:hover {
-  background-color: #fac821;
-  border-color: #fac821;
-}
-.component-card {
-    position: relative;
-    margin: 5px; /* Adjust this value according to your needs */
-    max-width: 300px; /* Adjust this value according to your needs */
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-}
-
-.component-card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-}
-
-.component-card:hover img {
-    transform: scale(1.1);
-}
-
-.component-card .component-card_image {
-    background: #fff;
-    height: 0;
-    overflow: hidden;
-    padding-bottom: 56.2%;
-    position: relative;
-}
-
-.component-card .component-card_image .component-card_image-inside {
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-}
-
-.component-card .component-card_image .component-card_image-inside img {
-    background-size: cover;
-    height: auto !important;
-    transform: scale(1);
-    transition: all .25s ease-in-out;
-    width: 100%;
-}
-
-.component-card .blog-detail {
-    background: #fff;
-    padding: 10px; /* Adjust this value to reduce space around the content */
-    position: relative;
-    top: -20px;
-    max-height: 200px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-}
-
-.component-card .blog-detail h3 {
-    font-size: 18px;
-    margin: 0;
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.component-card .blog-detail label {
-    color: #737373;
-    font-size: 14px;
-}
-
-.component-card .blog-detail p {
-    margin-bottom: 1rem;
-    margin-top: 0;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.component-card .blog-detail .btn {
-    background-color: transparent;
-    border: 1px solid transparent;
-    border-radius: .25rem;
-    color: #212529;
-    display: inline-block;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    padding: .375rem .75rem;
-    text-align: center;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    user-select: none;
-    vertical-align: middle;
-}
-
-.component-card .blog-detail .btn:hover {
-    background-color: #fac821;
-    color: #212529;
-    text-decoration: none;
-}
-
-.component-card .blog-detail .btn-read-more {
-    background: transparent;
-    border-radius: 0;
-    border: 2px solid #fac821;
-    outline: none;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.component-card .blog-detail .btn-read-more:hover {
-    background-color: #fac821;
-    border-color: #333;
-}
-
-.swiper-container {
-    overflow: hidden; /* Ensure that the Swiper container does not overflow its parent */
-    width: 100%; /* Set the width to 100% to fill the parent container */
- 
-}
 </style>
 </head>
 
@@ -399,12 +257,8 @@ a.createTutorBlog:hover {
                     <div class="container-fluid">
                       <div class="row">
                       <h4><?php echo $welcome_message; ?></h4>
-                      <div class="swiper-container">
-    <div class="swiper-wrapper" id="blogPostsContainer"></div>
-</div>
-
-</div>
-
+                      <div class="col-md-12" id="componentContainer">
+                      </div>
   
             <div class="new-post-actions">
     <div class="button-container">
@@ -438,7 +292,7 @@ a.createTutorBlog:hover {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    document.getElementById('blogPostsContainer').innerHTML = xhr.responseText;
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText;
                     initializeSwiper(); // Initialize Swiper after loading content
                     addDeleteButtonListeners();
                     addEditButtonListeners();
@@ -458,7 +312,7 @@ function createTutorBlog() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
                 // Replace the content of a specific element with the form HTML
-                document.getElementById('blogPostsContainer').innerHTML = xhr.responseText;
+                document.getElementById('componentContainer').innerHTML = xhr.responseText;
             } else {
                 console.error('Error fetching createTutorBlog form:', xhr.status);
             }
@@ -467,15 +321,17 @@ function createTutorBlog() {
     xhr.send();
 }
 
+
     // Function to initialize Swiper
     function initializeSwiper() {
-    var swiper = new Swiper(".swiper-container", {
-        slidesPerView: 'auto', // Set to 'auto' to display as many slides as possible based on container size
-        spaceBetween: 10,
-        loop: true,
+    var totalBlogs = $('#componentContainer .swiper-slide').length;
+    var slidesPerView = totalBlogs > 1 ? 3 : 1; // Set slidesPerView to 3 if there are more than 1 blog, otherwise set to 1
+    var swiper = new Swiper("#componentContainer .swiper-container", {
+        slidesPerView: slidesPerView,
+        spaceBetween: 2,
+        loop: true
     });
 }
-
     // Function to add event listeners to delete buttons
     function addDeleteButtonListeners() {
         document.querySelectorAll('.delete-blog-form').forEach(form => {
@@ -547,7 +403,7 @@ function createTutorBlog() {
         xhr.open('GET', 'editBlog.php?id=' + encodeURIComponent(postID), true);
         xhr.onload = function() {
             if (xhr.status === 200) {
-                document.getElementById('blogPostsContainer').innerHTML = xhr.responseText;
+                document.getElementById('componentContainer').innerHTML = xhr.responseText;
                 addEditFormListener(postID); // Add listener for edit form submission
             } else {
                 console.error('Request failed. Status:', xhr.status);
