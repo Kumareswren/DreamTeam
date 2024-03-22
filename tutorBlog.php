@@ -246,8 +246,8 @@ function getTutorBlog() {
              
              
   // Output HTML markup for blog component
-                echo '<div class="swiper-container" id="blogPostsContainer">';
-                echo '<div class="swiper-wrapper">';
+  echo '<div class="swiper-container">';
+  echo '<div class="swiper-wrapper">';
                 foreach ($blogPosts as $post) {
                     echo '<div class="swiper-slide col-md-4">';
                     echo '<div class="component-card">';
