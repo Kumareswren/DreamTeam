@@ -6,7 +6,7 @@ use \Firebase\JWT\JWT;
 function getStudentBlog() {
   global $conn; // Declare $conn as global
     // Your secret key
-    $secretKey = 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8='; // Update with your secret key
+    $secretKey = 'your_secret_key'; // Update with your secret key
 
     // Retrieve the token from the cookie
     if (isset($_COOKIE['token'])) {
@@ -99,7 +99,9 @@ function getStudentBlog() {
               }
               echo ' <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />';
               echo '<style>';
-              
+              echo 'body {';
+                echo '    overflow: hidden; /* Disable scrolling */';
+                echo '}';
               echo '.button-container {';
               echo '  text-align: left;';
               echo '}';

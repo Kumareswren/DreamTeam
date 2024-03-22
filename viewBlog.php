@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Error executing SQL query: " . $stmt->error);
     } else {
         // Decode JWT token
-        $secretKey = 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8=';
+        $secretKey = 'your_secret_key';
         $token = $_COOKIE['token'];
         $decoded = JWT::decode($token, $secretKey, array('HS256'));
 

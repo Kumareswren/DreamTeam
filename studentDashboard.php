@@ -1,58 +1,11 @@
 <?php
 require_once 'tokenVerify.php';
-require_once 'db.php'; // Include your database connection file
 
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
-
-use \Firebase\JWT\JWT;
-
-// Retrieve the JWT token from the cookie
-$token = $_COOKIE['token'];
-
-// Decode the JWT token to extract the email
-$decoded = JWT::decode($token, 'rNjde95IzZ9CEU1k94aRjHbOX1LvKgM+RX6iv8NfMm8=', array('HS256'));
-$user_email = $decoded->email;
-
-// Check if the user exists in the database
-$sql_check_user = "SELECT * FROM Student WHERE Email = '$user_email'";
-$result_check_user = $conn->query($sql_check_user);
-
-$welcome_message = "";
-$last_login_time = ""; // Initialize the variable to avoid errors
-$is_first_login = false; // Flag to indicate first login
-
-if ($result_check_user && $result_check_user->num_rows > 0) {
-    // User exists in the database
-    $row = $result_check_user->fetch_assoc();
-    
-    // Check if it's the user's first login (last login time is NULL)
-    if ($row['last_login'] === null || empty($row['last_login'])) {
-        // Update last login time
-        $current_time = date('Y-m-d H:i:s');
-        $update_query = "UPDATE Student SET last_login = '$current_time' WHERE Email = '$user_email'";
-        if ($conn->query($update_query) !== TRUE) {
-            // Handle error if update query fails
-            echo "Error updating last login time: " . $conn->error;
-        } else {
-            // Set flag for first login
-            $is_first_login = true;
-            // Set the welcome message for the first login
-            $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
-        }
-    } else {
-        // User has logged in before, fetch the last login time
-        $last_login_time = $row['last_login'];
-        $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
-    }
-} else {
-    // User doesn't exist in the database
-    $welcome_message = "Unknown User";
-}
-
-$conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -231,7 +184,7 @@ $conn->close();
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
                       <div class="row">
-                      <h4><?php echo $welcome_message; ?></h4>
+                     
                       <div class="col-md-12" id="componentContainer">
                       </div>
 
@@ -273,6 +226,8 @@ $conn->close();
                 
             });
         });
+        </script>
+        <script>
     // Function to fetch student blog posts via AJAX
     function getStudentBlog() {
         // document.querySelector('.createStudentBlog').style.display = 'none'; // No need to hide here
@@ -439,10 +394,6 @@ $conn->close();
         });
     };
 </script>
-
-
-
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var swiper = new Swiper("#componentContainer .swiper-container", { // Adjusted to target swiper-container within componentContainer
@@ -453,12 +404,6 @@ $conn->close();
         });
     </script>
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-    <!-- for charts? --> <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script> 
-    <script src="script.js"></script>
   
   </body>
 </html>
