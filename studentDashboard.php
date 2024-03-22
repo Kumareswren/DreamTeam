@@ -234,11 +234,7 @@ $conn->close();
                       <h4><?php echo $welcome_message; ?></h4>
                       <div class="col-md-12" id="componentContainer">
                       </div>
-<div class="new-post-actions">
-    <div class="button-container">
-        <a class="createStudentBlog" onclick="createStudentBlog()" style="cursor: pointer;">Click to Create New Blog</a>
-    </div>
-</div>
+
 
             </div>
                       <div class="row">
@@ -263,24 +259,46 @@ $conn->close();
     <script>
 
     // Function to fetch student blog posts via AJAX
-function getStudentBlog() {
-    document.querySelector('.createStudentBlog').style.display = 'none'; // Hide the button
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'studentBlog.php', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                document.getElementById('componentContainer').innerHTML = xhr.responseText; // Change to componentContainer
-                initializeSwiper(); // Initialize Swiper after loading content
-                addDeleteButtonListeners(); // Reattach event listeners
-                addEditButtonListeners(); // Reattach event listeners
-                document.querySelector('.createStudentBlog').style.display = 'block'; // Show the button
-            } else {
-                console.error('Error fetching student blog posts:', xhr.status);
+    function getStudentBlog() {
+        // document.querySelector('.createStudentBlog').style.display = 'none'; // No need to hide here
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'studentBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText;
+                    initializeSwiper();
+                    addDeleteButtonListeners();
+                    addEditButtonListeners();
+                    // document.querySelector('.createStudentBlog').style.display = 'block'; // No need to show here
+                    createCreateNewBlogButton(); // Create the button after fetching the blog posts
+                } else {
+                    console.error('Error fetching student blog posts:', xhr.status);
+                }
             }
-        }
-    };
-    xhr.send();
+        };
+        xhr.send();
+    }
+  // Function to create the "Create New Blog" button
+function createCreateNewBlogButton() {
+    var buttonContainer = document.createElement('div');
+    buttonContainer.className = 'new-post-actions';
+
+    var buttonInnerContainer = document.createElement('div');
+    buttonInnerContainer.className = 'button-container';
+
+    var createNewBlogButton = document.createElement('a');
+    createNewBlogButton.className = 'createStudentBlog';
+    createNewBlogButton.style.cursor = 'pointer';
+    createNewBlogButton.textContent = 'Click to Create New Blog';
+    createNewBlogButton.onclick = createStudentBlog;
+
+    buttonInnerContainer.appendChild(createNewBlogButton);
+    buttonContainer.appendChild(buttonInnerContainer);
+
+    // Append the button container to the componentContainer
+    var componentContainer = document.getElementById('componentContainer');
+    componentContainer.appendChild(buttonContainer);
 }
 
 // Function to fetch the createStudentBlog form via AJAX

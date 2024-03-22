@@ -90,8 +90,8 @@ function getTutorBlog() {
                 
                     // Call the appropriate function based on the action
                     switch ($action) {
-                        case 'getStudentBlog':
-                            getStudentBlog();
+                        case 'getTutorBlog':
+                            getTutorBlog();
                             break;
                         case 'deleteBlogPost':
                             deleteBlogPost();
@@ -105,7 +105,7 @@ function getTutorBlog() {
                 echo '  text-align: left;';
                 echo '}';
                 echo '';
-                echo 'a.createStudentBlog {';
+                echo 'a.createTutorBlog {';
                 echo '  display: flex;';
                 echo '  justify-content: center;';
                 echo '  align-items: center;';
@@ -123,7 +123,7 @@ function getTutorBlog() {
                 echo '  transition: background-color 0.3s ease;';
                 echo '}';
                 echo '';
-                echo 'a.createStudentBlog:hover {';
+                echo 'a.createTutorBlog:hover {';
                 echo '  background-color: #fac821;';
                 echo '  border-color: #fac821;';
                 echo '}';
