@@ -1,11 +1,59 @@
 <?php
 require_once 'tokenVerify.php';
+require_once 'db.php'; // Include your database connection file
 
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
-?>
 
+use \Firebase\JWT\JWT;
+
+// Retrieve the JWT token from the cookie
+$token = $_COOKIE['token'];
+
+// Decode the JWT token to extract the email
+$decoded = JWT::decode($token, 'your_secret_key', array('HS256'));
+$user_email = $decoded->email;
+
+// Check if the user exists in the database
+$sql_check_user = "SELECT * FROM Student WHERE Email = '$user_email'";
+$result_check_user = $conn->query($sql_check_user);
+
+$welcome_message = "";
+$last_login_time = ""; // Initialize the variable to avoid errors
+$is_first_login = false; // Flag to indicate first login
+
+if ($result_check_user && $result_check_user->num_rows > 0) {
+    // User exists in the database
+    $row = $result_check_user->fetch_assoc();
+    
+    // Check if it's the user's first login (last login time is NULL)
+    if ($row['last_login'] === null || empty($row['last_login'])) {
+        // Update last login time
+        date_default_timezone_set('Asia/Kuala_Lumpur');
+        $current_time = date('Y-m-d H:i:s');
+        $update_query = "UPDATE Student SET last_login = '$current_time' WHERE Email = '$user_email'";
+        if ($conn->query($update_query) !== TRUE) {
+            // Handle error if update query fails
+            echo "Error updating last login time: " . $conn->error;
+        } else {
+            // Set flag for first login
+            $is_first_login = true;
+            // Set the welcome message for the first login
+            $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
+        }
+    } else {
+        // User has logged in before, fetch the last login time
+        $last_login_time = $row['last_login'];
+        $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
+    }
+} else {
+    // User doesn't exist in the database
+    $welcome_message = "Unknown User";
+}
+
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,7 +209,7 @@ header("Expires: 0");
                     </li>
 
                     <li>
-                      <a href="#" class="nav-link px-10 align-middle">
+                      <a href="#" class="nav-link align-middle px-10 blogs-link">
                           <i class="fs-4 bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Blog</span> </a>
                     </li>
 
@@ -176,7 +224,7 @@ header("Expires: 0");
                       </li>
 
                     </ul>
-                    
+                    <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
                 </div>
             </div>
             <div class="col py-3 custom-div">
@@ -200,7 +248,7 @@ header("Expires: 0");
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- for charts? --> <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script> 
     <script src="script.js"></script>
-
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script> 
     $(document).ready(function() {
     
@@ -216,6 +264,182 @@ header("Expires: 0");
             }
                 });
                 
+            });
+        });
+    </script>
+     <script>
+    // Function to fetch student blog posts via AJAX
+    function getStudentBlog() {
+        // document.querySelector('.createStudentBlog').style.display = 'none'; // No need to hide here
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'studentBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText;
+                    initializeSwiper();
+                    addDeleteButtonListeners();
+                    addEditButtonListeners();
+                    // document.querySelector('.createStudentBlog').style.display = 'block'; // No need to show here
+                    createCreateNewBlogButton(); // Create the button after fetching the blog posts
+                } else {
+                    console.error('Error fetching student blog posts:', xhr.status);
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to create the "Create New Blog" button
+    function createCreateNewBlogButton() {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'new-post-actions';
+
+        var buttonInnerContainer = document.createElement('div');
+        buttonInnerContainer.className = 'button-container';
+
+        var createNewBlogButton = document.createElement('a');
+        createNewBlogButton.className = 'createStudentBlog';
+        createNewBlogButton.style.cursor = 'pointer';
+        createNewBlogButton.textContent = 'Click to Create New Blog';
+        createNewBlogButton.onclick = createStudentBlog;
+
+        buttonInnerContainer.appendChild(createNewBlogButton);
+        buttonContainer.appendChild(buttonInnerContainer);
+
+        // Append the button container to the componentContainer
+        var componentContainer = document.getElementById('componentContainer');
+        componentContainer.appendChild(buttonContainer);
+    }
+
+    // Function to fetch the createStudentBlog form via AJAX
+    function createStudentBlog() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'createStudentBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // Replace the content of a specific element with the form HTML
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText; // Change to componentContainer
+                } else {
+                    console.error('Error fetching createStudentBlog form:', xhr.status);
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to initialize Swiper
+    function initializeSwiper() {
+        var totalBlogs = $('#componentContainer .swiper-slide').length;
+        var slidesPerView = totalBlogs > 1 ? 3 : 1; // Set slidesPerView to 3 if there are more than 1 blog, otherwise set to 1
+        var swiper = new Swiper("#componentContainer .swiper-container", {
+            slidesPerView: slidesPerView,
+            spaceBetween: 2,
+            loop: true
+        });
+    }
+
+    // Function to add event listeners to delete buttons
+    function addDeleteButtonListeners() {
+        var deleteForms = document.querySelectorAll('.delete-blog-form');
+        console.log('Found', deleteForms.length, 'delete forms');
+        deleteForms.forEach(form => {
+            console.log('Adding listener to form', form);
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let postID = this.querySelector('input[name="postID"]').value;
+                sendDeleteRequest(postID);
+            });
+        });
+    }
+
+    // Function to send delete blog post request via AJAX
+    function sendDeleteRequest(postID) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'studentBlog.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log(xhr.responseText);
+                getStudentBlog(); // Reload the blog posts after deletion
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send('action=deleteBlogPost&postID=' + encodeURIComponent(postID));
+    }
+
+    // Function to add event listeners to edit buttons
+    function addEditButtonListeners() {
+        document.querySelectorAll('.edit-blog-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                let postID = this.dataset.postid;
+                editBlog(postID);
+            });
+        });
+    }
+
+    // Function to call editBlog function via AJAX
+    function editBlog(postID) {
+        document.querySelector('.createStudentBlog').style.display = 'none'; // Hide the button
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'editBlog.php?id=' + encodeURIComponent(postID), true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                document.getElementById('componentContainer').innerHTML = xhr.responseText; // Change to componentContainer
+                addEditFormListener(postID); // Add listener for edit form submission
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to add event listener for edit form submission
+    function addEditFormListener(postID) {
+        document.getElementById('editForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            formData.append('PostID', postID);
+            sendEditRequest(formData);
+        });
+    }
+
+    // Function to send edit blog post request via AJAX
+    function sendEditRequest(formData) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'editBlog.php', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    window.location.href = response.redirect_url; // Redirect to viewBlog page after successful edit
+                } else {
+                    console.error('Edit failed:', response.message);
+                }
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send(formData);
+    }
+
+    // Call the getStudentBlog function when the page loads
+    window.onload = function() {
+        $('.blogs-link').click(function(event) {
+            //event.preventDefault();
+            getStudentBlog(); // Call the function to fetch student blog posts via AJAX
+        });
+    };
+</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var swiper = new Swiper("#componentContainer .swiper-container", { // Adjusted to target swiper-container within componentContainer
+                slidesPerView: 2,
+                spaceBetween: 5,
+                loop: true,
             });
         });
     </script>
