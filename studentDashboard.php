@@ -208,7 +208,7 @@ $conn->close();
                     </li>
 
                     <li>
-                      <a href="#" class="nav-link px-10 align-middle">
+                      <a href="#" class="nav-link align-middle px-10 blogs-link">
                           <i class="fs-4 bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Blog</span> </a>
                     </li>
 
@@ -257,7 +257,6 @@ $conn->close();
     <script src="script.js"></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script>
-
     // Function to fetch student blog posts via AJAX
     function getStudentBlog() {
         // document.querySelector('.createStudentBlog').style.display = 'none'; // No need to hide here
@@ -279,69 +278,71 @@ $conn->close();
         };
         xhr.send();
     }
-  // Function to create the "Create New Blog" button
-function createCreateNewBlogButton() {
-    var buttonContainer = document.createElement('div');
-    buttonContainer.className = 'new-post-actions';
 
-    var buttonInnerContainer = document.createElement('div');
-    buttonInnerContainer.className = 'button-container';
+    // Function to create the "Create New Blog" button
+    function createCreateNewBlogButton() {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'new-post-actions';
 
-    var createNewBlogButton = document.createElement('a');
-    createNewBlogButton.className = 'createStudentBlog';
-    createNewBlogButton.style.cursor = 'pointer';
-    createNewBlogButton.textContent = 'Click to Create New Blog';
-    createNewBlogButton.onclick = createStudentBlog;
+        var buttonInnerContainer = document.createElement('div');
+        buttonInnerContainer.className = 'button-container';
 
-    buttonInnerContainer.appendChild(createNewBlogButton);
-    buttonContainer.appendChild(buttonInnerContainer);
+        var createNewBlogButton = document.createElement('a');
+        createNewBlogButton.className = 'createStudentBlog';
+        createNewBlogButton.style.cursor = 'pointer';
+        createNewBlogButton.textContent = 'Click to Create New Blog';
+        createNewBlogButton.onclick = createStudentBlog;
 
-    // Append the button container to the componentContainer
-    var componentContainer = document.getElementById('componentContainer');
-    componentContainer.appendChild(buttonContainer);
-}
+        buttonInnerContainer.appendChild(createNewBlogButton);
+        buttonContainer.appendChild(buttonInnerContainer);
 
-// Function to fetch the createStudentBlog form via AJAX
-function createStudentBlog() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'createStudentBlog.php', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                // Replace the content of a specific element with the form HTML
-                document.getElementById('componentContainer').innerHTML = xhr.responseText; // Change to componentContainer
-            } else {
-                console.error('Error fetching createStudentBlog form:', xhr.status);
+        // Append the button container to the componentContainer
+        var componentContainer = document.getElementById('componentContainer');
+        componentContainer.appendChild(buttonContainer);
+    }
+
+    // Function to fetch the createStudentBlog form via AJAX
+    function createStudentBlog() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'createStudentBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // Replace the content of a specific element with the form HTML
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText; // Change to componentContainer
+                } else {
+                    console.error('Error fetching createStudentBlog form:', xhr.status);
+                }
             }
-        }
-    };
-    xhr.send();
-}
-
+        };
+        xhr.send();
+    }
 
     // Function to initialize Swiper
- function initializeSwiper() {
-    var totalBlogs = $('#componentContainer .swiper-slide').length;
-    var slidesPerView = totalBlogs > 1 ? 3 : 1; // Set slidesPerView to 3 if there are more than 1 blog, otherwise set to 1
-    var swiper = new Swiper("#componentContainer .swiper-container", {
-        slidesPerView: slidesPerView,
-        spaceBetween: 2,
-        loop: true
-    });
-}
-// Function to add event listeners to delete buttons
-function addDeleteButtonListeners() {
-    var deleteForms = document.querySelectorAll('.delete-blog-form');
-    console.log('Found', deleteForms.length, 'delete forms');
-    deleteForms.forEach(form => {
-        console.log('Adding listener to form', form);
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            let postID = this.querySelector('input[name="postID"]').value;
-            sendDeleteRequest(postID);
+    function initializeSwiper() {
+        var totalBlogs = $('#componentContainer .swiper-slide').length;
+        var slidesPerView = totalBlogs > 1 ? 3 : 1; // Set slidesPerView to 3 if there are more than 1 blog, otherwise set to 1
+        var swiper = new Swiper("#componentContainer .swiper-container", {
+            slidesPerView: slidesPerView,
+            spaceBetween: 2,
+            loop: true
         });
-    });
-}
+    }
+
+    // Function to add event listeners to delete buttons
+    function addDeleteButtonListeners() {
+        var deleteForms = document.querySelectorAll('.delete-blog-form');
+        console.log('Found', deleteForms.length, 'delete forms');
+        deleteForms.forEach(form => {
+            console.log('Adding listener to form', form);
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let postID = this.querySelector('input[name="postID"]').value;
+                sendDeleteRequest(postID);
+            });
+        });
+    }
+
     // Function to send delete blog post request via AJAX
     function sendDeleteRequest(postID) {
         var xhr = new XMLHttpRequest();
@@ -416,10 +417,13 @@ function addDeleteButtonListeners() {
 
     // Call the getStudentBlog function when the page loads
     window.onload = function() {
-        getStudentBlog();
+        $('.blogs-link').click(function(event) {
+            //event.preventDefault();
+            getStudentBlog(); // Call the function to fetch student blog posts via AJAX
+        });
     };
-
 </script>
+
 
 
 
