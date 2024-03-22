@@ -257,6 +257,22 @@ $conn->close();
     <script src="script.js"></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script>
+          $(document).ready(function() {
+    
+    $('.courses-link').click(function(event) {
+        //event.preventDefault();
+        $.ajax({
+            url: 'studentCourses.php',
+            success: function(data) {
+                $('#componentContainer').html(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+                });
+                
+            });
+        });
     // Function to fetch student blog posts via AJAX
     function getStudentBlog() {
         // document.querySelector('.createStudentBlog').style.display = 'none'; // No need to hide here

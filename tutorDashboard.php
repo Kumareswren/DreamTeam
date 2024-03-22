@@ -53,7 +53,8 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+   
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
  
@@ -186,7 +187,7 @@ $conn->close();
                     </li>
 
                     <li>
-                      <a href="tutorBlog.php" class="nav-link px-10 align-middle">
+                      <a href="" class="nav-link align-middle px-10 blogs-link">
                           <i class="fs-4 bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Blog</span> </a>
                     </li>
 
@@ -280,171 +281,175 @@ $conn->close();
 <script src="script.js"></script>
 
 <script>
-// Function to fetch tutor blog posts via AJAX
-function getTutorBlog() {
-    var createButton = document.querySelector('.createTutorBlog');
-    if (createButton) {
-        createButton.style.display = 'none'; // Hide the button if it exists
+    // Function to fetch tutor blog posts via AJAX
+    function getTutorBlog() {
+        var createButton = document.querySelector('.createTutorBlog');
+        if (createButton) {
+            createButton.style.display = 'none'; // Hide the button if it exists
+        }
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'tutorBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText;
+                    initializeSwiper(); // Initialize Swiper after loading content
+                    addDeleteButtonListeners();
+                    addEditButtonListeners();
+                    createCreateNewBlogButton(); // Create the "Create New Blog" button
+                    if (createButton) {
+                        createButton.style.display = 'block'; // Show the button if it exists
+                    }
+                } else {
+                    console.error('Error fetching tutor blog posts:', xhr.status);
+                }
+            }
+        };
+        xhr.send();
     }
-    
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'tutorBlog.php', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
+
+    // Function to create the "Create New Blog" button
+    function createCreateNewBlogButton() {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'new-post-actions';
+
+        var buttonInnerContainer = document.createElement('div');
+        buttonInnerContainer.className = 'button-container';
+
+        var createNewBlogButton = document.createElement('a');
+        createNewBlogButton.className = 'createTutorBlog';
+        createNewBlogButton.style.cursor = 'pointer';
+        createNewBlogButton.textContent = 'Click to Create New Blog';
+        createNewBlogButton.onclick = createTutorBlog;
+
+        buttonInnerContainer.appendChild(createNewBlogButton);
+        buttonContainer.appendChild(buttonInnerContainer);
+
+        // Append the button container to the componentContainer
+        var componentContainer = document.getElementById('componentContainer');
+        componentContainer.appendChild(buttonContainer);
+    }
+
+    // Function to fetch the createTutorBlog form via AJAX
+    function createTutorBlog() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'createTutorBlog.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // Replace the content of a specific element with the form HTML
+                    document.getElementById('componentContainer').innerHTML = xhr.responseText;
+                } else {
+                    console.error('Error fetching createTutorBlog form:', xhr.status);
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to initialize Swiper
+    function initializeSwiper() {
+        var totalBlogs = $('#componentContainer .swiper-slide').length;
+        var slidesPerView = totalBlogs > 1 ? 3 : 1; // Set slidesPerView to 3 if there are more than 1 blog, otherwise set to 1
+        var swiper = new Swiper("#componentContainer .swiper-container", {
+            slidesPerView: slidesPerView,
+            spaceBetween: 2,
+            loop: true
+        });
+    }
+
+    // Function to add event listeners to delete buttons
+    function addDeleteButtonListeners() {
+        document.querySelectorAll('.delete-blog-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let postID = this.querySelector('input[name="postID"]').value;
+                sendDeleteRequest(postID);
+            });
+        });
+    }
+
+    // Function to send delete blog post request via AJAX
+    function sendDeleteRequest(postID) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'tutorBlog.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log(xhr.responseText);
+                getTutorBlog(); // Reload the blog posts after deletion
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send('action=deleteBlogPost&postID=' + encodeURIComponent(postID));
+    }
+
+    // Function to add event listeners to edit buttons
+    function addEditButtonListeners() {
+        document.querySelectorAll('.edit-blog-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                let postID = this.dataset.postid;
+                editBlog(postID);
+            });
+        });
+    }
+
+    // Function to call editBlog function via AJAX
+    function editBlog(postID) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'editBlog.php?id=' + encodeURIComponent(postID), true);
+        xhr.onload = function() {
             if (xhr.status === 200) {
                 document.getElementById('componentContainer').innerHTML = xhr.responseText;
-                initializeSwiper(); // Initialize Swiper after loading content
-                addDeleteButtonListeners();
-                addEditButtonListeners();
-                createCreateNewBlogButton(); // Create the "Create New Blog" button
-                if (createButton) {
-                    createButton.style.display = 'block'; // Show the button if it exists
+                addEditFormListener(postID); // Add listener for edit form submission
+            } else {
+                console.error('Request failed. Status:', xhr.status);
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to add event listener for edit form submission
+    function addEditFormListener(postID) {
+        document.getElementById('editForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            formData.append('PostID', postID);
+            sendEditRequest(formData);
+        });
+    }
+
+    // Function to send edit blog post request via AJAX
+    function sendEditRequest(formData) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'editBlog.php', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    window.location.href = response.redirect_url; // Redirect to viewBlog page after successful edit
+                } else {
+                    console.error('Edit failed:', response.message);
                 }
             } else {
-                console.error('Error fetching tutor blog posts:', xhr.status);
+                console.error('Request failed. Status:', xhr.status);
             }
-        }
-    };
-    xhr.send();
-}
+        };
+        xhr.send(formData);
+    }
 
-// Function to create the "Create New Blog" button
-function createCreateNewBlogButton() {
-    var buttonContainer = document.createElement('div');
-    buttonContainer.className = 'new-post-actions';
-
-    var buttonInnerContainer = document.createElement('div');
-    buttonInnerContainer.className = 'button-container';
-
-    var createNewBlogButton = document.createElement('a');
-    createNewBlogButton.className = 'createTutorBlog';
-    createNewBlogButton.style.cursor = 'pointer';
-    createNewBlogButton.textContent = 'Click to Create New Blog';
-    createNewBlogButton.onclick = createTutorBlog;
-
-    buttonInnerContainer.appendChild(createNewBlogButton);
-    buttonContainer.appendChild(buttonInnerContainer);
-
-    // Append the button container to the componentContainer
-    var componentContainer = document.getElementById('componentContainer');
-    componentContainer.appendChild(buttonContainer);
-}
-
-// Function to fetch the createTutorBlog form via AJAX
-function createTutorBlog() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'createTutorBlog.php', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                // Replace the content of a specific element with the form HTML
-                document.getElementById('componentContainer').innerHTML = xhr.responseText;
-            } else {
-                console.error('Error fetching createTutorBlog form:', xhr.status);
-            }
-        }
-    };
-    xhr.send();
-}
-
-// Function to initialize Swiper
-function initializeSwiper() {
-    var totalBlogs = $('#componentContainer .swiper-slide').length;
-    var slidesPerView = totalBlogs > 1 ? 3 : 1; // Set slidesPerView to 3 if there are more than 1 blog, otherwise set to 1
-    var swiper = new Swiper("#componentContainer .swiper-container", {
-        slidesPerView: slidesPerView,
-        spaceBetween: 2,
-        loop: true
-    });
-}
-
-// Function to add event listeners to delete buttons
-function addDeleteButtonListeners() {
-    document.querySelectorAll('.delete-blog-form').forEach(form => {
-        form.addEventListener('submit', function(event) {
+    // Call the getTutorBlog function when the page loads
+    window.onload = function() {
+        $('.blogs-link').click(function(event) {
             event.preventDefault();
-            let postID = this.querySelector('input[name="postID"]').value;
-            sendDeleteRequest(postID);
+            getTutorBlog(); // Call the function to fetch tutor blog posts via AJAX
         });
-    });
-}
-
-// Function to send delete blog post request via AJAX
-function sendDeleteRequest(postID) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'tutorBlog.php', true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            console.log(xhr.responseText);
-            getTutorBlog(); // Reload the blog posts after deletion
-        } else {
-            console.error('Request failed. Status:', xhr.status);
-        }
     };
-    xhr.send('action=deleteBlogPost&postID=' + encodeURIComponent(postID));
-}
-
-// Function to add event listeners to edit buttons
-function addEditButtonListeners() {
-    document.querySelectorAll('.edit-blog-btn').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            let postID = this.dataset.postid;
-            editBlog(postID);
-        });
-    });
-}
-
-// Function to call editBlog function via AJAX
-function editBlog(postID) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'editBlog.php?id=' + encodeURIComponent(postID), true);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            document.getElementById('componentContainer').innerHTML = xhr.responseText;
-            addEditFormListener(postID); // Add listener for edit form submission
-        } else {
-            console.error('Request failed. Status:', xhr.status);
-        }
-    };
-    xhr.send();
-}
-
-// Function to add event listener for edit form submission
-function addEditFormListener(postID) {
-    document.getElementById('editForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        var formData = new FormData(this);
-        formData.append('PostID', postID);
-        sendEditRequest(formData);
-    });
-}
-
-// Function to send edit blog post request via AJAX
-function sendEditRequest(formData) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'editBlog.php', true);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            if (response.success) {
-                window.location.href = response.redirect_url; // Redirect to viewBlog page after successful edit
-            } else {
-                console.error('Edit failed:', response.message);
-            }
-        } else {
-            console.error('Request failed. Status:', xhr.status);
-        }
-    };
-    xhr.send(formData);
-}
-
-// Call the getTutorBlog function when the page loads
-window.onload = function() {
-    getTutorBlog();
-};
 </script>
+
 
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script>
