@@ -6,9 +6,9 @@ echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min
 function Chat() {
     // Simulated previous messages
     $previousMessages = [
-        ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
-        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
-        ['sender' => 'student', 'message' => 'Great! When can we discuss?'],
+        ['sender' => 'tutor', 'message' => 'Hi, I need help with my assignment.'],
+        ['sender' => 'student', 'message' => 'Sure, I can help you with that.'],
+        ['sender' => 'tutor', 'message' => 'Great! When can we discuss?'],
         ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
         ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
         ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
@@ -104,7 +104,7 @@ $output .= '  border: 2px solid #333;';
 $output .= '  border-radius: 10px;';
 $output .= '}';
 
-    $output .= '.student-name {';
+    $output .= '.tutor-name {';
     $output .= '  padding: 10px;';
     $output .= '  border-bottom: 2px solid #333;'; // Adding bottom border
     $output .= '  background-color: #f9f9f9;';
@@ -115,12 +115,12 @@ $output .= '}';
 
     $output .= '<div class="chat-container">';
     $output .= '<div class="chat-box" id="chatBox">';
-    $output .= '<div class="student-name">';
-    $output .= '  Student Name Here'; // Replace this with the actual student name
+    $output .= '<div class="tutor-name">';
+    $output .= '  Tutor Name Here'; // Replace this with the actual tutor name
     $output .= '</div>';
     // Previous messages
     foreach ($previousMessages as $message) {
-        $senderClass = ($message['sender'] == 'student') ? 'you' : 'me';
+        $senderClass = ($message['sender'] == 'tutor') ? 'you' : 'me';
         $output .= '<div class="chat-message">';
         $output .= "<div class='chat-bubble $senderClass'>{$message['message']}</div>";
         $output .= '</div>';
@@ -131,7 +131,7 @@ $output .= '}';
     $output .= '<button class="send-btn" onclick="sendMessage()">Send</button>';
     $output .= '</div>'; // Closing chat-input div
     $output .= '</div>'; // Closing chat-container div
-    // JavaScript for handling student click event
+    // JavaScript for handling Tutor click event
     $output .= '<script>';
     $output .= '$(document).ready(function() {';
     $output .= '  // Your JavaScript code here';
