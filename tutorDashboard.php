@@ -175,7 +175,7 @@ $conn->close();
                     </li>
 
                         <li class="nav-item">
-                          <a href="#" class="nav-link align-middle px-10">
+                          <a href="#" class="nav-link align-middle px-10 chat-link">
                               <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
                           </a>
                       </li>
@@ -256,6 +256,22 @@ $conn->close();
 });
 
     </script>
+       <script>
+$(document).ready(function() {
+    $('.chat-link').click(function(event) {
+        event.preventDefault();
+        $.ajax({
+            url: 'chatBackend.php',
+            success: function(data) {
+                $('#componentContainer').html(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    });
+});
+</script>
             <div class="col py-3 custom-div">
                 
                 <main class="mt-5 pt-3">
