@@ -30,20 +30,28 @@ function Chat() {
         $output .= '  font-family: Arial, sans-serif;';
         $output .= '  font-size: 16px;';
         $output .= '}';
-    
-    $output .= '.student-list {';
-    $output .= '  width: 100%;';
-    $output .= '  border-right: 2px solid #333;';
-    $output .= '  overflow-y: scroll;';
-    $output .= '}';
-    
-    $output .= '.chat-box {';
-    $output .= '  width: 100%;';
-    $output .= '  height: 400px;';
-    $output .= '  overflow-y: scroll;';
-    $output .= '  padding: 10px;';
-    $output .= '  background-color: #f9f9f9;';
-    $output .= '}';
+        
+        $output .= '.student-list {';
+        $output .= '  width: 100%;';
+        $output .= '  border-right: 2px solid #333;';
+        $output .= '  overflow-y: auto;'; // Changed from 'scroll' to 'auto'
+        $output .= '}';
+
+        $output .= '.student-name {';
+            $output .= '  padding: 10px;';
+            $output .= '  border-bottom: 2px solid #333;';
+            $output .= '  background-color: #f9f9f9;';
+            $output .= '  text-align: center;';
+            $output .= '  font-weight: bold;';
+            $output .= '}';
+
+        $output .= '.chat-box {';
+        $output .= '  width: 100%;';
+        $output .= '  height: 400px;';
+        $output .= '  overflow-y: auto;'; // Changed from 'scroll' to 'auto'
+        $output .= '  padding: 10px;';
+        $output .= '  background-color: #f9f9f9;';
+        $output .= '}';
     
     $output .= '.chat-message {';
         $output .= '  padding: 10px;';
@@ -71,29 +79,33 @@ function Chat() {
         $output .= '  background-color: #28a745;';
         $output .= '}';
     
-    $output .= '.chat-input {';
-    $output .= '  padding: 10px;';
-    $output .= '  border-top: 2px solid #333;';
-    $output .= '}';
-    
-    $output .= '.chat-input input[type="text"] {';
-    $output .= '  width: 70%;';
-    $output .= '  padding: 10px;';
-    $output .= '  border: 2px solid #333;';
-    $output .= '  border-radius: 10px;';
-    $output .= '  margin-right: 5px;';
-    $output .= '}';
-    
-    $output .= '.send-btn {';
-    $output .= '  width: 25%;';
-    $output .= '  padding: 10px;';
-    $output .= '  border: none;';
-    $output .= '  border-radius: 10px;';
-    $output .= '  background-color: #007bff;';
-    $output .= '  color: #fff;';
-    $output .= '  cursor: pointer;';
-    $output .= '  font-weight: bold;';
-    $output .= '}';
+        $output .= '.chat-input {';
+            $output .= '  padding: 10px;';
+            $output .= '  border-top: 2px solid #333;';
+            $output .= '}';
+            
+            $output .= '.chat-input textarea {';
+                $output .= '  width: calc(70% - 20px);'; // Adjust width considering padding
+                $output .= '    height: auto;';
+                $output .= '  padding: 10px;';
+                $output .= '  border: 2px solid #333;';
+                $output .= '  border-radius: 10px;';
+                $output .= '  margin-right: 5px;';
+
+                $output .= '  overflow: hidden;'; // Hide scrollbar
+                $output .= '}';
+                
+                $output .= '.send-btn {';
+                $output .= '  width: calc(25% - 20px);'; // Adjust width considering padding
+                $output .= '  padding: 10px;';
+                $output .= '  border: none;';
+                $output .= '  border-radius: 10px;';
+                $output .= '  background-color: #007bff;';
+                $output .= '  color: #fff;';
+                $output .= '  cursor: pointer;';
+                $output .= '  font-weight: bold;';
+                $output .= '  vertical-align: top;'; // Align with the top of textarea
+                $output .= '}';
     
     $output .= '.send-btn:hover {';
     $output .= '  background-color: #0056b3;';
@@ -127,11 +139,17 @@ function Chat() {
     $studentList .= '</div>'; // Closing student-list div
     $studentList .= '</div>'; // Closing student-list-container div
 
+
+
     $output .= '<div class="chat-container">';
     $output .= $studentList;
     $output .= '<div class="chat-box-container">';
     $output .= '<div class="chat-container">';
     $output .= '<div class="chat-box" id="chatBox">';
+    $output .= '<div class="student-name">';
+
+$output .= '  Student Name Here'; // Replace this with the actual student name
+$output .= '</div>';
 
     // Previous messages
     foreach ($previousMessages as $message) {
@@ -144,9 +162,11 @@ function Chat() {
     $output .= '</div>'; // Closing chat-box div
 
     $output .= '<div class="chat-input">';
-    $output .= '<input type="text" id="chatInput" placeholder="Type your message...">';
+    $output .= '<textarea id="chatInput" placeholder="Type your message..." rows="4"></textarea>';
     $output .= '<button class="send-btn" onclick="sendMessage()">Send</button>';
     $output .= '</div>'; // Closing chat-input div
+
+
 
     $output .= '</div>'; // Closing chat-container div
     $output .= '</div>'; // Closing chat-box-container div

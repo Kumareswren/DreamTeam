@@ -256,14 +256,26 @@ $conn->close();
 });
 
     </script>
-       <script>
+<script>
 $(document).ready(function() {
     $('.chat-link').click(function(event) {
         event.preventDefault();
         $.ajax({
-            url: 'chatBackend.php',
+            url: 'chatTutorBackend.php',
             success: function(data) {
                 $('#componentContainer').html(data);
+
+                // Add auto-resizing functionality after loading the chat
+                var textarea = $('#chatInput');
+                
+                textarea.on('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+
+                // Adjust initial height to fit one line
+                textarea.css('height', 'auto');
+                textarea.css('height', textarea[0].scrollHeight + 'px');
             },
             error: function(xhr, status, error) {
                 console.error('An error occurred:', error);
@@ -272,6 +284,8 @@ $(document).ready(function() {
     });
 });
 </script>
+
+
             <div class="col py-3 custom-div">
                 
                 <main class="mt-5 pt-3">

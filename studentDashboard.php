@@ -193,7 +193,7 @@ $conn->close();
                     </li>
 
                         <li class="nav-item">
-                          <a href="#" class="nav-link align-middle px-10">
+                          <a href="#" class="nav-link align-middle px-10 chat-link">
                               <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
                           </a>
                       </li>
@@ -267,6 +267,36 @@ $conn->close();
             });
         });
     </script>
+
+<script>
+$(document).ready(function() {
+    $('.chat-link').click(function(event) {
+        event.preventDefault();
+        $.ajax({
+            url: 'chatStudentBackend.php',
+            success: function(data) {
+                $('#componentContainer').html(data);
+
+                // Add auto-resizing functionality after loading the chat
+                var textarea = $('#chatInput');
+                
+                textarea.on('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+
+                // Adjust initial height to fit one line
+                textarea.css('height', 'auto');
+                textarea.css('height', textarea[0].scrollHeight + 'px');
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    });
+});
+</script>
+
      <script>
     // Function to fetch student blog posts via AJAX
     function getStudentBlog() {
