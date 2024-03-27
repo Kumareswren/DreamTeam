@@ -15,7 +15,12 @@ function Chat() {
     $students = [
         ['SID' => 1, 'FName' => 'John', 'LName' => 'Doe'],
         ['SID' => 2, 'FName' => 'Jane', 'LName' => 'Smith'],
-        ['SID' => 3, 'FName' => 'Alice', 'LName' => 'Johnson']
+        ['SID' => 3, 'FName' => 'Alice', 'LName' => 'Johnson'],
+        ['SID' => 4, 'FName' => 'John', 'LName' => 'Doe'],
+        ['SID' => 5, 'FName' => 'Jane', 'LName' => 'Smith'],
+        ['SID' => 6, 'FName' => 'John', 'LName' => 'Doe'],
+        ['SID' => 7, 'FName' => 'Jane', 'LName' => 'Smith'],
+        
     ];
 
     $output = '<style>';
@@ -35,6 +40,7 @@ function Chat() {
         $output .= '  width: 100%;';
         $output .= '  border-right: 2px solid #333;';
         $output .= '  overflow-y: auto;'; // Changed from 'scroll' to 'auto'
+        $output .= '  max-height: 100px;';
         $output .= '}';
 
         $output .= '.student-name {';
@@ -110,7 +116,7 @@ $output .= '.send-btn {';
     $output .= '.send-btn:hover {';
         $output .= '  background-color: #0056b3;';
         $output .= '}';
-        
+
     $output .= '.search-box {';
     $output .= '  width: 100%;';
     $output .= '  padding: 10px;';
