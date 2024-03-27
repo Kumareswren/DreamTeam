@@ -8,7 +8,13 @@ function Chat() {
     $previousMessages = [
         ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
         ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
-        ['sender' => 'student', 'message' => 'Great! When can we discuss?']
+        ['sender' => 'student', 'message' => 'Great! When can we discuss?'],
+        ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
+        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
+        ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
+        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.Sure, I can help you with that.Sure, I can help you with that.Sure, I can help you with that.Sure, I can help you with that.Sure, I can help you with that.Sure, I can help you with that.Sure, I can help you with that.']
+        
+
     ];
 
     $output = '<style>';
@@ -52,33 +58,52 @@ function Chat() {
     $output .= '  text-align: right;';
     $output .= '  background-color: #28a745;';
     $output .= '}';
+
     $output .= '.chat-input {';
-    $output .= '  padding: 10px;';
-    $output .= '  border-top: 2px solid #333;';
-    $output .= '}';
-    $output .= '.chat-input textarea {';
-    $output .= '  width: calc(70% - 20px);'; // Adjust width considering padding
-    $output .= '    height: auto;';
-    $output .= '  padding: 10px;';
-    $output .= '  border: 2px solid #333;';
-    $output .= '  border-radius: 10px;';
-    $output .= '  margin-right: 5px;';
-    $output .= '  overflow: hidden;'; // Hide scrollbar
-    $output .= '}';
-    $output .= '.send-btn {';
-    $output .= '  width: calc(25% - 20px);'; // Adjust width considering padding
-    $output .= '  padding: 10px;';
-    $output .= '  border: none;';
-    $output .= '  border-radius: 10px;';
-    $output .= '  background-color: #007bff;';
-    $output .= '  color: #fff;';
-    $output .= '  cursor: pointer;';
-    $output .= '  font-weight: bold;';
-    $output .= '  vertical-align: top;'; // Align with the top of textarea
-    $output .= '}';
-    $output .= '.send-btn:hover {';
+        $output .= '  display: flex;'; // Use flexbox to align items
+        $output .= '  align-items: center;'; // Center items vertically
+        $output .= '  padding: 10px;';
+        $output .= '  border-top: 2px solid #333;';
+        $output .= '}';
+
+$output .= '.chat-input textarea {';
+$output .= '  flex: 1;'; // Take remaining space
+$output .= '  height: auto;';
+$output .= '  padding: 10px;';
+$output .= '  border: 2px solid #333;';
+$output .= '  border-radius: 10px;';
+$output .= '  margin-right: 5px;';
+$output .= '  overflow: hidden;';
+$output .= '}';
+
+$output .= '.send-btn {';
+$output .= '  padding: 10px;';
+$output .= '  border: none;';
+$output .= '  border-radius: 10px;';
+$output .= '  background-color: #007bff;';
+$output .= '  color: #fff;';
+$output .= '  cursor: pointer;';
+$output .= '  font-weight: bold;';
+$output .= '}';
+
+
+$output .= '.send-btn:hover {';
     $output .= '  background-color: #0056b3;';
     $output .= '}';
+    
+$output .= '.search-box {';
+$output .= '  width: 100%;';
+$output .= '  padding: 10px;';
+$output .= '  border-bottom: 2px solid #333;';
+$output .= '}';
+
+$output .= '.search-box input[type="text"] {';
+$output .= '  width: 100%;';
+$output .= '  padding: 10px;';
+$output .= '  border: 2px solid #333;';
+$output .= '  border-radius: 10px;';
+$output .= '}';
+
     $output .= '.student-name {';
     $output .= '  padding: 10px;';
     $output .= '  border-bottom: 2px solid #333;'; // Adding bottom border
@@ -87,6 +112,7 @@ function Chat() {
     $output .= '  font-weight: bold;';
     $output .= '}';
     $output .= '</style>';
+
     $output .= '<div class="chat-container">';
     $output .= '<div class="chat-box" id="chatBox">';
     $output .= '<div class="student-name">';

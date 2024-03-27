@@ -80,37 +80,37 @@ function Chat() {
         $output .= '}';
     
         $output .= '.chat-input {';
+            $output .= '  display: flex;'; // Use flexbox to align items
+            $output .= '  align-items: center;'; // Center items vertically
             $output .= '  padding: 10px;';
             $output .= '  border-top: 2px solid #333;';
             $output .= '}';
-            
-            $output .= '.chat-input textarea {';
-                $output .= '  width: calc(70% - 20px);'; // Adjust width considering padding
-                $output .= '    height: auto;';
-                $output .= '  padding: 10px;';
-                $output .= '  border: 2px solid #333;';
-                $output .= '  border-radius: 10px;';
-                $output .= '  margin-right: 5px;';
 
-                $output .= '  overflow: hidden;'; // Hide scrollbar
-                $output .= '}';
-                
-                $output .= '.send-btn {';
-                $output .= '  width: calc(25% - 20px);'; // Adjust width considering padding
-                $output .= '  padding: 10px;';
-                $output .= '  border: none;';
-                $output .= '  border-radius: 10px;';
-                $output .= '  background-color: #007bff;';
-                $output .= '  color: #fff;';
-                $output .= '  cursor: pointer;';
-                $output .= '  font-weight: bold;';
-                $output .= '  vertical-align: top;'; // Align with the top of textarea
-                $output .= '}';
-    
-    $output .= '.send-btn:hover {';
-    $output .= '  background-color: #0056b3;';
+$output .= '.chat-input textarea {';
+$output .= '  flex: 1;'; // Take remaining space
+$output .= '  height: auto;';
+$output .= '  padding: 10px;';
+$output .= '  border: 2px solid #333;';
+$output .= '  border-radius: 10px;';
+$output .= '  margin-right: 5px;';
+$output .= '  overflow: hidden;';
+$output .= '}';
+
+$output .= '.send-btn {';
+    $output .= '  padding: 10px;';
+    $output .= '  border: none;';
+    $output .= '  border-radius: 10px;';
+    $output .= '  background-color: #007bff;';
+    $output .= '  color: #fff;';
+    $output .= '  cursor: pointer;';
+    $output .= '  font-weight: bold;';
     $output .= '}';
     
+
+    $output .= '.send-btn:hover {';
+        $output .= '  background-color: #0056b3;';
+        $output .= '}';
+        
     $output .= '.search-box {';
     $output .= '  width: 100%;';
     $output .= '  padding: 10px;';
