@@ -72,3 +72,25 @@ CREATE TABLE CourseStudent (
     FOREIGN KEY (SID) REFERENCES Student(SID),
     UNIQUE KEY (courseId, SID)
 );
+
+/*NEW QUERY*/
+
+CREATE TABLE MeetingStudent (
+    meetingID INT AUTO_INCREMENT PRIMARY KEY,
+    courseTitle TEXT,
+    meetingDate DATE,
+    meetingTime TIME,
+    meetingLocation TEXT,
+    meetingDesc TEXT,
+    TID INT,
+    FOREIGN KEY (TID) REFERENCES Tutor(TID)
+);
+
+/* update table MeetingStudent */
+ALTER TABLE MeetingStudent
+ADD COLUMN status VARCHAR(20) DEFAULT 'Pending' AFTER meetingDesc;
+
+ALTER TABLE MeetingStudent
+ADD COLUMN SID INT AFTER TID,
+ADD FOREIGN KEY (SID) REFERENCES Student(SID);
+

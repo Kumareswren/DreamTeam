@@ -13,13 +13,19 @@ if (!$isAdmin) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $courseName = trim($_POST["course_name"]);
     $courseDescription = trim($_POST["course_description"]);
     $startDate = $_POST["start_date"] . '-01';
     $endDate = $_POST["end_date"] . '-01';
     $tutorID = $_POST["tutor_id"];
-    
+
+    // Server-side validation
+    $regex = '/^[A-Za-z\s]+$/'; // Regular expression to match letters and spaces
+    if (!preg_match($regex, $courseName)) {
+        echo "<script>alert('Please enter a valid string without mathematical symbols in the Course Name field.');</script>";
+        exit();
+    }
+
     // Check if the course with the same name, start date, and tutor ID already exists
     $check_sqlCourse = "SELECT * FROM Course WHERE courseName = ? AND startDate = ? AND TID = ?";
     $check_stmtCourse = $conn->prepare($check_sqlCourse);
@@ -38,7 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmtCourse->bind_param("ssssi", $courseName, $startDate, $endDate, $courseDescription, $tutorID);
 
     if ($stmtCourse->execute()) {
-
         // Fetch the tutor's email address from the database
         $getTutorEmailSQL = "SELECT email FROM Tutor WHERE TID = ?";
         $getTutorEmailStmt = $conn->prepare($getTutorEmailSQL);
@@ -56,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ->setPassword('zohh take gpri knhn');
             
             $mailer = new Swift_Mailer($transport);
-            
+             
             $message = (new Swift_Message('Course Assigned'))
                 ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
                 ->setTo([$tutorEmail]) // Use the tutor's email fetched from the database
@@ -65,7 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Send the message
             $mailer->send($message);
         }
-
 
         echo "<script>alert('Course created successfully.');</script>";
         unset($_SESSION['message_type']);
