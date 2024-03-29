@@ -219,8 +219,6 @@ if (empty($students)) {
 }
 
 $studentList .= '</div>'; // Closing student-list-container div
-
-
     $output .= '<div class="chat-container">';
     $output .= $studentList;
     $output .= '<div class="chat-box-container">';
@@ -228,7 +226,10 @@ $studentList .= '</div>'; // Closing student-list-container div
     $output .= '<div class="chat-box" id="chatBox">';
     $output .= '<div class="student-name">';
 
-$output .= '  Student Name Here'; // Replace this with the actual student name
+    $output .= '<div class="student-name">';
+    $output .= '  <span id="selectedStudentName">Student Name Here</span>';
+    $output .= '</div>';
+    
 $output .= '</div>';
 
     // Previous messages
@@ -252,12 +253,30 @@ $output .= '</div>';
     $output .= '</div>'; // Closing chat-box-container div
     $output .= '</div>'; // Closing chat-container div
 
-   // JavaScript for handling student click event
+// JavaScript for handling student click event
+
+$output .= '<script>';
+$output .= '$(document).ready(function() {';
+$output .= '  $("#searchStudent").on("input", function() {';
+$output .= '    var searchText = $(this).val().toLowerCase();';
+$output .= '    $(".student").each(function() {';
+$output .= '      var studentName = $(this).text().toLowerCase();';
+$output .= '      if (studentName.includes(searchText)) {';
+$output .= '        $(this).show();';
+$output .= '      } else {';
+$output .= '        $(this).hide();';
+$output .= '      }';
+$output .= '    });';
+$output .= '  });';
+$output .= '});';
+$output .= '</script>';
+
 $output .= '<script>';
 $output .= '$(document).ready(function() {';
 $output .= '  $(".student").click(function() {';
-$output .= '    var studentId = $(this).data("sid");';
-$output .= '    console.log("Selected student ID: " + studentId);'; // Just for demonstration
+$output .= '    var studentName = $(this).text();';
+$output .= '    console.log("Selected student name: " + studentName);'; // Just for demonstration
+$output .= '    $("#selectedStudentName").text(studentName);'; // Update the displayed student name
 $output .= '  });';
 $output .= '});';
 $output .= '</script>';
