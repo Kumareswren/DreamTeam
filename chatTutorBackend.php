@@ -70,6 +70,9 @@ function Chat() {
     $previousMessages = [
         ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
         ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
+        ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
+        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],    ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
+        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
         ['sender' => 'student', 'message' => 'Great! When can we discuss?']
     ];
 
