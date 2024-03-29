@@ -3,7 +3,69 @@ session_start();
 require_once('db.php'); // Include the database connection file
 require_once('vendor/autoload.php'); // Include the JWT library
 echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>';
+use \Firebase\JWT\JWT;
 function Chat() {
+    global $conn;
+    // Retrieve the token from the cookie
+    if (isset($_COOKIE['token'])) {
+        $token = $_COOKIE['token'];
+
+        // Decode the token to get the email 
+        $secretKey = 'your_secret_key'; // Update with your secret key
+        try {
+            $decoded = JWT::decode($token, $secretKey, array('HS256'));
+            $email = $decoded->email;
+
+            // Query to get the TID for the tutor's email
+            $sqlTutor = "SELECT TID FROM tutor WHERE Email=?";
+            $stmtTutor = $conn->prepare($sqlTutor);
+            if (!$stmtTutor) {
+                die("Error in SQL query: " . $conn->error);
+            }
+
+            $stmtTutor->bind_param("s", $email);
+            $stmtTutor->execute();
+            $resultTutor = $stmtTutor->get_result();
+
+            // Check if tutor found
+            if ($resultTutor->num_rows > 0) {
+                $rowTutor = $resultTutor->fetch_assoc();
+                $tid = $rowTutor['TID'];
+
+                // Query to get the students assigned to the tutor's TID
+                $sql = "SELECT Student.* FROM Student 
+                        INNER JOIN StudentAssignment ON Student.SID = StudentAssignment.SID 
+                        WHERE StudentAssignment.TID = ?";
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    die("Error in SQL query: " . $conn->error);
+                }
+
+                $stmt->bind_param("i", $tid);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                // Generate student list
+                $students = $result->fetch_all(MYSQLI_ASSOC);
+
+                // Close the database connection
+                $conn->close();
+            } else {
+                // Tutor not found
+                echo "Tutor not found.";
+                return;
+            }
+        } catch (Exception $e) {
+            // Token verification failed
+            echo "Token verification failed.";
+            return;
+        }
+    } else {
+        // Token not found
+        echo "Token not found.";
+        return;
+    }
+
     // Simulated previous messages
     $previousMessages = [
         ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
@@ -11,7 +73,9 @@ function Chat() {
         ['sender' => 'student', 'message' => 'Great! When can we discuss?']
     ];
 
-    // Simulated list of students
+// Remove the hard-coded student list
+/*
+    //  list of students
     $students = [
         ['SID' => 1, 'FName' => 'John', 'LName' => 'Doe'],
         ['SID' => 2, 'FName' => 'Jane', 'LName' => 'Smith'],
@@ -21,8 +85,8 @@ function Chat() {
         ['SID' => 6, 'FName' => 'John', 'LName' => 'Doe'],
         ['SID' => 7, 'FName' => 'Jane', 'LName' => 'Smith'],
         
-    ];
-
+ ];
+*/
     $output = '<style>';
     $output .= '.chat-container {';
         $output .= '  display: flex;';
@@ -131,11 +195,17 @@ $output .= '.send-btn {';
     $output .= '}';
     $output .= '</style>';
 
-    // Generate the list of students
-    $studentList = '<div class="student-list-container">';
-    $studentList .= '<div class="search-box">';
-    $studentList .= '<input type="text" id="searchStudent" placeholder="Search student...">';
-    $studentList .= '</div>'; // Closing search-box div
+// Generate the list of students
+$studentList = '<div class="student-list-container">';
+$studentList .= '<div class="search-box">';
+$studentList .= '<input type="text" id="searchStudent" placeholder="Search student...">';
+$studentList .= '</div>'; // Closing search-box div
+// Check if there are students in the list
+if (empty($students)) {
+    $studentList .= '<div class="student-list">';
+    $studentList .= 'No students found.';
+    $studentList .= '</div>'; // Closing student-list div
+} else {
     $studentList .= '<div class="student-list">';
     $studentList .= '<ul id="studentList">';
     foreach ($students as $student) {
@@ -143,8 +213,9 @@ $output .= '.send-btn {';
     }
     $studentList .= '</ul>';
     $studentList .= '</div>'; // Closing student-list div
-    $studentList .= '</div>'; // Closing student-list-container div
+}
 
+$studentList .= '</div>'; // Closing student-list-container div
 
 
     $output .= '<div class="chat-container">';
