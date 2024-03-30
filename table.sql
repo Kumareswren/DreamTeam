@@ -93,3 +93,42 @@ CREATE TABLE BlogPost (
     FOREIGN KEY (StudentID) REFERENCES Student(SID) ON DELETE CASCADE,
     FOREIGN KEY (TutorID) REFERENCES Tutor(TID) ON DELETE CASCADE
 );
+
+CREATE TABLE Tutorial (
+    tutorialID INT AUTO_INCREMENT PRIMARY KEY,
+    tutorID INT, 
+    tutorialTitle VARCHAR(255),
+    tutorialDescription TEXT,
+    tutorialFilePath VARCHAR(255),
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutorID) REFERENCES Tutor(TID) 
+);
+
+CREATE TABLE TutorialAnswer (
+    tutorialAnswerID INT AUTO_INCREMENT PRIMARY KEY,
+    tutorialID INT,
+    SID INT,
+    tutorialAnswerTitle TEXT,
+    tutorComment TEXT,
+    tutorialAnswerFilePath VARCHAR(255),
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (SID) REFERENCES Student(SID),
+    FOREIGN KEY (tutorialID) REFERENCES Tutorial(tutorialID)
+);
+
+CREATE TABLE Note (
+    noteID INT AUTO_INCREMENT PRIMARY KEY,
+    tutorID INT, 
+    courseID INT,
+    noteTitle VARCHAR(255),
+    noteDescription TEXT,
+    noteFilePath VARCHAR(255),
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutorID) REFERENCES Tutor(TID),
+    FOREIGN KEY (courseID) REFERENCES Course(courseID)
+);
+
+
+ALTER TABLE Tutorial
+ADD COLUMN CourseID INT,
+ADD FOREIGN KEY (CourseID) REFERENCES Course(courseID);
