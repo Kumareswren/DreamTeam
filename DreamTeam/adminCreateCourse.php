@@ -35,16 +35,6 @@ $tutorResult = mysqli_query($conn, $tutorQuery);
             document.forms["adminCreateCourseForm"].reset();
         }
 
-        // Function to validate the form before submission (client-side validation)
-        function validateForm() {
-            var courseName = document.forms["adminCreateCourseForm"]["course_name"].value;
-            if (courseName.trim() === "") {
-                alert("Course name cannot be empty.");
-                return false;
-            }
-            return true;
-        }
-
     </script>
 
     <style>
@@ -158,16 +148,15 @@ $tutorResult = mysqli_query($conn, $tutorQuery);
                         <?php unset($_SESSION['course_creation_error']); ?>
                     <?php endif; ?>
 
-                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="form" name="adminCreateCourseForm" onsubmit="return validateForm()">
+                    <form method="post" action="adminCreateCourseBackend.php" class="form" name="adminCreateCourseForm">
                         <label for="course_name">Course Name:</label>
                         <input type="text" name="course_name" class="form-control mb-3" required>
 
-
                         <label for="start_date">Start Date:</label>
-                        <input type="date" name="start_date" class="form-control mb-3" id="start_date" required>
+                        <input type="month" name="start_date" class="form-control mb-3" required>
 
                         <label for="end_date">End Date:</label>
-                        <input type="date" name="end_date" class="form-control mb-3" id="end_date" required>
+                        <input type="month" name="end_date" class="form-control mb-3" required>
 
                         <label for="course_description">Course Description:</label>
                         <textarea name="course_description" class="form-control mb-3" rows="3" required></textarea>
@@ -192,16 +181,6 @@ $tutorResult = mysqli_query($conn, $tutorQuery);
 
     <!-- Bootstrap JavaScript (optional, for certain components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    // Get today's date
-    var today = new Date().toISOString().split('T')[0];
-
-    // Set the minimum value of the date input to today's date
-    document.getElementById("start_date").min = today;
-    document.getElementById("end_date").min = today;
-
-</script>
-
 </body>
 </html>
 

@@ -20,7 +20,7 @@ header("Expires: 0");
 
     <title>Student Dashboard</title>
 
-    <!-- <script>
+    <script>
         
         function verifyToken(token) {
         }
@@ -34,7 +34,7 @@ header("Expires: 0");
         
             window.location.href = 'index.php';
         }
-    </script> -->
+    </script>
 
     <style>
 
@@ -156,13 +156,8 @@ header("Expires: 0");
                       </li>
 
                       <li>
-                          <a href="#" class="nav-link px-10 align-middle my-meeting-link">
-                              <i class="fs-4 bi bi-journal-text"></i> <span class="ms-1 d-none d-sm-inline">Upcoming Meeting</span></a>
-                      </li>
-
-                      <li>
-                          <a href="#" class="nav-link px-10 align-middle completed-meeting-link">
-                              <i class="fs-4 bi bi-journal-text"></i> <span class="ms-1 d-none d-sm-inline">Meeting History</span></a>
+                          <a href="#" class="nav-link px-10 align-middle meetings-status-link">
+                              <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">View my meeting</span></a>
                       </li>
                       
                       <li>
@@ -209,41 +204,43 @@ header("Expires: 0");
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- for charts? --> <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script> 
-    <!-- <script src="script.js"></script> -->
+    <script src="script.js"></script>
 
     <script> 
     $(document).ready(function() {
-        // AJAX request for 'studentCourses.php'
-        $('.courses-link').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: 'studentCourses.php',
-                success: function(data) {
-                    $('#componentContainer').html(data);
-                },
-                error: function(xhr, status, error) {
-                    console.error('An error occurred:', error);
-                }
-            });      
-        });
+    
+    $('.courses-link').click(function(event) {
+        //event.preventDefault();
+        $.ajax({
+            url: 'studentCourses.php',
+            success: function(data) {
+                $('#componentContainer').html(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+                });
+                
+            });
 
-        // AJAX request for 'studentMeeting.php'
+        //call the meetings page if clicked
         $('.meetings-link').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: 'studentMeeting.php',
-                success: function(data) {
-                    $('#componentContainer').html(data);
-                    handleMeetingFormSubmission(); // Call the function after loading content
-                },
-                error: function(xhr, status, error) {
-                    console.error('An error occurred:', error);
-                }
+        //event.preventDefault();
+        $.ajax({
+            url: 'studentMeeting.php',
+            success: function(data) {
+                $('#componentContainer').html(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+                });
+                $('#componentContainer').off('submit', 'form');
+                      handleMeetingFormSubmission();
             });
         });
 
-        // Function to handle meeting form submission
-        function handleMeetingFormSubmission() {
+                function handleMeetingFormSubmission() {
                     // Attach event listener to form submission
                     $('#alertMessageMeeting').hide();
                     $('#componentContainer').on('submit', 'form', function(event) {
@@ -276,37 +273,10 @@ header("Expires: 0");
                                 alert("An error occurred: " + error);
                             }
                         });
-                    }); 
+                    });
                 }
+       
 
-        // AJAX request for 'studentMeetingList.php'
-        $('.my-meeting-link').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: 'studentMeetingList.php',
-                success: function(data) {
-                    $('#componentContainer').html(data);
-                },
-                error: function(xhr, status, error) {
-                    console.error('An error occurred:', error);
-                }
-            });
-        });
-
-        // AJAX request for 'studentMeetingList.php'
-        $('.completed-meeting-link').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: 'studentMeetingHistory.php',
-                success: function(data) {
-                    $('#componentContainer').html(data);
-                },
-                error: function(xhr, status, error) {
-                    console.error('An error occurred:', error);
-                }
-            });
-        });
-});
     </script>
   </body>
 </html>

@@ -86,11 +86,4 @@ CREATE TABLE MeetingStudent (
     FOREIGN KEY (TID) REFERENCES Tutor(TID)
 );
 
-/* update table MeetingStudent */
-ALTER TABLE MeetingStudent
-ADD COLUMN status VARCHAR(20) DEFAULT 'Pending' AFTER meetingDesc;
-
-ALTER TABLE MeetingStudent
-ADD COLUMN SID INT AFTER TID,
-ADD FOREIGN KEY (SID) REFERENCES Student(SID);
 
