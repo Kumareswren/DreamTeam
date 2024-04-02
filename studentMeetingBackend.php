@@ -146,4 +146,3 @@ foreach ($meetingLocationOptions as $option) {
 // Close database connection
 $conn->close();
 ?>
-
