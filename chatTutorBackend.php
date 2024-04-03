@@ -32,6 +32,8 @@ function Chat() {
                 $rowTutor = $resultTutor->fetch_assoc();
                 $tid = $rowTutor['TID'];
 
+                
+
                 // Query to get the students assigned to the tutor's TID
                 $sql = "SELECT Student.* FROM Student 
                         INNER JOIN StudentAssignment ON Student.SID = StudentAssignment.SID 
@@ -66,7 +68,15 @@ function Chat() {
         return;
     }
 
-    // Simulated previous messages
+    if(isset($_POST['sid'])) { //this code block is to check if the SID is being sent, can comment it out if u want
+        $sid = $_POST['sid'];
+        echo "Success: SID {$sid} is present.";
+    } else {
+        echo "Error: SID is not present.";
+    }
+
+    
+    // Simulated previous messages - but it is harcoded
     $previousMessages = [
         ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
         ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
@@ -74,22 +84,9 @@ function Chat() {
         ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],    ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
         ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
         ['sender' => 'student', 'message' => 'Great! When can we discuss?']
-    ];
+    ]; //use select statement - sender/receiver placement - arranged according to increasing timestamp
 
-// Remove the hard-coded student list
-/*
-    //  list of students
-    $students = [
-        ['SID' => 1, 'FName' => 'John', 'LName' => 'Doe'],
-        ['SID' => 2, 'FName' => 'Jane', 'LName' => 'Smith'],
-        ['SID' => 3, 'FName' => 'Alice', 'LName' => 'Johnson'],
-        ['SID' => 4, 'FName' => 'John', 'LName' => 'Doe'],
-        ['SID' => 5, 'FName' => 'Jane', 'LName' => 'Smith'],
-        ['SID' => 6, 'FName' => 'John', 'LName' => 'Doe'],
-        ['SID' => 7, 'FName' => 'Jane', 'LName' => 'Smith'],
-        
- ];
-*/
+
     $output = '<style>';
     $output .= '.chat-container {';
         $output .= '  display: flex;';
@@ -239,19 +236,6 @@ $output .= '</div>';
         $output .= "<div class='chat-bubble $senderClass'>{$message['message']}</div>";
         $output .= '</div>';
     }
-
-    $output .= '</div>'; // Closing chat-box div
-
-    $output .= '<div class="chat-input">';
-    $output .= '<textarea id="chatInput" placeholder="Type your message..." rows="4"></textarea>';
-    $output .= '<button class="send-btn" onclick="sendMessage()">Send</button>';
-    $output .= '</div>'; // Closing chat-input div
-
-
-
-    $output .= '</div>'; // Closing chat-container div
-    $output .= '</div>'; // Closing chat-box-container div
-    $output .= '</div>'; // Closing chat-container div
 
 // JavaScript for handling student click event
 
