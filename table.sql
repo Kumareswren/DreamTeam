@@ -128,6 +128,7 @@ CREATE TABLE Tutorial (
     FOREIGN KEY (tutorID) REFERENCES Tutor(TID) 
 );
 
+
 CREATE TABLE TutorialAnswer (
     tutorialAnswerID INT AUTO_INCREMENT PRIMARY KEY,
     tutorialID INT,
@@ -156,6 +157,18 @@ CREATE TABLE Note (
 ALTER TABLE Tutorial
 ADD COLUMN CourseID INT,
 ADD FOREIGN KEY (CourseID) REFERENCES Course(courseID);
-=======
+
+CREATE TABLE Messages ( 
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    TID INT,
+    SID INT,
+    messageContent TEXT,
+    sender_type TEXT,
+    receiver_type TEXT,
+    readStatus TEXT,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (TID) REFERENCES Tutor(TID) ON DELETE CASCADE,
+    FOREIGN KEY (SID) REFERENCES Student(SID) ON DELETE CASCADE
 );
+
 

@@ -1,6 +1,7 @@
 <?php
 require_once 'tokenVerify.php';
 require_once 'db.php'; // Include your database connection file
+/* $_SESSION['TID'] = $row['TID']; */ // Assuming $row['TID'] contains the TID value
 
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
@@ -39,9 +40,14 @@ if ($result_check_user && $result_check_user->num_rows > 0) {
     } else {
         // User has logged in before, fetch the last login time
         $last_login_time = $row['last_login'];
-        $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
+        $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!" . $row['TID'];
+        /* echo $welcome_message; */
     }
-} else {
+
+     // Assuming $row['TID'] contains the TID value
+     $_SESSION['TID'] = $row['TID']; //this line was added 2,4 to make the message stuff work, so ref for student?
+    /* echo $_SESSION['TID']; */
+    } else {
     // User doesn't exist in the database
     $welcome_message = "Unknown User";
 }
@@ -175,7 +181,7 @@ $conn->close();
                     </li>
 
                         <li class="nav-item">
-                          <a href="#" class="nav-link align-middle px-10">
+                          <a href="#" class="nav-link align-middle px-10 chat-link">
                               <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
                           </a>
                       </li>
@@ -333,6 +339,45 @@ function handleMeetingFormSubmission() {
 });
 
     </script>
+<script>
+                //MESSAGES STUFF!!
+$(document).ready(function() {
+    $('.chat-link').click(function(event) {
+        event.preventDefault();
+
+         // Retrieve TID
+         var tid = <?php echo $_SESSION['TID']; ?>;
+
+        $.ajax({
+            type: 'POST',
+            url: 'chatTutorOverview.php',
+            data: {tid: tid}, 
+            success: function(data) {
+                $('#componentContainer').html(data);
+
+                // Add auto-resizing functionality after loading the chat
+                var textarea = $('#chatInput');
+                
+                textarea.on('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+
+                // Adjust initial height to fit one line
+                textarea.css('height', 'auto');
+                textarea.css('height', textarea[0].scrollHeight + 'px');
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    });
+});
+
+
+</script>
+
+
             <div class="col py-3 custom-div">
                 
                 <main class="mt-5 pt-3">
@@ -554,6 +599,8 @@ $(document).ready(function() {
             getTutorBlog(); // Call the function to fetch tutor blog posts via AJAX
         });
     };
+
+ 
 </script>
 
 
