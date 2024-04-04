@@ -47,6 +47,10 @@ if ($result_check_user && $result_check_user->num_rows > 0) {
         $last_login_time = $row['last_login'];
         $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
     }
+
+    $_SESSION['SID'] = $row['SID'];
+    /* echo $_SESSION['SID']; */
+
 } else {
     // User doesn't exist in the database
     $welcome_message = "Unknown User";
@@ -269,32 +273,48 @@ $conn->close();
     </script>
 
 <script>
+
 $(document).ready(function() {
     $('.chat-link').click(function(event) {
         event.preventDefault();
-        $.ajax({
-            url: 'chatStudentBackend.php',
-            success: function(data) {
-                $('#componentContainer').html(data);
 
-                // Add auto-resizing functionality after loading the chat
-                var textarea = $('#chatInput');
-                
-                textarea.on('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
+        // Retrieve the SID from the decoded JWT token
+        var SID = <?php echo $_SESSION['SID']; ?>;
 
-                // Adjust initial height to fit one line
-                textarea.css('height', 'auto');
-                textarea.css('height', textarea[0].scrollHeight + 'px');
-            },
-            error: function(xhr, status, error) {
-                console.error('An error occurred:', error);
-            }
-        });
+        // Check if SID is not empty
+        if (SID) {
+            // Send the SID as POST data using AJAX
+            $.ajax({
+                url: 'chatStudentOverview.php',
+                method: 'POST', // Change method to POST
+                data: { SID: SID }, // Send SID as POST data
+                success: function(data) {
+                    $('#componentContainer').html(data);
+
+                    // Add auto-resizing functionality after loading the chat
+                    var textarea = $('#chatInput');
+                    
+                    textarea.on('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = (this.scrollHeight) + 'px';
+                    });
+
+                    // Adjust initial height to fit one line
+                    textarea.css('height', 'auto');
+                    textarea.css('height', textarea[0].scrollHeight + 'px');
+                },
+                error: function(xhr, status, error) {
+                    console.error('An error occurred:', error);
+                }
+            });
+        } else {
+            console.error('SID not found.');
+        }
     });
 });
+
+
+
 </script>
 
      <script>

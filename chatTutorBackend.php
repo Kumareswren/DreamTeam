@@ -32,7 +32,22 @@ function Chat() {
                 $rowTutor = $resultTutor->fetch_assoc();
                 $tid = $rowTutor['TID'];
 
-                
+                // Retrieve SID from $_POST array
+                if(isset($_POST['sid'])) {
+                    $sid = $_POST['sid'];
+
+                    // Update readStatus in Messages table where TID, SID, and sender_type match
+                    $sqlUpdateReadStatus = "UPDATE Messages SET readStatus = 'Read' WHERE TID = ? AND SID = ? AND sender_type = 'Student'";
+                    $stmtUpdateReadStatus = $conn->prepare($sqlUpdateReadStatus);
+                    if (!$stmtUpdateReadStatus) {
+                        die("Error in SQL query: " . $conn->error);
+                    }
+                    $stmtUpdateReadStatus->bind_param("ii", $tid, $sid);
+                    $stmtUpdateReadStatus->execute();
+                } else {
+                    echo "Error: SID is not present.";
+                    return;
+                }
 
                 // Query to get the students assigned to the tutor's TID
                 $sql = "SELECT Student.* FROM Student 
@@ -51,7 +66,7 @@ function Chat() {
                 $students = $result->fetch_all(MYSQLI_ASSOC);
 
                 // Close the database connection
-                $conn->close();
+      
             } else {
                 // Tutor not found
                 echo "Tutor not found.";
@@ -68,24 +83,23 @@ function Chat() {
         return;
     }
 
-    if(isset($_POST['sid'])) { //this code block is to check if the SID is being sent, can comment it out if u want
+  /*   if(isset($_POST['sid'])) { //this code block is to check if the SID is being sent, can comment it out if u want
         $sid = $_POST['sid'];
         echo "Success: SID {$sid} is present.";
     } else {
         echo "Error: SID is not present.";
-    }
+    } */
 
-    
-    // Simulated previous messages - but it is harcoded
-    $previousMessages = [
-        ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
-        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
-        ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
-        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],    ['sender' => 'student', 'message' => 'Hi, I need help with my assignment.'],
-        ['sender' => 'tutor', 'message' => 'Sure, I can help you with that.'],
-        ['sender' => 'student', 'message' => 'Great! When can we discuss?']
-    ]; //use select statement - sender/receiver placement - arranged according to increasing timestamp
-
+// Query to fetch previous messages from the database
+$sqlMessages = "SELECT sender_type, messageContent, sent_at FROM Messages WHERE SID = ?";
+$stmtMessages = $conn->prepare($sqlMessages);
+$stmtMessages->bind_param("i", $sid);
+$stmtMessages->execute();
+$resultMessages = $stmtMessages->get_result();
+$previousMessages = [];
+while ($row = $resultMessages->fetch_assoc()) {
+    $previousMessages[] = $row;
+} 
 
     $output = '<style>';
     $output .= '.chat-container {';
@@ -117,7 +131,7 @@ function Chat() {
 
         $output .= '.chat-box {';
         $output .= '  width: 100%;';
-        $output .= '  height: 400px;';
+        $output .= '  height: 550px;';
         $output .= '  overflow-y: auto;'; // Changed from 'scroll' to 'auto'
         $output .= '  padding: 10px;';
         $output .= '  background-color: #f9f9f9;';
@@ -127,6 +141,12 @@ function Chat() {
         $output .= '  padding: 10px;';
         $output .= '  clear: both;';
         $output .= '}';
+
+        $output .= '.sent-time {';
+            $output .= '  align-self: flex-end;';
+            $output .= '  font-size: 0.8em;';
+            $output .= '  color: #000000;';
+            $output .= '}';
         
         $output .= '.chat-bubble {';
         $output .= '  display: inline-block;';
@@ -195,47 +215,46 @@ $output .= '.send-btn {';
     $output .= '}';
     $output .= '</style>';
 
-// Generate the list of students
-$studentList = '<div class="student-list-container">';
-$studentList .= '<div class="search-box">';
-$studentList .= '<input type="text" id="searchStudent" placeholder="Search student...">';
-$studentList .= '</div>'; // Closing search-box div
-// Check if there are students in the list
-if (empty($students)) {
-    $studentList .= '<div class="student-list">';
-    $studentList .= 'No students found.';
-    $studentList .= '</div>'; // Closing student-list div
-} else {
-    $studentList .= '<div class="student-list">';
-    $studentList .= '<ul id="studentList">';
-    foreach ($students as $student) {
-        $studentList .= "<li class='student' data-sid='{$student['SID']}'>{$student['FName']} {$student['LName']}</li>";
-    }
-    $studentList .= '</ul>';
-    $studentList .= '</div>'; // Closing student-list div
-}
-
-$studentList .= '</div>'; // Closing student-list-container div
-    $output .= '<div class="chat-container">';
-    $output .= $studentList;
-    $output .= '<div class="chat-box-container">';
     $output .= '<div class="chat-container">';
     $output .= '<div class="chat-box" id="chatBox">';
     $output .= '<div class="student-name">';
+   /*  $output .= $sid; // Assuming $sid contains the student's name */
 
-    $output .= '<div class="student-name">';
-    $output .= '  <span id="selectedStudentName">Student Name Here</span>';
     $output .= '</div>';
-    
-$output .= '</div>';
+    // Query to get the full name of the student based on SID
+$sqlFullName = "SELECT FName, LName FROM Student WHERE SID = ?";
+$stmtFullName = $conn->prepare($sqlFullName);
+$stmtFullName->bind_param("i", $sid);
+$stmtFullName->execute();
+$resultFullName = $stmtFullName->get_result();
 
-    // Previous messages
+    // Check if student found
+if ($resultFullName->num_rows > 0) {
+    $rowFullName = $resultFullName->fetch_assoc();
+    $fullName = $rowFullName['FName'] . ' ' . $rowFullName['LName'];
+    $output .= '<div class="student-name">';
+    $output .= $fullName; // Displaying full name of the student
+    $output .= '</div>';
+} else {
+    $output .= '<div class="student-name">';
+    $output .= 'Student Not Found'; // Display if student not found
+    $output .= '</div>';
+}
+
     foreach ($previousMessages as $message) {
-        $senderClass = ($message['sender'] == 'student') ? 'you' : 'me';
+        if ($message['sender_type'] == 'Tutor') {
+            $senderClass = 'me'; // 'me' if sender is tutor
+        } else {
+            $senderClass = 'you'; // 'you' if sender is student
+        }
         $output .= '<div class="chat-message">';
-        $output .= "<div class='chat-bubble $senderClass'>{$message['message']}</div>";
+        $output .= "<div class='chat-bubble $senderClass'>{$message['messageContent']}";
+        $output .= "<div class='sent-time'>$message[sent_at]</div>"; // Include sent_at timestamp within the chat-bubble div
+        $output .= '</div>';
         $output .= '</div>';
     }
+    
+
 
 // JavaScript for handling student click event
 
@@ -270,4 +289,5 @@ $output .= '</script>';
 
 // Call the function to generate the UI
 echo Chat();
+$conn->close();
 ?>

@@ -36,18 +36,22 @@ $tid = $row['TID'];
         $stmt->bind_param("iisss", $tid, $sid, $message, $sender_type, $receiver_type);
         if ($stmt->execute()) {
             // Message inserted successfully
-            echo "Message inserted successfully.";
+            http_response_code(200);
+            echo "Message sent successfully.";
         } else {
             // Error occurred while executing query
+            http_response_code(500);
             echo "Error: " . $stmt->error;
         }
         $stmt->close();
     } else {
         // Error occurred in preparing statement
+        http_response_code(500);
         echo "Error: " . $conn->error;
     }
 } else {
     // Invalid request or missing parameters
-    echo "Invalid request.";
+    http_response_code(400);
+    echo "Error occurred: No message found.";
 }
 ?>

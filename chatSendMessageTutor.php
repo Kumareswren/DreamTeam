@@ -174,6 +174,8 @@ function Chat() {
     
     $output .= '</div>';
 
+    $output .= '<div class="mt-3" id="alertBox"></div>'; // Add the alertBox div
+    $output .= '</div>';
 
     // JavaScript for handling student click event
 
@@ -250,10 +252,12 @@ $(document).ready(function() {
                 /* tid: tid */ //just added
             },
             success: function(response) {
-                console.log("Message sent successfully.");
+                $("#alertBox").html('<div class="alert alert-success" role="alert">Message sent successfully.</div>');
+                // Clear the chat input after successful submission
+                $("#chatInput").val('');
             },
             error: function(xhr, status, error) {
-                console.error("Error occurred:", error);
+                $("#alertBox").html('<div class="alert alert-danger" role="alert">Error occurred: ' + error + '</div>');
             }
         });
     });
