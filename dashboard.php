@@ -1,7 +1,5 @@
 <?php
 
-
-
 if(isset($_POST['user_role'])) {
     $user_role = $_POST['user_role'];
     $userID = $_POST['userID'];

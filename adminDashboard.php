@@ -179,6 +179,11 @@ $conn->close();
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10 viewDashboard-link">
+                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-10">
                             <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Students</span>
                         </a>
@@ -240,7 +245,22 @@ $conn->close();
         </script>
         
             <script>
-                // Call the function when the assignment link is clicked
+                $(document).ready(function() {
+                    $('.viewDashboard-link').click(function(event) {
+                        event.preventDefault();
+                        $.ajax({
+                            url: 'viewDashboardAdmin.php',
+                            success: function(data) {
+                                $('#componentContainer').html(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('An error occurred:', error);
+                            }
+                        });
+
+                    });
+                });
+
                 $(document).ready(function() {
                     $('.assignment-link').click(function(event) {
                         event.preventDefault();
@@ -293,6 +313,8 @@ $conn->close();
                         });
                     });
                 }
+
+                
             </script>
             <script>
                     // Call the function when the register link is clicked
