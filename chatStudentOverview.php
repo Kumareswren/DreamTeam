@@ -23,52 +23,58 @@ $sql_fetch_tutor_details = "SELECT sa.TID, CONCAT(t.FName, ' ', t.LName) AS Tuto
                             WHERE sa.SID = '$sid'";
 $result_fetch_tutor_details = $conn->query($sql_fetch_tutor_details);
 
-
-// Generate the table
-$output = '<h3>Overview of your Conversation</h3>';
-$output .= '<div class="table-responsive">';
-$output .= '<table class="table table-striped table-hover">';
-$output .= '<thead>';
-$output .= '<tr>';
-$output .= '<th>Tutor Name</th>';
-$output .= '<th>Unread Messages</th>';
-$output .= '<th>Message History</th>';
-$output .= '<th>Reply</th>';
-$output .= '</tr>';
-$output .= '</thead>';
-$output .= '<tbody>';
-
-while ($tutor_row = $result_fetch_tutor_details->fetch_assoc()) {
-    // Get SID and student name
-    $tid = $tutor_row['TID'];
-    $tutor_name = $tutor_row['TutorName'];
-
-    // Fetch the count of unread messages for the student
-    $sql_unread_messages = "SELECT COUNT(*) AS unread_messages_count
-                            FROM Messages
-                            WHERE TID = '$tid'
-                            AND SID = '$sid'
-                            AND sender_type = 'Tutor'
-                            AND readStatus IS NULL";
-    $result_unread_messages = $conn->query($sql_unread_messages);
-    $unread_messages_row = $result_unread_messages->fetch_assoc();
-    $unread_messages_count = $unread_messages_row['unread_messages_count'];
-
-    // Add the student row to the table
+// Check if any records were fetched
+if ($result_fetch_tutor_details->num_rows > 0) {
+    // Generate the table
+    $output = '<h3>Overview of your Conversation</h3>';
+    $output .= '<div class="table-responsive">';
+    $output .= '<table class="table table-striped table-hover">';
+    $output .= '<thead>';
     $output .= '<tr>';
-    $output .= '<td>' . $tutor_name . '</td>';
-    $output .= '<td>' . $unread_messages_count . '</td>';
-    $output .= '<td><button class="btn btn-primary message-history-btn" data-tid="'. $tid.'>">Message History</button></td>';
-    $output .= '<td><button class="btn btn-success reply-btn">Reply</button></td>'; //reply-btn data-sid="'. $sid.' ">
+    $output .= '<th>Tutor Name</th>';
+    $output .= '<th>Unread Messages</th>';
+    $output .= '<th>Message History</th>';
+    $output .= '<th>Reply</th>';
     $output .= '</tr>';
-}
+    $output .= '</thead>';
+    $output .= '<tbody>';
 
-$output .= '</tbody>';
-$output .= '</table>';
-$output .= '</div>';
+    while ($tutor_row = $result_fetch_tutor_details->fetch_assoc()) {
+        // Get SID and student name
+        $tid = $tutor_row['TID'];
+        $tutor_name = $tutor_row['TutorName'];
+
+        // Fetch the count of unread messages for the student
+        $sql_unread_messages = "SELECT COUNT(*) AS unread_messages_count
+                                FROM Messages
+                                WHERE TID = '$tid'
+                                AND SID = '$sid'
+                                AND sender_type = 'Tutor'
+                                AND readStatus IS NULL";
+        $result_unread_messages = $conn->query($sql_unread_messages);
+        $unread_messages_row = $result_unread_messages->fetch_assoc();
+        $unread_messages_count = $unread_messages_row['unread_messages_count'];
+
+        // Add the student row to the table
+        $output .= '<tr>';
+        $output .= '<td>' . $tutor_name . '</td>';
+        $output .= '<td>' . $unread_messages_count . '</td>';
+        $output .= '<td><button class="btn btn-primary message-history-btn" data-tid="'. $tid.'>">Message History</button></td>';
+        $output .= '<td><button class="btn btn-success reply-btn">Reply</button></td>'; //reply-btn data-sid="'. $sid.' ">
+        $output .= '</tr>';
+    }
+
+    $output .= '</tbody>';
+    $output .= '</table>';
+    $output .= '</div>';
+} else {
+    // No records found
+    $output = '<h3>No records found</h3>';
+}
 
 // Echo the generated HTML
 echo $output;
+
 ?>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

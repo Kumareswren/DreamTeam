@@ -52,6 +52,13 @@ $(document).ready(function(){
         // Get the reply content from the textarea
         var replyContent = $("#tutorReplyContent").val();
         
+        
+        // Check if replyContent is empty
+        if(replyContent.trim() === '') {
+            $("#alertBox").html('<div class="alert alert-danger" role="alert">Please type something</div>'); 
+            return; // Stop further execution
+        }
+        
         // AJAX call to tutorReplyChatUpdate.php
         $.ajax({
             url: 'studentReplyChatUpdate.php',

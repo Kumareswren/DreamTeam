@@ -30,7 +30,7 @@ $output .= '<label for="studentLabel" class="mb-3" style="color: #1F8A70;">To: '
 $output .= '</div>';
 $output .= '<div class="form-group mt-1">';
 $output .= '<label for="tutorReplyContent" class="mb-3">Your Reply:</label>';
-$output .= '<textarea class="form-control" id="tutorReplyContent" name="tutorReplyContent" rows="3" placeholder="Enter your reply"></textarea>';
+$output .= '<textarea class="form-control" id="tutorReplyContent" name="tutorReplyContent" rows="3" placeholder="Enter your reply" ></textarea>';
 $output .= '</div>';
 $output .= '<div class="form-group mt-4">';
 $output .= '<button type="button" class="btn btn-primary" id="sendReplyBtn">Send Reply</button>';
@@ -50,6 +50,12 @@ $(document).ready(function(){
         var sid = $("#sid").val();
         // Get the reply content from the textarea
         var replyContent = $("#tutorReplyContent").val();
+
+        // Check if replyContent is empty
+        if(replyContent.trim() === '') {
+            $("#alertBox").html('<div class="alert alert-danger" role="alert">Please type something</div>'); 
+            return; // Stop further execution
+        }
         
         // AJAX call to tutorReplyChatUpdate.php
         $.ajax({

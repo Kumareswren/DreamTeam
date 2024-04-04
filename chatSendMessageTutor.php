@@ -255,9 +255,10 @@ $(document).ready(function() {
                 $("#alertBox").html('<div class="alert alert-success" role="alert">Message sent successfully.</div>');
                 // Clear the chat input after successful submission
                 $("#chatInput").val('');
+                $("#selectedStudentName").text('');
             },
             error: function(xhr, status, error) {
-                $("#alertBox").html('<div class="alert alert-danger" role="alert">Error occurred: ' + error + '</div>');
+                $("#alertBox").html('<div class="alert alert-danger" role="alert">Please type something </div>');
             }
         });
     });
