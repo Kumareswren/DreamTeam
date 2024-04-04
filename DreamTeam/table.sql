@@ -73,7 +73,6 @@ CREATE TABLE CourseStudent (
     UNIQUE KEY (courseId, SID)
 );
 
-
 /*NEW QUERY*/
 
 CREATE TABLE MeetingStudent (
@@ -87,75 +86,4 @@ CREATE TABLE MeetingStudent (
     FOREIGN KEY (TID) REFERENCES Tutor(TID)
 );
 
-/* update table MeetingStudent */
-ALTER TABLE MeetingStudent
-ADD COLUMN status VARCHAR(20) DEFAULT 'Pending' AFTER meetingDesc;
-
-ALTER TABLE MeetingStudent
-ADD COLUMN SID INT AFTER TID,
-ADD FOREIGN KEY (SID) REFERENCES Student(SID);
-
-=======
-/*Adam changes*/
-
-ALTER TABLE Student ADD COLUMN last_login TIMESTAMP NULL;
-
-ALTER TABLE Tutor ADD COLUMN last_login TIMESTAMP NULL;
-
-ALTER TABLE Admin ADD COLUMN last_login TIMESTAMP NULL;
-
-CREATE TABLE BlogPost (
-    PostID INT PRIMARY KEY AUTO_INCREMENT,
-    Title VARCHAR(255),
-    Content TEXT,
-    StudentID INT,
-    TutorID INT,
-    ImagePath VARCHAR(255),
-    UserRole ENUM('student', 'tutor'),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (StudentID) REFERENCES Student(SID) ON DELETE CASCADE,
-    FOREIGN KEY (TutorID) REFERENCES Tutor(TID) ON DELETE CASCADE
-
-);
-
-CREATE TABLE Tutorial (
-    tutorialID INT AUTO_INCREMENT PRIMARY KEY,
-    tutorID INT, 
-    tutorialTitle VARCHAR(255),
-    tutorialDescription TEXT,
-    tutorialFilePath VARCHAR(255),
-    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tutorID) REFERENCES Tutor(TID) 
-);
-
-CREATE TABLE TutorialAnswer (
-    tutorialAnswerID INT AUTO_INCREMENT PRIMARY KEY,
-    tutorialID INT,
-    SID INT,
-    tutorialAnswerTitle TEXT,
-    tutorComment TEXT,
-    tutorialAnswerFilePath VARCHAR(255),
-    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (SID) REFERENCES Student(SID),
-    FOREIGN KEY (tutorialID) REFERENCES Tutorial(tutorialID)
-);
-
-CREATE TABLE Note (
-    noteID INT AUTO_INCREMENT PRIMARY KEY,
-    tutorID INT, 
-    courseID INT,
-    noteTitle VARCHAR(255),
-    noteDescription TEXT,
-    noteFilePath VARCHAR(255),
-    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tutorID) REFERENCES Tutor(TID),
-    FOREIGN KEY (courseID) REFERENCES Course(courseID)
-);
-
-
-ALTER TABLE Tutorial
-ADD COLUMN CourseID INT,
-ADD FOREIGN KEY (CourseID) REFERENCES Course(courseID);
-=======
-);
 
