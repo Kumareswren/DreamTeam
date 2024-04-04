@@ -401,7 +401,7 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 // Display error message to the user
-                $('#uploadMessage').html('<div class="alert alert-danger" role="alert">Error: ' + error + '</div>');
+                $('#uploadMessage').html('<div class="alert alert-danger" role="alert">Please select a file</div>');
             }
         });
     });

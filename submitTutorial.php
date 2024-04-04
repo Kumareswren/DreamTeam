@@ -55,7 +55,7 @@ $(document).on('submit', '#tutorialForm', function(event) {
         error: function(xhr, status, error) {
             // Check HTTP status code for error
             if (xhr.status === 400) {
-                $('#messageBox').html('<div class="alert alert-danger">Error: ' + error + '</div>');
+                $('#messageBox').html('<div class="alert alert-danger">Please select file</div>');
             } else if (xhr.status === 500) {
                 $('#messageBox').html('<div class="alert alert-danger">Internal Server Error</div>');
             } else {
