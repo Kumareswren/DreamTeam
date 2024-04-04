@@ -187,10 +187,16 @@ $conn->close();
                       </li>
                       
                       <li>
-                          <a href="#" class="nav-link px-10 align-middle">
+                          <a href="#" class="nav-link px-10 align-middle meeting-link">
                               <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">Meetings</span></a>
                       </li>
                       
+                      <li>
+                          <a href="#" class="nav-link px-10 align-middle meetings-list-link">
+                              <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">View my meeting</span></a>
+                      </li>
+
+
                       <li>
                         <a href="#" class="nav-link px-10 align-middle">
                             <i class="fs-4 bi-book"></i> <span class="ms-1 d-none d-sm-inline">Tutorial</span> </a>
@@ -259,6 +265,77 @@ $conn->close();
         });
         
     });
+
+    //tutor meeting
+
+    $('.meeting-link').click(function(event) {
+    // Prevent default link behavior
+    event.preventDefault();
+    
+    // Load the tutorMeeting.php page using AJAX
+    $.ajax({
+        url: 'tutorMeeting.php',
+        success: function(data) {
+            $('#componentContainer').html(data); // Load the page content into the specified container
+        },
+        error: function(xhr, status, error) {
+            console.error('An error occurred:', error);
+        }
+    });
+
+    // Remove any previous form submission event handler
+    $('#componentContainer').off('submit', 'form');
+    
+    // Attach the form submission event handler to the loaded form
+    handleMeetingFormSubmission();
+});
+
+function handleMeetingFormSubmission() {
+    // Hide any previous alert messages
+    $('#alertMessageMeeting').hide();
+
+    // Attach event listener to form submission
+    $('#componentContainer').on('submit', 'form', function(event) {
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Collect form data
+        var formData = $(this).serialize();
+
+        // Send form data to backend using AJAX
+        $.ajax({
+            type: 'POST',
+            url: 'tutorMeetingBackend.php',
+            data: formData,
+            success: function(response) {
+                // Handle the response
+                $('.alert').remove();
+                $('#alertMessage').hide();
+                if (response === 'success') {
+                    alert("Accept successful.");
+                    // Reload the component after successful acceptance
+                    $.get('tutorMeeting.php', function(data) {
+                        $('.container').replaceWith(data); // Replace the container content with the updated one
+                    });
+                } else {
+                    $('<div id="alertMessageMeeting" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                alert("An error occurred: " + error);
+            }
+        });
+    });
+
+    
+}
+
+
+
+
+
+
 });
 
     </script>
@@ -314,6 +391,40 @@ $(document).ready(function() {
             </div>
         </div>
     </div>
+
+
+    <script>
+$(document).ready(function() {
+    // Click event for the "View my meeting" link
+    $('.meetings-list-link').click(function(event) {
+        event.preventDefault(); // Prevent default link behavior
+
+        // Load the tutorMeetingList.php page using AJAX
+        $.ajax({
+            url: 'tutorMeetingList.php',
+            success: function(data) {
+                $('#componentContainer').html(data); // Load the page content into the specified container
+
+                // After loading the meeting list, fetch the meeting data
+                $.ajax({
+                    url: 'tutorMeetingListBackend.php', // Update with the correct backend URL
+                    method: 'GET', // Assuming you're using GET method to fetch meeting data
+                    success: function(response) {
+                        // Process the meeting data here (e.g., display in a table)
+                        console.log(response); // For testing, you can log the response to the console
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('An error occurred while fetching meeting data:', error);
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    });
+});
+</script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

@@ -73,6 +73,29 @@ CREATE TABLE CourseStudent (
     UNIQUE KEY (courseId, SID)
 );
 
+
+/*NEW QUERY*/
+
+CREATE TABLE MeetingStudent (
+    meetingID INT AUTO_INCREMENT PRIMARY KEY,
+    courseTitle TEXT,
+    meetingDate DATE,
+    meetingTime TIME,
+    meetingLocation TEXT,
+    meetingDesc TEXT,
+    TID INT,
+    FOREIGN KEY (TID) REFERENCES Tutor(TID)
+);
+
+/* update table MeetingStudent */
+ALTER TABLE MeetingStudent
+ADD COLUMN status VARCHAR(20) DEFAULT 'Pending' AFTER meetingDesc;
+
+ALTER TABLE MeetingStudent
+ADD COLUMN SID INT AFTER TID,
+ADD FOREIGN KEY (SID) REFERENCES Student(SID);
+
+=======
 /*Adam changes*/
 
 ALTER TABLE Student ADD COLUMN last_login TIMESTAMP NULL;
@@ -92,6 +115,7 @@ CREATE TABLE BlogPost (
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (StudentID) REFERENCES Student(SID) ON DELETE CASCADE,
     FOREIGN KEY (TutorID) REFERENCES Tutor(TID) ON DELETE CASCADE
+
 );
 
 CREATE TABLE Tutorial (
@@ -103,6 +127,7 @@ CREATE TABLE Tutorial (
     uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tutorID) REFERENCES Tutor(TID) 
 );
+
 
 CREATE TABLE TutorialAnswer (
     tutorialAnswerID INT AUTO_INCREMENT PRIMARY KEY,
@@ -145,3 +170,5 @@ CREATE TABLE Messages (
     FOREIGN KEY (TID) REFERENCES Tutor(TID) ON DELETE CASCADE,
     FOREIGN KEY (SID) REFERENCES Student(SID) ON DELETE CASCADE
 );
+
+
