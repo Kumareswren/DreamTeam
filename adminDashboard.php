@@ -17,6 +17,16 @@ $token = $_COOKIE['token'];
 $decoded = JWT::decode($token, 'your_secret_key', array('HS256'));
 $user_email = $decoded->email;
 
+$stmt = $conn->prepare("SELECT AID FROM Admin WHERE Email = ?");
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $_SESSION['AID'] = $row['AID'];
+}
+
 // Check if the user exists in the database
 $sql_check_user = "SELECT * FROM Admin WHERE Email = '$user_email'";
 $result_check_user = $conn->query($sql_check_user);
@@ -114,6 +124,14 @@ $conn->close();
     color: #8fc8bd;
 }
 
+.bi-journal-text{
+    color: #8fc8bd;
+}
+
+.bi-house-fill {
+    color: #8fc8bd;
+}
+
 
 .bi-person-vcard{
     color: #8fc8bd;
@@ -156,6 +174,11 @@ $conn->close();
                 </a> <br>
                 <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                     <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10 dashboard-link" data-aid="<?php echo $_SESSION['AID']; ?>">
+                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-10">
                             <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Students</span>
                         </a>
@@ -195,6 +218,26 @@ $conn->close();
                 <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
             </div>
         </div>
+        <script>
+            $(document).ready(function() {
+                $('.dashboard-link').click(function(event) {
+                    var userRole = "admin"; // Set the user role here, replace with actual user role
+                    var aid = $(this).data('aid'); // Assuming $tid contains the TID value
+
+                    $.ajax({
+                        url: 'dashboard.php',
+                        type: 'POST',
+                        data: { user_role: userRole, userID: aid }, // Include tid in the data object
+                        success: function(response) {
+                            $('#componentContainer').html(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('An error occurred:', error);
+                        }
+                    });
+                });
+            });
+        </script>
         
             <script>
                 // Call the function when the assignment link is clicked

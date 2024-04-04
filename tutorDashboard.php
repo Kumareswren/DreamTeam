@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'tokenVerify.php';
 require_once 'db.php'; // Include your database connection file
 /* $_SESSION['TID'] = $row['TID']; */ // Assuming $row['TID'] contains the TID value
@@ -15,6 +16,16 @@ $token = $_COOKIE['token'];
 // Decode the JWT token to extract the email
 $decoded = JWT::decode($token, 'your_secret_key', array('HS256'));
 $user_email = $decoded->email;
+
+$stmt = $conn->prepare("SELECT TID FROM Tutor WHERE Email = ?");
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $_SESSION['TID'] = $row['TID'];
+}
 
 // Check if the user exists in the database
 $sql_check_user = "SELECT * FROM Tutor WHERE Email = '$user_email'";
@@ -167,11 +178,11 @@ $conn->close();
                     </a> 
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                         
-                      <li class="nav-item">
-                          <a href="#" class="nav-link align-middle px-10">
-                              <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
-                          </a>
-                      </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10 dashboard-link" data-tid="<?php echo $_SESSION['TID']; ?>">
+                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                        </a>
+                    </li>
 
                     
                     <li class="nav-item">
@@ -245,10 +256,32 @@ $conn->close();
             }
         });
         
-    });
-});
+            });
+        });
 
     </script>
+
+    <script>
+        $(document).ready(function() {
+            $('.dashboard-link').click(function(event) {
+                var userRole = "tutor"; // Set the user role here, replace with actual user role
+                var tid = $(this).data('tid'); // Assuming $tid contains the TID value
+
+                $.ajax({
+                    url: 'dashboard.php',
+                    type: 'POST',
+                    data: { user_role: userRole, userID: tid }, // Include tid in the data object
+                    success: function(response) {
+                        $('#componentContainer').html(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('An error occurred:', error);
+                    }
+                });
+            });
+        });
+    </script>
+
     <script>
         $(document).ready(function() {
     
