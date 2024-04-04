@@ -1,13 +1,22 @@
 <?php
 session_start();
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     // Generate HTML for course details
     $output = '<div class="container mt-5">';
     $output .= '<h1>' . $courseName . " (" . $startDate . " - " . $endDate . ")" . '</h1>';
 
     $output .= '<input type="hidden" id="courseId" value="' . $courseId . '">';
-
+    $output .= '<input type="hidden" id="courseName" name="courseName" value="' . $courseName . '">';
+    $output .= '<input type="hidden" id="startDate" name="startDate" value="' . $startDate . '">';
+    $output .= '<input type="hidden" id="endDate" name="endDate" value="' . $endDate . '">';
     // Tabs
     $output .= '<ul class="nav nav-tabs mt-5" id="myTab" role="tablist">';
     $output .= '<li class="nav-item">';
@@ -19,26 +28,188 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $output .= '<li class="nav-item">';
     $output .= '<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false">Students</a>';
     $output .= '</li>';
+   /*  $output .= '<li class="nav-item">';
+    $output .= '<a class="nav-link" id="tab4-tab" data-toggle="tab" href="#tab4" role="tab" aria-controls="tab4" aria-selected="false">Answers</a>';
+    $output .= '</li>'; */
     $output .= '</ul>';
-
+    
     // Tab content
     $output .= '<div class="tab-content mt-3" id="myTabContent">';
     $output .= '<div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">';
-    $output .= '<h3>Notes Content here</h3>';
-    $output .= '<p>This is the content of tab Notes.</p>';
+    
+    $output .= '<h2>Upload Notes</h2>';
+    $output .= '<form id="noteForm" enctype="multipart/form-data">';
+    $output .= '<div class="form-group mb-3">';
+    $output .= '<label for="noteFile">Select File:</label>';
+    $output .= '<input type="file" class="form-control-file" id="noteFile" name="noteFile" accept=".docx, .pptx, .pdf">';
+    $output .= '</div>';
+    $output .= '<div class="form-group mb-3">';
+    $output .= '<label for="noteDescription">Note Description:</label>';
+    $output .= '<input type="text" class="form-control" id="noteDescription" name="noteDescription" placeholder="Enter note description">';
+    $output .= '</div>';
+    $output .= '<div class="form-group mb-3">';
+    $output .= '<label for="noteTitle">Note Title:</label>';
+    $output .= '<input type="text" class="form-control" id="noteTitle" name="noteTitle" placeholder="Enter note title">';
+    $output .= '</div>';
+    $output .= '<button type="submit" class="btn btn-success">Upload Note</button>';
+    $output .= '</form>';
+    $output .= '<div id="uploadNoteResult" class="mt-3"></div>';
+    
+    $output .= '<div id="uploadedNotesFiles" class="mt-5">';
+    $output .= '<h3>Uploaded Notes</h3>';
+    // Fetch data from the 'note' table
+    include 'db.php'; // Include database connection
+    $sql = "SELECT noteTitle, noteDescription, uploadDate, noteFilePath FROM Note WHERE courseID = $courseId"; 
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        // Output table headers
+        $output .= '<div class="table-responsive">';
+        $output .= '<table class="table table-striped">';
+        $output .= '<thead><tr><th>Note Title</th><th>Note Description</th><th>Date</th><th>URL</th></tr></thead>';
+        $output .= '<tbody>';
+        // Output data of each row
+        while ($row = $result->fetch_assoc()) {
+            $noteFilePath = $row['noteFilePath']; 
+            $output .= '<tr>';
+            $output .= '<td>' . $row['noteTitle'] . '</td>';
+            $output .= '<td>' . $row['noteDescription'] . '</td>';
+            $output .= '<td>' . $row['uploadDate'] . '</td>';
+            $output .= '<td><a href="' . $noteFilePath . '" class="btn btn-primary" download>Download</a></td>';
+            $output .= '</tr>';
+        }
+        $output .= '</tbody>';
+        $output .= '</table>';
+        $output .= '</div>';
+    } else {
+        $output .= '<div class="alert alert-info" role="alert">No notes found.</div>';
+    }
+    $conn->close();
+    $output .= '</div>';
+
+        //notes  form ended
     $output .= '</div>';
     $output .= '<div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">';
-    $output .= '<h3>Tutorial Content here</h3>';
-    $output .= '<p>This is the content of tab Tutorial.</p>';
+    $output .= '<h3>Tutorials of the Course</h3>';
+    $output .= '<p>Here are your tutorials</p>';
+    //form to upload tutorials
+    $output .= '<form id="tutorialForm" enctype="multipart/form-data" action="tutorialUploaded.php" method="post">';
+    
+    $output .= '<div class="form-group mb-3">';
+    $output .= '<label for="tutorialFile">Select File:</label>';
+    $output .= '<input type="file" class="form-control-file" id="tutorialFile" name="tutorialFile">';
     $output .= '</div>';
+    $output .= '<div class="form-group mb-3">';
+    $output .= '<label for="tutorialDescription">Tutorial Description:</label>';
+    $output .= '<input type="text" class="form-control" id="tutorialDescription" name="tutorialDescription" placeholder="Enter tutorial description">';
+    $output .= '</div>';
+    $output .= '<div class="form-group mb-3">';
+    $output .= '<label for="tutorialTitle">Tutorial Title:</label>';
+    $output .= '<input type="text" class="form-control" id="tutorialTitle" name="tutorialTitle" placeholder="Enter tutorial title">';
+    $output .= '</div>';
+    $output .= '<div class="form-group d-flex align-items-center mt-3" style="height: 100px;">'; //start flex containter
+    $output .= '<button type="submit" class="btn btn-success mr-5">Upload Tutorial</button>';
+    $output .= '<div id="uploadMessage"></div>'; //inside flexbox -- should i change this ti messageBox? - refer to line 390
+    $output .= '</div>'; //flex container end
+    $output .= '</form>';
+     
+    
+    // Display section for uploaded tutorials
+    $output .= '<div id="uploadResult" class="mt-5"></div>';
+    $output .= '<div id="uploadedTutorialFiles" class="mt-5">';
+    $output .= '<h3>Uploaded Tutorials</h3>';
+
+     include 'db.php'; 
+     $sql = "SELECT * FROM Tutorial WHERE courseID = $courseId"; 
+     $result = $conn->query($sql);
+     if ($result->num_rows > 0) {
+         $output .= '<div class="table-responsive">';
+         $output .= '<table class="table table-striped">';
+         $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>Download</th><th>Submits</th></tr></thead>';
+         $output .= '<tbody>';
+         // Output data of each row
+         while ($row = $result->fetch_assoc()) {
+            $tutorialID = $row['tutorialID'];
+            $tutorialFilePath = $row['tutorialFilePath'];
+             $output .= '<tr>';
+             $output .= '<td>' . $row['tutorialTitle'] . '</td>';
+             $output .= '<td>' . $row['tutorialDescription'] . '</td>';
+             $output .= '<td>' . $row['uploadDate'] . '</td>';
+             $output .= '<td><a href="' . $tutorialFilePath . '" class="btn btn-primary" download>Download</a></td>';
+             $output .= '<td><button class="btn btn-success btn-see-answers" data-tutorial-id="' . $tutorialID . '" >See Answers</button></td>'; // on click -> ajaxcomponent that displays matching tutorialAnswers
+             $output .= '</tr>';
+         }
+         $output .= '</tbody>';
+         $output .= '</table>';
+         $output .= '</div>';
+     } else {
+         $output .= '<div class="alert alert-info" role="alert">No tutorials found.</div>';
+     }
+     $conn->close();
+
+    $output .= '</div>'; // tutorial form ended
+
+    $output .= '</div>';
+    //starting the students tab stuff
     $output .= '<div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">';
     $output .= '<h3>Students</h3>';
+    // Move the studentList container inside the 'Students' tab's content division
     $output .= '<div id="studentList"></div>';
     $output .= '<button id="addStudentBtn">Add Student</button>';
     $output .= '</div>';
-    $output .= '</div>';
 
+      // New tab for Answers
+    /* $output .= '<div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">';
+    $output .= '<div id="commentFormContainer">';
+    $output .= '<h3>Answers</h3>';
+    $output .= '<div class="table-responsive">';
+    $output .= '<table class="table table-striped">';
+    $output .= '<thead>';
+    $output .= '<tr>';
+    $output .= '<th>Student Name</th>';
+    $output .= '<th>Submission Title</th>';
+    $output .= '<th>Your Comment</th>';
+    $output .= '<th>Upload Date</th>';
+    $output .= '<th>Download</th>';
+    $output .= '<th>Remarks</th>';
+    $output .= '</tr>';
+    $output .= '</thead>';
+    $output .= '<tbody>';
+    
+    include 'db.php'; 
+    $sql = "SELECT ta.tutorialAnswerID, ta.tutorialAnswerTitle, ta.SID, CONCAT(s.FName, ' ', s.LName) AS StudentName, ta.tutorComment, ta.uploadDate, ta.tutorialAnswerFilePath
+        FROM TutorialAnswer AS ta
+        INNER JOIN Student AS s ON ta.SID = s.SID
+        WHERE ta.tutorialAnswerID = $courseId";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $tutorialAnswerID = $row['tutorialAnswerID'];
+            $output .= '<tr>';
+            $output .= '<td>' . $row['StudentName'] . '</td>';
+            $output .= '<td>' . $row['tutorialAnswerTitle'] . '</td>';
+            $output .= '<td style="display: none;">' . $row['SID'] . '</td>';
+            $output .= '<td>' . $row['tutorComment'] . '</td>';
+            $output .= '<td>' . $row['uploadDate'] . '</td>';
+            $output .= '<td><a href="' . $row['tutorialAnswerFilePath'] . '" class="btn btn-primary" download>Download</a></td>';
+            $output .= '<td>'; // Remarks column
+            $output .= '<button class="btn btn-success btn-comment" data-tutorial-answer-id="' . $tutorialAnswerID . '">Comment</button>';
+            $output .= '</td>';
+            $output .= '</tr>';
+        }
+    } else {
+        $output .= '<tr><td colspan="7">No answers found.</td></tr>';
+    }
+    $conn->close();
+    
+    $output .= '</tbody>';
+    $output .= '</table>';
+    $output .= '</div>'; 
     $output .= '</div>';
+    $output .= '</div>'; */  //end of tab-pane
+
+    $output .= '</div>'; //end of tab content
+
+    $output .= '</div>'; //end of container
 
     return $output;
 }
@@ -51,6 +222,9 @@ $endDate = isset($_SESSION['endDate']) ? $_SESSION['endDate'] : '';
 
 // Generate and output the course details HTML
 echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
+
+// Handle file upload if form is submitted
+
 ?>
 
 <!-- Include Bootstrap JavaScript Library -->
@@ -149,7 +323,130 @@ echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
 
     // Event listener for the Students tab
     $(document).on('click', '#tab3-tab', reloadStudentList);
+
+                                //Valsan section -- NOTES part
+ 
+ $(document).ready(function() {
+            // Event listener for form submission in inCourse.php
+            $('#noteForm').submit(function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Serialize the form data
+                var formData = new FormData($(this)[0]);
+                formData.append('courseId', $('#courseId').val());
+
+                // Make an AJAX request to submit the form data
+                $.ajax({
+                    url: 'notesUploaded.php', // Endpoint to handle form submission
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response, textStatus, xhr) {
+                        // Check the status code to determine success or failure
+                if (xhr.status === 200) {
+                    // Display the success message
+                    $('#uploadNoteResult').html('<div class="alert alert-success" role="alert">' + response + '</div>');
+                    // Update the list of uploaded files
+                    updateUploadedFilesList(formData.get('noteFile').name);
+                } else {
+                    // Display the error message
+                    $('#uploadNoteResult').text(response);
+                    // Handle error
+                }
+            },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        // Handle error
+                    }
+                });
+            });
+        });
+
+// Update the list of uploaded files after successful file upload
+function updateUploadedFilesList(fileName) {
+    // Append the new file to the list
+    $('#fileList').append('<li>' + fileName + '</li>');
+}
+
+});
+                                //Valsan section -- TUTORIALS part
+$(document).ready(function() {
+    // Event listener for tutorial file upload
+    $('#tutorialForm').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Serialize the form data
+        var formData = new FormData($(this)[0]);
+        formData.append('courseId', $('#courseId').val());
+
+        // Make an AJAX request to submit the form data
+        $.ajax({
+            url: 'tutorialUploaded.php', // Endpoint to handle form submission
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response, textStatus, xhr) {
+                // Check the HTTP status code in the response
+                if (xhr.status === 200) {
+                    // Success
+                    $('#uploadMessage').html('<div class="alert alert-success" role="alert">' + response + '</div>');
+                    /* $('#uploadResult').html(response); */
+                    updateUploadedFilesList(response.fileNames);
+                } else {
+                    // Error
+                    $('#uploadMessage').html('<div class="alert alert-danger" role="alert">Error: ' + response + '</div>');
+                }
+            },
+            error: function(xhr, status, error) {
+                // Display error message to the user
+                $('#uploadMessage').html('<div class="alert alert-danger" role="alert">Error: ' + error + '</div>');
+            }
+        });
+    });
 });
 
+// SEE ANSWERS button clicked - jQuery
+$(document).ready(function(){
+    $('.btn-see-answers').click(function(){
+        var tutorialID = $(this).data('tutorial-id'); // Retrieve tutorial ID from data attribute
+        $.ajax({
+            type: 'POST',
+            url: 'seeStudentSubmission.php',
+            data: { tutorialID: tutorialID }, // Pass tutorial ID to PHP script
+            success: function(response){
+                $('#uploadedTutorialFiles').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                // Debugging: Log any errors to the console
+                console.log("AJAX Error: " + error);
+            }
+
+        });
+    });
+});
+
+//jQuery for answers tab - tab4 - hidden
+/* $(document).ready(function() { 
+    $('.btn-comment').click(function(event) {
+        event.preventDefault(); 
+
+        var tutorialAnswerID = $(this).data('tutorial-answer-id');
+        $.ajax({
+            url: 'tutorCommentForm.php', 
+            type: 'POST',
+            data: { tutorialAnswerID: tutorialAnswerID },
+            success: function(response) {
+                $('#commentFormContainer').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+}); */
 
 </script>
+
