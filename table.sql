@@ -73,6 +73,7 @@ CREATE TABLE CourseStudent (
     UNIQUE KEY (courseId, SID)
 );
 
+
 /*NEW QUERY*/
 
 CREATE TABLE MeetingStudent (
@@ -94,3 +95,24 @@ ALTER TABLE MeetingStudent
 ADD COLUMN SID INT AFTER TID,
 ADD FOREIGN KEY (SID) REFERENCES Student(SID);
 
+=======
+/*Adam changes*/
+
+ALTER TABLE Student ADD COLUMN last_login TIMESTAMP NULL;
+
+ALTER TABLE Tutor ADD COLUMN last_login TIMESTAMP NULL;
+
+ALTER TABLE Admin ADD COLUMN last_login TIMESTAMP NULL;
+
+CREATE TABLE BlogPost (
+    PostID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(255),
+    Content TEXT,
+    StudentID INT,
+    TutorID INT,
+    ImagePath VARCHAR(255),
+    UserRole ENUM('student', 'tutor'),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (StudentID) REFERENCES Student(SID) ON DELETE CASCADE,
+    FOREIGN KEY (TutorID) REFERENCES Tutor(TID) ON DELETE CASCADE
+);

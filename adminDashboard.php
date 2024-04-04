@@ -7,6 +7,48 @@ include "db.php";
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
+
+use \Firebase\JWT\JWT;
+
+// Retrieve the JWT token from the cookie
+$token = $_COOKIE['token'];
+
+// Decode the JWT token to extract the email
+$decoded = JWT::decode($token, 'your_secret_key', array('HS256'));
+$user_email = $decoded->email;
+
+// Check if the user exists in the database
+$sql_check_user = "SELECT * FROM Admin WHERE Email = '$user_email'";
+$result_check_user = $conn->query($sql_check_user);
+
+$welcome_message = "";
+$last_login_time = ""; // Initialize the variable to avoid errors
+
+if ($result_check_user && $result_check_user->num_rows > 0) {
+    // User exists in the database
+    $row = $result_check_user->fetch_assoc();
+    
+    // Check if it's the user's first login (last login time is NULL)
+    if ($row['last_login'] === null) {
+        // Update last login time
+        date_default_timezone_set('Asia/Kuala_Lumpur');
+        $current_time = date('Y-m-d H:i:s');
+        $update_query = "UPDATE Admin SET last_login = '$current_time' WHERE Email = '$user_email'";
+        $conn->query($update_query);
+
+        // Display welcome message for the first login
+        $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
+    } else {
+        // User has logged in before, fetch the last login time
+        $last_login_time = $row['last_login'];
+        $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
+    }
+} else {
+    // User doesn't exist in the database
+    $welcome_message = "Unknown User";
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -150,6 +192,7 @@ header("Expires: 0");
                         </a>
                     </li>
                 </ul>
+                <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
             </div>
         </div>
         
