@@ -250,7 +250,7 @@ function getStudentBlog() {
 // Output HTML markup for blog component
  
 // Prepare SQL query to log system activity
-$activity_type = "Show Blog Post";
+$activity_type = "Blog";
 $page_name = "studentDashboard.php";
 $browser_name = $_SERVER['HTTP_USER_AGENT'];
 $user_id = $userID; // Assuming $userID holds the student's ID
