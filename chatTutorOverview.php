@@ -69,7 +69,7 @@ $output .= '</div>';
   $_SESSION['TID'] = $sid;
 
   // Prepare SQL query to log system activity
-  $activity_type = "Chat";
+  $activity_type = "Show Chat";
   $page_name = "TutorDashboard.php";
   $browser_name = $_SERVER['HTTP_USER_AGENT'];
   $user_id = $tid; 

@@ -71,7 +71,7 @@ if ($result_fetch_tutor_details->num_rows > 0) {
     $_SESSION['SID'] = $sid;
 
     // Prepare SQL query to log system activity
-    $activity_type = "Chat";
+    $activity_type = "Show Chat";
     $page_name = "studentDashboard.php";
     $browser_name = $_SERVER['HTTP_USER_AGENT'];
     $user_id = $sid; // Assuming $sid holds the student's ID
