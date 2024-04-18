@@ -102,7 +102,25 @@ $rowCount = 0;
             $mailer->send($message);
             echo "success";
         }
-        
+          // Log system activity
+          $user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
+          $activity_type = "Register user";
+          $page_name = "adminDashboard.php";
+          $browser_name = $_SERVER['HTTP_USER_AGENT'];
+          $user_type = "Admin";
+
+          $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                           VALUES (?, ?, ?, ?, ?)";
+          $insert_stmt = $conn->prepare($insert_query);
+          $insert_stmt->bind_param("issss", $user_id, $user_type, $activity_type, $page_name, $browser_name);
+
+          if ($insert_stmt->execute()) {
+              echo "success";
+          } else {
+              // Handle error if insert query fails
+              echo "Error inserting system activity: " . $conn->error;
+          }
+
         exit();
     } else {
         // Registration failed, handle the error (e.g., duplicate email)
