@@ -32,7 +32,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
       // Tab content
       $output .= '<div class="tab-content mt-3" id="myTabContent">';
       $output .= '<div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">';
-      $output .= '<h3>Notes Content here</h3>';
+      $output .= '<h3>Available Notes</h3>';
       $output .= '<div id="noteList"></div>'; // Placeholder for notes list
       $output .= '</div>';
 
@@ -45,9 +45,10 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $sql = "SELECT tutorialTitle, tutorialID, tutorialDescription, uploadDate, tutorialFilePath FROM Tutorial WHERE courseId = $courseId";
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
-        // Output table headers
+
+        $output .= '<input type="text" id="tutorialSearchInput" placeholder="Search tutorials..." class="form-control mb-3">';
         $output .= '<div class="table-responsive">';
-        $output .= '<table class="table table-striped">';
+        $output .= '<table class="table table-striped" id="tutorialTable">';
         $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>View</th><th>Answer</th></tr></thead>';
         $output .= '<tbody>';
         // Output data of each row
@@ -109,6 +110,14 @@ echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Include jQuery -->
 <script>
+    $(document).ready(function() {
+    $('#tutorialSearchInput').on('keyup', function() {
+        var searchText = $(this).val().toLowerCase();
+        $('#tutorialTable tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+        });
+    });
+});
 /* $(document).on('click', '#tab1-tab', reloadNotesList); */
 
     // Function to reload the student list after successful insertion
@@ -194,6 +203,7 @@ $(document).on('click', '.submit-tutorial', function() {
     // Event listener for the Students tab
     $(document).on('click', '#tab3-tab', reloadStudentList);
 
+    
 
 </script>
 

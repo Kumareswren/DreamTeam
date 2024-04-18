@@ -4,6 +4,21 @@ include 'tutorUploadSession.php';
 require_once('vendor/autoload.php');
 
 use \Firebase\JWT\JWT;
+
+try {
+    // Create the Transport instance (using SMTP transport for example)
+    $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) 
+    ->setUsername('venturesrsk@gmail.com')
+    ->setPassword('zohh take gpri knhn');
+
+    //****************here************************** */
+$mailer = new Swift_Mailer($transport);
+} catch (Exception $e) {
+    // Handle any errors that occur during transport/mail creation
+    echo "Error creating mailer: " . $e->getMessage();
+    exit(); // Exit the script if mailer creation fails
+}
+
 function sendResponse($statusCode, $message) {
     http_response_code($statusCode);
     echo $message;
@@ -37,75 +52,104 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Move the uploaded file to the desired directory
             if (move_uploaded_file($file["tmp_name"], $filePath)) {
-                /* sendResponse(200, "File uploaded successfully."); */
-            
-            // Retrieve tutorID from token
-            if (isset($_COOKIE['token'])) {
-                $token = $_COOKIE['token'];
+                // Retrieve tutorID from token
+                if (isset($_COOKIE['token'])) {
+                    $token = $_COOKIE['token'];
 
-                // Decode the token to get the email 
-                $secretKey = 'your_secret_key'; // Update with your secret key
-                try {
-                    $decoded = JWT::decode($token, $secretKey, array('HS256'));
-                    $email = $decoded->email;
+                    // Decode the token to get the email 
+                    $secretKey = 'your_secret_key'; // Update with your secret key
+                    try {
+                        $decoded = JWT::decode($token, $secretKey, array('HS256'));
+                        $email = $decoded->email;
 
-                    // Query to get the TID for the tutor's email
-                    $sqlTutor = "SELECT TID FROM Tutor WHERE Email=?";
-                    $stmtTutor = $conn->prepare($sqlTutor);
-                    if (!$stmtTutor) {
-                        die("Error in SQL query: " . $conn->error);
-                    }
-
-                    $stmtTutor->bind_param("s", $email);
-                    $stmtTutor->execute();
-                    $resultTutor = $stmtTutor->get_result();
-
-                    // Check if tutor found
-                    if ($resultTutor->num_rows > 0) {
-                        $rowTutor = $resultTutor->fetch_assoc();
-                        $tutorID = $rowTutor['TID'];
-
-                     /*    //retrieve coursID currently associated with tutor
-                        session_start();
-                        $courseId = $_SESSION['courseID']; */
-
-                        // Prepare and execute SQL statement to insert file details into the database
-                        $noteTitle = isset($_POST['noteTitle']) ? $_POST['noteTitle'] : 'Note Title';
-                        $noteDescription = isset($_POST['noteDescription']) ? $_POST['noteDescription'] : 'Note Description';
-                        
-                        // Retrieve courseId from session
-                        $courseId = $_SESSION['courseId'];
-                        
-                        $sqlInsert = "INSERT INTO Note (tutorID, courseID, noteTitle, noteDescription, noteFilePath) 
-                                      VALUES (?, ?, ?, ?, ?)";
-                        $stmtInsert = $conn->prepare($sqlInsert);
-                        $stmtInsert->bind_param("iisss", $tutorID, $courseId, $noteTitle, $noteDescription, $filePath);
-                        
-                        // Execute the SQL statement
-                        if ($stmtInsert->execute()) {
-                            header("HTTP/1.1 200 OK");
-                            echo "Notes uploaded successfully";
-                        } else {
-                            // Send internal server error response
-                            http_response_code(500);
-                            echo "Failed to insert file details into database.";
+                        // Query to get the TID for the tutor's email
+                        $sqlTutor = "SELECT TID FROM Tutor WHERE Email=?";
+                        $stmtTutor = $conn->prepare($sqlTutor);
+                        if (!$stmtTutor) {
+                            die("Error in SQL query: " . $conn->error);
                         }
-                    } else {
-                        // Send not found response
-                        http_response_code(404);
-                        echo "Tutor not found.";
+
+                        $stmtTutor->bind_param("s", $email);
+                        $stmtTutor->execute();
+                        $resultTutor = $stmtTutor->get_result();
+
+                        // Check if tutor found
+                        if ($resultTutor->num_rows > 0) {
+                            $rowTutor = $resultTutor->fetch_assoc();
+                            $tutorID = $rowTutor['TID'];
+
+                            // Prepare and execute SQL statement to insert file details into the database
+                            $noteTitle = isset($_POST['noteTitle']) ? $_POST['noteTitle'] : 'Note Title';
+                            $noteDescription = isset($_POST['noteDescription']) ? $_POST['noteDescription'] : 'Note Description';
+
+                            // Retrieve courseId from session
+                            $courseId = $_SESSION['courseId'];
+
+                            $sqlInsert = "INSERT INTO Note (tutorID, courseID, noteTitle, noteDescription, noteFilePath) 
+                                      VALUES (?, ?, ?, ?, ?)";
+                            $stmtInsert = $conn->prepare($sqlInsert);
+                            $stmtInsert->bind_param("iisss", $tutorID, $courseId, $noteTitle, $noteDescription, $filePath);
+
+                            // Execute the SQL statement
+                            if ($stmtInsert->execute()) {
+                                // Retrieve student email associated with the matching course ID
+                                $sqlStudentEmail = "SELECT Student.Email
+                                                    FROM Student
+                                                    INNER JOIN CourseStudent ON Student.SID = CourseStudent.SID
+                                                    WHERE CourseStudent.courseID = ?";
+                                $stmtStudentEmail = $conn->prepare($sqlStudentEmail);
+                                $stmtStudentEmail->bind_param("i", $courseId);
+                                $stmtStudentEmail->execute();
+                                $resultStudentEmail = $stmtStudentEmail->get_result();
+
+                                if ($resultStudentEmail->num_rows > 0) {
+                                    $rowStudentEmail = $resultStudentEmail->fetch_assoc();
+                                    $student_email = $rowStudentEmail['Email'];
+
+                                    // Send email notification to students
+                                    $mailer = new Swift_Mailer($transport);
+
+                                    $message = (new Swift_Message('New Notes Uploaded'))
+                                        ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
+                                        ->setTo([$student_email])
+                                        ->setBody("Dear student, your tutor has uploaded new notes. You can now access them using the website.");
+
+                                    // Send the message
+                                    $result = $mailer->send($message);
+                                    if ($result) {
+                                        // Email sent successfully
+                                        header("HTTP/1.1 200 OK");
+                                        echo "Notes uploaded successfully";
+                                        exit();
+                                    } else {
+                                        // Error sending email
+                                        http_response_code(500);
+                                        echo "Failed to upload notes";
+                                        exit();
+                                    }
+                                } else {
+                                    echo "No student found for the given course ID.";
+                                }
+                            } else {
+                                // Send internal server error response
+                                http_response_code(500);
+                                echo "Failed to insert file details into database.";
+                            }
+                        } else {
+                            // Send not found response
+                            http_response_code(404);
+                            echo "Tutor not found.";
+                        }
+                    } catch (Exception $e) {
+                        // Send bad request response
+                        http_response_code(400);
+                        echo "Error decoding token: " . $e->getMessage();
                     }
-                } catch (Exception $e) {
+                } else {
                     // Send bad request response
                     http_response_code(400);
-                    echo "Error decoding token: " . $e->getMessage();
+                    echo "Token not found.";
                 }
-            } else {
-                // Send bad request response
-                http_response_code(400);
-                echo "Token not found.";
-            }
-            
             } else {
                 // Send internal server error response
                 http_response_code(500);
@@ -121,6 +165,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         http_response_code(400);
         echo "No file uploaded.";
     }
-}
-
-
+} 
+?>

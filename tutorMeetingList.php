@@ -76,6 +76,12 @@ if (isset($_COOKIE['token'])) {
                 echo "<body>";
                 echo "<div class='container mt-5'>";
                 echo "<h2>Tutor Meeting List</h2>";
+                // search stuff
+                echo "<div class='search-container'>";
+                echo "<input type='text' id='searchInput' class='form-control' placeholder='Search for student name...'>";
+                echo "</div>";
+                //end of search stuff
+                echo "<div class='table-responsive'>"; 
                 echo "<table class='table table-bordered mt-3'>";
                 echo "<thead class='thead-dark'>";
                 echo "<tr>";
@@ -90,6 +96,7 @@ if (isset($_COOKIE['token'])) {
                 echo "<tbody>";
 
                 while ($row = $meetingResult->fetch_assoc()) {
+
                     echo "<tr>";
                     echo "<td>{$row['fname']} {$row['lname']}</td>";
                     echo "<td>{$row['meetingDate']}</td>";
@@ -139,3 +146,16 @@ if (isset($_COOKIE['token'])) {
     exit();
 }
 ?>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#searchInput').on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        $('tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+});
+</script>
+

@@ -9,6 +9,7 @@ header("Content-Type: text/html"); // Set content type to HTML
     
     function generateStudentList($conn, $result) {
         $output = '<h2 class="mt-5 mb-4">My Student List</h2>'; // Add the heading
+        $output .= '<input type="text" id="searchInput" placeholder="Search for student" class="form-control mb-3">'; //search input field
         $output .= '<table class="table">';
         $output .= '<thead>';
         $output .= '<tr>';
@@ -98,3 +99,26 @@ if (isset($_COOKIE['token'])) {
     echo "Token not found.";
 }
 ?>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
+<script>
+$(document).ready(function() {
+    // Add an event listener to the search input field
+    $('#searchInput').on('input', function() {
+        // Get the search term
+        var searchTerm = $(this).val().toLowerCase();
+
+        // Filter the table rows based on the search term
+        $('tbody tr').each(function() {
+            var firstName = $(this).find('td:nth-child(1)').text().toLowerCase();
+            var lastName = $(this).find('td:nth-child(2)').text().toLowerCase();
+            var email = $(this).find('td:nth-child(3)').text().toLowerCase();
+            var contact = $(this).find('td:nth-child(4)').text().toLowerCase();
+            if (firstName.includes(searchTerm) || lastName.includes(searchTerm) || email.includes(searchTerm) || contact.includes(searchTerm)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+});
+</script>

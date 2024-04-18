@@ -9,6 +9,7 @@ header("Content-Type: text/html"); // Set content type to HTML
 
 function generateCourseList($conn, $result) {
     $output = '<h2 class="mt-5 mb-4">Courses List</h2>'; // Add the heading
+    $output .= '<input type="text" id="courseSearchInput" placeholder="Search courses..."  class="form-control mb-3">';
     $output .= '<table class="table">';
     $output .= '<thead>';
     $output .= '<tr>';
@@ -163,5 +164,14 @@ if (isset($_COOKIE['token'])) {
             });
         });
     });
+
+    $(document).ready(function() {
+    $('#courseSearchInput').on('keyup', function() {
+        var searchText = $(this).val().toLowerCase();
+        $('.course-row').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+        });
+    });
+});
 </script>
 
