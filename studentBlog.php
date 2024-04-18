@@ -97,6 +97,7 @@ function getStudentBlog() {
                           break;
                   }
               }
+              
               echo ' <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />';
               echo '<style>';
               echo 'body {';
@@ -248,6 +249,19 @@ function getStudentBlog() {
               
 // Output HTML markup for blog component
  
+// Prepare SQL query to log system activity
+$activity_type = "Show Blog Post";
+$page_name = "studentDashboard.php";
+$browser_name = $_SERVER['HTTP_USER_AGENT'];
+$user_id = $userID; // Assuming $userID holds the student's ID
+$user_type = "Student";
+
+$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+if ($conn->query($insert_query) !== TRUE) {
+    // Handle error if insert query fails
+    echo "Error inserting system activity: " . $conn->error;
+}
 
 echo '<div class="swiper-container">';
 echo '<div class="swiper-wrapper">';
@@ -303,4 +317,5 @@ echo '</div>';
 
 // Call the function to output the blog component
 getStudentBlog();
+
 ?>
