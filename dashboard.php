@@ -379,7 +379,7 @@ $resultMostActiveUsers = $conn->query($sqlMostActiveUsers);
 // Display results for most active users
 echo '<div class="table-responsive">';
 echo '<table class="table table-bordered">';
-echo "<thead><tr><th>User Type</th><th>First Name</th><th>Activity Count</th></tr></thead><tbody>";
+echo "<thead><tr><th>User Type</th><th>Name</th><th>Activity Count</th></tr></thead><tbody>";
 while ($row = $resultMostActiveUsers->fetch_assoc()) {
     echo "<tr><td>" . $row['UserType'] . "</td><td>" . $row['FirstName'] . "</td><td>" . $row['ActivityCount'] . "</td></tr>";
 }
