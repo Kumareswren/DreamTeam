@@ -64,6 +64,19 @@ function createStudentBlog() {
                     // Move uploaded image to desired directory
                     move_uploaded_file($_FILES['upload-image']['tmp_name'], $imagePath);
 
+                    // Insert record into SystemActivity table
+                    $activity_type = "Create Blog Post";
+                    $page_name = "studentDashboard.php";
+                    $browser_name = $_SERVER['HTTP_USER_AGENT'];
+                    $user_id = $row['SID'];
+                    $user_type = "Student";
+
+                    $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                                     VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+                    if ($conn->query($insert_query) !== TRUE) {
+                        // Handle error if insert query fails
+                        echo "Error inserting system activity: " . $conn->error;
+                    }
                     // Redirect to some page after successful submission
                     header("Location: studentDashboard.php");
                     exit();

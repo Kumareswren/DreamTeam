@@ -341,22 +341,22 @@ if(isset($_POST['user_role'])) {
         echo "<h2>Dashboard</h2><br/>";
         echo "<h2>System Usage Reports</h2>";
 
-    // Query to get the most viewed pages
-    echo "<h4>Most Viewed Pages</h4>";
-    $sqlMostViewedPages = "SELECT PageName, COUNT(*) as ViewCount
-                           FROM SystemActivity
-                           GROUP BY PageName
-                           ORDER BY ViewCount DESC";
-    $resultMostViewedPages = $conn->query($sqlMostViewedPages);
-    
-    // Display results for most viewed pages
-    echo '<div class="table-responsive">';
-    echo '<table class="table table-bordered">';
-    echo "<thead><tr><th>Page Name</th><th>View Count</th></tr></thead><tbody>";
-    while ($row = $resultMostViewedPages->fetch_assoc()) {
-        echo "<tr><td>" . $row['PageName'] . "</td><td>" . $row['ViewCount'] . "</td></tr>";
-    }
-    echo "</tbody></table></div>";
+    // Query to get the most viewed pages with their activity types
+echo "<h4>Most Viewed Pages</h4>";
+$sqlMostViewedPages = "SELECT PageName, ActivityType, COUNT(*) as ViewCount
+                       FROM SystemActivity
+                       GROUP BY PageName, ActivityType
+                       ORDER BY ViewCount DESC";
+$resultMostViewedPages = $conn->query($sqlMostViewedPages);
+
+// Display results for most viewed pages with activity types
+echo '<div class="table-responsive">';
+echo '<table class="table table-bordered">';
+echo "<thead><tr><th>Page Name</th><th>Activity Type</th><th>View Count</th></tr></thead><tbody>";
+while ($row = $resultMostViewedPages->fetch_assoc()) {
+    echo "<tr><td>" . $row['PageName'] . "</td><td>" . $row['ActivityType'] . "</td><td>" . $row['ViewCount'] . "</td></tr>";
+}
+echo "</tbody></table></div>";
     
 // Query to get the most active users
 echo "<h4>Most Active Users</h4>";
