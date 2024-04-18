@@ -358,22 +358,32 @@ if(isset($_POST['user_role'])) {
     }
     echo "</tbody></table></div>";
     
-    // Query to get the most active users
-    echo "<h4>Most Active Users</h4>";
-    $sqlMostActiveUsers = "SELECT UserID, UserType, COUNT(*) as ActivityCount
-                           FROM SystemActivity
-                           GROUP BY UserID, UserType
-                           ORDER BY ActivityCount DESC";
-    $resultMostActiveUsers = $conn->query($sqlMostActiveUsers);
-    
-    // Display results for most active users
-    echo '<div class="table-responsive">';
-    echo '<table class="table table-bordered">';
-    echo "<thead><tr><th>User ID</th><th>User Type</th><th>Activity Count</th></tr></thead><tbody>";
-    while ($row = $resultMostActiveUsers->fetch_assoc()) {
-        echo "<tr><td>" . $row['UserID'] . "</td><td>" . $row['UserType'] . "</td><td>" . $row['ActivityCount'] . "</td></tr>";
-    }
-    echo "</tbody></table></div>";
+// Query to get the most active users
+echo "<h4>Most Active Users</h4>";
+$sqlMostActiveUsers = "SELECT SA.UserType, 
+                            CASE
+                                WHEN SA.UserType = 'Student' THEN S.FName
+                                WHEN SA.UserType = 'Tutor' THEN T.FName
+                                WHEN SA.UserType = 'Admin' THEN A.FName
+                            END AS FirstName,
+                           COUNT(*) as ActivityCount
+                       FROM SystemActivity SA
+                       LEFT JOIN Student S ON SA.UserID = S.SID AND SA.UserType = 'Student'
+                       LEFT JOIN Tutor T ON SA.UserID = T.TID AND SA.UserType = 'Tutor'
+                       LEFT JOIN Admin A ON SA.UserID = A.AID AND SA.UserType = 'Admin'
+                       GROUP BY SA.UserID, SA.UserType
+                       ORDER BY ActivityCount DESC";
+
+$resultMostActiveUsers = $conn->query($sqlMostActiveUsers);
+
+// Display results for most active users
+echo '<div class="table-responsive">';
+echo '<table class="table table-bordered">';
+echo "<thead><tr><th>User Type</th><th>First Name</th><th>Activity Count</th></tr></thead><tbody>";
+while ($row = $resultMostActiveUsers->fetch_assoc()) {
+    echo "<tr><td>" . $row['UserType'] . "</td><td>" . $row['FirstName'] . "</td><td>" . $row['ActivityCount'] . "</td></tr>";
+}
+echo "</tbody></table></div>";
     
     // Query to get the browsers being used
     echo "<h4>Browsers Being Used</h4>";
