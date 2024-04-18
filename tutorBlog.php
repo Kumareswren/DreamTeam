@@ -246,7 +246,19 @@ function getTutorBlog() {
                 echo '}';
                 echo '</style>';
              
-             
+             // Prepare SQL query to log system activity
+$activity_type = "Show Blog Post";
+$page_name = "tutorDashboard.php";
+$browser_name = $_SERVER['HTTP_USER_AGENT'];
+$user_id = $userID; // Assuming $userID holds the student's ID
+$user_type = "Tutor";
+
+$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+if ($conn->query($insert_query) !== TRUE) {
+    // Handle error if insert query fails
+    echo "Error inserting system activity: " . $conn->error;
+}
   // Output HTML markup for blog component
   echo '<div class="swiper-container">';
   echo '<div class="swiper-wrapper">';
