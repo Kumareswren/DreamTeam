@@ -160,6 +160,7 @@ header("Expires: 0");
                         event.preventDefault();
                         $.ajax({
                             url: 'assStudentTutorComp.php',
+                            data: { 'AID': <?php echo isset($_SESSION['AID']) ? $_SESSION['AID'] : 'null'; ?> }, // Pass the admin ID as a parameter
                             success: function(data) {
                                 $('#componentContainer').html(data);
                             },
