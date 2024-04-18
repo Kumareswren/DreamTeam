@@ -65,7 +65,22 @@ while ($student_row = $result_fetch_students->fetch_assoc()) {
 $output .= '</tbody>';
 $output .= '</table>';
 $output .= '</div>';
+  
+  $_SESSION['TID'] = $sid;
 
+  // Prepare SQL query to log system activity
+  $activity_type = "Chat";
+  $page_name = "TutorDashboard.php";
+  $browser_name = $_SERVER['HTTP_USER_AGENT'];
+  $user_id = $tid; 
+  $user_type = "Tutor";
+
+  $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                   VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+  if ($conn->query($insert_query) !== TRUE) {
+      // Handle error if insert query fails
+      echo "Error inserting system activity: " . $conn->error;
+  }
 // Wrap the "Start New Conversation" button in a container div and apply CSS for positioning
 $output .= '<div style="text-align: center; margin-top: 10px; margin-right:30px; ">';
 $output .= '<button class="btn btn-warning start-conversation-btn" data-tid="'. $tid.'">Start New Conversation</button>';
