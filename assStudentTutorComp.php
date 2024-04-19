@@ -66,7 +66,15 @@ if (isset($_SESSION['AID'])) {
     // Prepare SQL query to log system activity
     $activity_type = "Assign Students to Tutors";
     $page_name = "adminDashboard.php";
-    $browser_name = $_SERVER['HTTP_USER_AGENT'];
+ $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+ // Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
     $user_id = $AID;
     $user_type = "Admin";
 

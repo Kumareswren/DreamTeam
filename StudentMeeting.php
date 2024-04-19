@@ -53,7 +53,16 @@ if ($user_email !== null) {
     // Prepare SQL query to log system activity
     $activity_type = "Request Meeting";
     $page_name = "studentDashboard.php";
-    $browser_name = $_SERVER['HTTP_USER_AGENT'];
+    $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+ // Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+
     $user_id = $student_SID; // Assuming $student_SID holds the student's ID
     $user_type = "Student";
 

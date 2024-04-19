@@ -6,8 +6,10 @@ $user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
 $activity_type = "View Student and Tutor Dashboard";
 $page_name = "adminDashboard.php";
 $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
-// Regular expression to extract the browser name
-if (preg_match('/(Firefox|Chrome|Safari|Opera|Edge)/i', $full_user_agent, $matches)) {
+ // Regular expression to extract the browser name
+ if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
     $browser_name = $matches[1];
 } else {
     $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined

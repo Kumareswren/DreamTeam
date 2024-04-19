@@ -70,7 +70,16 @@ if ($result_check_user && $result_check_user->num_rows > 0) {
  // Insert record into SystemActivity table
  $activity_type = "Access Dashboard";
  $page_name = "studentDashboard.php";
- $browser_name = $_SERVER['HTTP_USER_AGENT'];
+ $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+// Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+
  $user_id = $row['SID'];
  $user_type = "Student";
 
