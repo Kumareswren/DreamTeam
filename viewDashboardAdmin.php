@@ -1,5 +1,24 @@
 <?php
 require_once 'db.php';
+// Log system activity
+$user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
+$activity_type = "View Student and Tutor Dashboard";
+$page_name = "adminDashboard.php";
+$browser_name = $_SERVER['HTTP_USER_AGENT'];
+$user_type = "Admin";
+
+$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES (?, ?, ?, ?, ?)";
+$insert_stmt = $conn->prepare($insert_query);
+$insert_stmt->bind_param("issss", $user_id, $user_type, $activity_type, $page_name, $browser_name);
+
+if ($insert_stmt->execute()) {
+    echo "success";
+} else {
+    // Handle error if insert query fails
+    echo "Error inserting system activity: " . $conn->error;
+    exit(); // Exit script if system activity logging fails
+}
 function displayDashboardComponent($conn) {
     echo '<!DOCTYPE html>
             <html lang="en">
