@@ -19,6 +19,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $endDate = $_POST["end_date"] . '-01';
     $tutorID = $_POST["tutor_id"];
 
+    $AID = $_SESSION['AID']; // Retrieve admin ID from session
+    // Prepare SQL query to log system activity
+$activity_type = "Create Course";
+$page_name = "adminDashboard.php";
+$browser_name = $_SERVER['HTTP_USER_AGENT'];
+
+$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES ('$AID', 'admin', '$activity_type', '$page_name', '$browser_name')";
+if ($conn->query($insert_query) !== TRUE) {
+    // Handle error if insert query fails
+    echo "<script>alert('Error inserting system activity: " . $conn->error . "');</script>";
+    exit();
+}
     // Server-side validation
     $regex = '/^[A-Za-z\s]+$/'; // Regular expression to match letters and spaces
     if (!preg_match($regex, $courseName)) {
