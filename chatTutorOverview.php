@@ -70,7 +70,7 @@ $output .= '</div>';
 
   // Prepare SQL query to log system activity
   $activity_type = "Show Chat";
-  $page_name = "TutorDashboard.php";
+  $page_name = "tutorDashboard.php";
   $browser_name = $_SERVER['HTTP_USER_AGENT'];
   $user_id = $tid; 
   $user_type = "Tutor";
