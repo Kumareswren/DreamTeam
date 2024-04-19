@@ -186,9 +186,9 @@ body{ /* whole body colouring 18,4 */
 }
 
 .footer .nav-link {
-    padding-top: 5px;
+    padding-top: 1px;
     padding-right: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 1px;
     padding-left: 5px;
     margin-right: 10px;
 
