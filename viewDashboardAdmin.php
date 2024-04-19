@@ -1,10 +1,17 @@
 <?php
+session_start();
 require_once 'db.php';
 // Log system activity
 $user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
 $activity_type = "View Student and Tutor Dashboard";
 $page_name = "adminDashboard.php";
-$browser_name = $_SERVER['HTTP_USER_AGENT'];
+$full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+// Regular expression to extract the browser name
+if (preg_match('/(Firefox|Chrome|Safari|Opera|Edge)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
 $user_type = "Admin";
 
 $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
