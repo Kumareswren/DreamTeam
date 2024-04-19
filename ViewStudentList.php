@@ -68,7 +68,7 @@ if (isset($_COOKIE['token'])) {
 
             // Prepare SQL query to log system activity
             $activity_type = "Show Student list";
-            $page_name = "TutorDashboard.php";
+            $page_name = "tutorDashboard.php";
             $browser_name = $_SERVER['HTTP_USER_AGENT'];
             $user_id = $tid; // Assuming $tid holds the tutor's ID
             $user_type = "Tutor";
