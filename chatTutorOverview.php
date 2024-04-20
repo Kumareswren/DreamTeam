@@ -26,6 +26,7 @@ $result_fetch_students = $conn->query($sql_fetch_students);
 // Generate the table
 $output = '<h3>Overview of your Conversations</h3>';
 $output .= '<div class="table-responsive">';
+$output .= '<input type="text" id="searchInput" placeholder="Search for student" class="form-control mb-3">'; // Add the search input field
 $output .= '<table class="table table-striped table-hover">';
 $output .= '<thead>';
 $output .= '<tr>';
@@ -65,7 +66,31 @@ while ($student_row = $result_fetch_students->fetch_assoc()) {
 $output .= '</tbody>';
 $output .= '</table>';
 $output .= '</div>';
+  
+  $_SESSION['TID'] = $sid;
 
+  // Prepare SQL query to log system activity
+  $activity_type = "Show Chat";
+  $page_name = "tutorDashboard.php";
+
+  $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+  // Regular expression to extract the browser name
+ if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+     $browser_name = 'Edge';
+ } elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+     $browser_name = $matches[1];
+ } else {
+     $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+ }
+  $user_id = $tid; 
+  $user_type = "Tutor";
+
+  $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                   VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+  if ($conn->query($insert_query) !== TRUE) {
+      // Handle error if insert query fails
+      echo "Error inserting system activity: " . $conn->error;
+  }
 // Wrap the "Start New Conversation" button in a container div and apply CSS for positioning
 $output .= '<div style="text-align: center; margin-top: 10px; margin-right:30px; ">';
 $output .= '<button class="btn btn-warning start-conversation-btn" data-tid="'. $tid.'">Start New Conversation</button>';
@@ -124,6 +149,7 @@ $(document).ready(function(){
             data: {sid: sid }, // You can pass data here 
             success: function(response){
                 $('#componentContainer').html(response);
+                console.log(response);
 
                 // Add auto-resizing functionality after loading the chat
                 var textarea = $('#chatInput');
@@ -133,6 +159,9 @@ $(document).ready(function(){
                     this.style.height = (this.scrollHeight) + 'px';
                 });
 
+                // Adjust initial height to fit one line
+                textarea.css('height', 'auto');
+                textarea.css('height', textarea[0].scrollHeight + 'px');
             },
             error: function(xhr, status, error){
                 /* console.error(xhr.responseText); */
@@ -155,6 +184,7 @@ $(document).ready(function(){
             data: {sid: sid}, // Pass SID as POST data
             success: function(response){
                 $('#componentContainer').html(response);
+                console.log(response);
             },
             error: function(xhr, status, error){
                 console.error("Error: " + error);
@@ -163,5 +193,22 @@ $(document).ready(function(){
     });
 });
 
+$(document).ready(function() {
+    // Add an event listener to the search input field
+    $('#searchInput').on('input', function() {
+        // Get the search term
+        var searchTerm = $(this).val().toLowerCase();
+
+        // Filter the table rows based on the search term
+        $('tbody tr').each(function() {
+            var studentName = $(this).find('td:first').text().toLowerCase();
+            if (studentName.includes(searchTerm)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+});
 
 </script>

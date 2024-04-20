@@ -62,9 +62,6 @@ if (isset($_COOKIE['token'])) {
             $stmtMeeting->execute();
             $meetingResult = $stmtMeeting->get_result();
 
-            $trailAction = "Checked meeting list";
-            insertTrailRecord($conn, $trailAction);
-
             // Check if meeting list fetched successfully
             if ($meetingResult->num_rows > 0) {
                 // You can process the meeting list here if needed, but in this case, it's just redirecting back to the tutor meeting list page
@@ -97,27 +94,5 @@ if (isset($_COOKIE['token'])) {
     $_SESSION['message'] = "Token not found.";
     header("Location: tutorMeetingList.php");
     exit();
-}
-
-function insertTrailRecord($conn, $trailAction) {
-    $token = $_COOKIE['token'];
-    $secretKey = 'your_secret_key';
-    $decoded = JWT::decode($token, $secretKey, array('HS256'));
-    $userId = $decoded->userId;
-    $userRole = $decoded->role;
-    $ipAddress = $_SERVER['REMOTE_ADDR'];
-
-    // Prepare and execute the SQL query to insert into trail table
-    $trailSql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
-    $trailStmt = $conn->prepare($trailSql);
-    $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $trailAction);
-    if ($trailStmt->execute()) {
-        // Trail record inserted successfully
-        // You can handle success here if needed
-    } else {
-        // Error inserting into trail table
-        echo "Error inserting into trail table: " . $trailStmt->error;
-    }
-    $trailStmt->close();
 }
 ?>

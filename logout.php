@@ -26,18 +26,6 @@ if(isset($_COOKIE['token'])) {
             // Token not expired, blacklist the token and redirect to login page
             setcookie('token', '', $pastExpirationTime, '/');
             
-            // Log the logout action
-            $userId = $decoded->userId;
-            $userRole = $decoded->role;
-            $userIP = $_SERVER['REMOTE_ADDR'];
-            $actionPerformed = 'Logged out';
-
-            $sql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("isss", $userId, $userRole, $userIP, $actionPerformed);
-            $stmt->execute();
-            $stmt->close();
-
             header("Location: index.php");
             //include logout message
             /* header("Location: index.php"); */
@@ -53,4 +41,4 @@ if(isset($_COOKIE['token'])) {
     header("Location: index.php?error=Token%20not%20provided");
     exit();
 }
-?>
+
