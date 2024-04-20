@@ -191,7 +191,14 @@ $conn->close();
                         <ul class="submenu nav flex-column ms-4">
                             <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 assignment-link">
-                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Assignment</span>
+                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">New Assignment</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="submenu nav flex-column ms-4">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 reassignment-link">
+                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Re-assignment</span>
                                 </a>
                             </li>
                         </ul>
@@ -211,6 +218,12 @@ $conn->close();
                     <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 course-link">
                                 <i class="fs-4 bi bi-journal-text"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 trail-link">
+                                <i class="fs-4 bi bi-journal-text"></i><span class="ms-1 d-none d-sm-inline">Activities</span>
                                 </a>
                             </li>
 
@@ -299,6 +312,59 @@ $conn->close();
                                     alert("Assignment successful.");
                                     // Reload the component
                                     $.get('assStudentTutorComp.php', function(data) {
+                                        $('.container').replaceWith(data); // Replace the container content with the updated one
+                                    });
+                                    
+                                } else {
+                                    $('<div id="alertMessageAssign" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle errors
+                                alert("An error occurred: " + error);
+                            }
+                        });
+                    });
+                }
+
+                $(document).ready(function() {
+                    $('.reassignment-link').click(function(event) {
+                        event.preventDefault();
+                        $.ajax({
+                            url: 'reAssStudentTutorComp.php',
+                            success: function(data) {
+                                $('#componentContainer').html(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('An error occurred:', error);
+                            }
+                        });
+                        $('#componentContainer').off('submit', 'form');
+                        handleReAssignmentFormSubmission();
+                    });
+                });
+
+                function handleReAssignmentFormSubmission() {
+                    // Attach event listener to form submission
+                    $('#alertMessageAssign').hide();
+                    $('#componentContainer').on('submit', 'form', function(event) {
+                        // Prevent default form submission
+                        event.preventDefault();
+                        // Collect form data
+                        var formData = $(this).serialize();
+                        
+                        // Send form data to backend using AJAX
+                        $.ajax({
+                            type: 'POST',
+                            url: 'reAssStudentTutorBackend.php',
+                            data: formData,
+                            success: function(response) {
+                                // Handle the response
+                                $('.alert').remove();
+                                if (response === 'success') {
+                                    alert("Assignment successful.");
+                                    // Reload the component
+                                    $.get('reAssStudentTutorComp.php', function(data) {
                                         $('.container').replaceWith(data); // Replace the container content with the updated one
                                     });
                                     
@@ -423,6 +489,24 @@ $conn->close();
                         });
                     });
                 }
+            </script>
+            <script>
+            $(document).ready(function() {
+                $('.trail-link').click(function(event) {
+                    //event.preventDefault();
+                    $.ajax({
+                        url: 'selectUserTrail.php',
+                        success: function(data) {
+                                $('#componentContainer').html(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('An error occurred:', error);
+                            }
+                    });
+                
+                    });
+                });
+
             </script>
 
             <div class="col py-3 custom-div">

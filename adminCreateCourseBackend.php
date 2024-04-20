@@ -44,7 +44,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmtCourse->bind_param("ssssi", $courseName, $startDate, $endDate, $courseDescription, $tutorID);
 
     if ($stmtCourse->execute()) {
-        // Fetch the tutor's email address from the database
+        
+        $token = $_COOKIE['token'];
+        $secretKey = 'your_secret_key';
+        $decoded = JWT::decode($token, $secretKey, array('HS256'));
+        $userId = $decoded->userId;
+        $userRole = $decoded->role;
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+
+        $trailAction = "Created course: $courseName";
+        $trailSql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+        $trailStmt = $conn->prepare($trailSql);
+        $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $trailAction);
+        $trailStmt->execute();
+        $trailStmt->close();
+
         $getTutorEmailSQL = "SELECT email FROM Tutor WHERE TID = ?";
         $getTutorEmailStmt = $conn->prepare($getTutorEmailSQL);
         $getTutorEmailStmt->bind_param("i", $tutorID);

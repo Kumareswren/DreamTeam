@@ -124,7 +124,6 @@ $(document).ready(function(){
             data: {sid: sid }, // You can pass data here 
             success: function(response){
                 $('#componentContainer').html(response);
-                console.log(response);
 
                 // Add auto-resizing functionality after loading the chat
                 var textarea = $('#chatInput');
@@ -134,9 +133,6 @@ $(document).ready(function(){
                     this.style.height = (this.scrollHeight) + 'px';
                 });
 
-                // Adjust initial height to fit one line
-                textarea.css('height', 'auto');
-                textarea.css('height', textarea[0].scrollHeight + 'px');
             },
             error: function(xhr, status, error){
                 /* console.error(xhr.responseText); */
@@ -159,7 +155,6 @@ $(document).ready(function(){
             data: {sid: sid}, // Pass SID as POST data
             success: function(response){
                 $('#componentContainer').html(response);
-                console.log(response);
             },
             error: function(xhr, status, error){
                 console.error("Error: " + error);

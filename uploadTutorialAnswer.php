@@ -88,6 +88,15 @@ if (isset($_FILES["tutorialFile"])) {
                     // Set HTTP status code for success
                     header("HTTP/1.1 200 OK");
                     echo "File uploaded successfully.";
+                
+                    // Call noteTitle.php to insert a record into the Trail table
+                    $actionPerformed = $tutorialAnswerTitle . " tutorial have been submitted";
+                
+                    // Set up POST data for noteTitle.php
+                    $_POST['actionPerformed'] = $actionPerformed;
+                
+                    // Include noteTitle.php
+                    include 'noteTitle.php';
                 } else {
                     // Set HTTP status code for error
                     header("HTTP/1.1 500 Internal Server Error");
