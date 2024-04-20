@@ -37,7 +37,6 @@ $last_login_time = ""; // Initialize the variable to avoid errors
 if ($result_check_user && $result_check_user->num_rows > 0) {
     // User exists in the database
     $row = $result_check_user->fetch_assoc();
-    $user_fullname = $row['FName'] . " " . $row['LName']; //18,4
     
     // Check if it's the user's first login (last login time is NULL)
     if ($row['last_login'] === null) {
@@ -89,10 +88,6 @@ $conn->close();
     color: #ffffff;
 }
 
-body{ /* whole body colouring 18,4 */
-    background-color: #FFF6D9;
-}
-
 .custom-div {
     background-color: #FFF6D9;
     padding: 20px;
@@ -129,7 +124,7 @@ body{ /* whole body colouring 18,4 */
     color: #8fc8bd;
 }
 
-.bi-pencil-square{
+.bi-journal-text{
     color: #8fc8bd;
 }
 
@@ -137,19 +132,8 @@ body{ /* whole body colouring 18,4 */
     color: #8fc8bd;
 }
 
-.bi-binoculars{
-    color: #8fc8bd;
-}
 
 .bi-person-vcard{
-    color: #8fc8bd;
-}
-
-.bi-person-workspace{
-    color: #8fc8bd;
-}
-
-.bi-person-plus-fill{
     color: #8fc8bd;
 }
 
@@ -160,7 +144,6 @@ body{ /* whole body colouring 18,4 */
 
 .bg-secondary{
     background-color: #1F8A70!important;
-    background-image: linear-gradient(to left, #28a989, #025f47);
 }
 
 .login-logo{
@@ -168,34 +151,6 @@ body{ /* whole body colouring 18,4 */
     width: 40px;
     height: 40px;
     transform: translateY(32px);
-}
-
-.footer { /* footer styling added 18/4 */
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    z-index: 1000; /* Ensure it's above other content */
-}
-
-.footer .nav-link {
-    padding-top: 1px;
-    padding-right: 2px;
-    padding-bottom: 1px;
-    padding-left: 5px;
-    margin-right: 10px;
-
-}
-
-.welcome-message {
-    position: fixed;
-    top: 0;
-    right: 0;
-    padding: 5px;
-    background-color: transparent; 
-    z-index: 1;
-    font-size: 8px; 
-    color: #333;
 }
 
 .custom-div {
@@ -209,7 +164,7 @@ body{ /* whole body colouring 18,4 */
     
 <div class="container-fluid">
     <div class="row flex-nowrap">
-        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary d-none d-sm-block">
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary">
             <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                 <a href="#" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                     <span class="fs-5 d-none d-sm-inline">
@@ -225,7 +180,7 @@ body{ /* whole body colouring 18,4 */
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-10 viewDashboard-link">
-                            <i class="fs-4 bi-binoculars"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
+                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -243,19 +198,19 @@ body{ /* whole body colouring 18,4 */
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-10">
-                            <i class="fs-4 bi-person-workspace"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
+                            <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 register-link">
-                                    <i class="fs-4 bi-person-plus-fill"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
+                                    <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
                                 </a>
                             </li>
 
                     <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 course-link">
-                                <i class="fs-4 bi bi-pencil-square"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
+                                <i class="fs-4 bi bi-journal-text"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
                                 </a>
                             </li>
 
@@ -474,14 +429,6 @@ body{ /* whole body colouring 18,4 */
                 
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="welcome-message">
-                                <h4 style="font-size: 12px; color: #1F8A70 ; font-weight: normal;">Admin: <?php echo $user_fullname; ?></h4>
-
-                                </div>
-                            </div>
-                        </div>
                       <div class="row">
                         <div class="col-md-12" id="componentContainer">
 
@@ -493,68 +440,7 @@ body{ /* whole body colouring 18,4 */
         </div>
     </div>
 
-    <!-- footer added for mobile breakpoint 8/3 -->
-<footer class="footer d-sm-none">
-        <div class="container-fluid">
-            <!-- Start of your footer content -->
-            <div class="row justify-content-center">
-                <div class="col">
-                    <div class="d-flex flex-row justify-content-between align-items-center px-3 py-2 text-white">
-                        
-                        <ul class="nav nav-pills flex-row mb-0">
-                        <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-10 dashboard-link" data-aid="<?php echo $_SESSION['AID']; ?>">
-                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-10 viewDashboard-link">
-                            <i class="fs-4 bi-binoculars"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-10">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Students</span>
-                        </a>
-                        <!-- Submenu for Student tab -->
-                        
-                            <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 assignment-link">
-                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Assignment</span>
-                                </a>
-                            </li>
-                        
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-10">
-                            <i class="fs-4 bi-person-workspace"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 register-link">
-                                    <i class="fs-4 bi-person-plus-fill"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
-                                </a>
-                            </li>
-
-                    <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 course-link">
-                                <i class="fs-4 bi bi-pencil-square"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
-                                </a>
-                            </li>
-
-                    <li class="nav-item">
-                        <a href="logout.php" class="nav-link align-middle px-10">
-                            <i class="fs-4 bi-box-arrow-left"></i> <span class="ms-1 d-none d-sm-inline">Logout</span>
-                        </a>
-                    </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- End of your footer content -->
-        </div>
-    </footer>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
