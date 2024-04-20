@@ -64,7 +64,6 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     if ($result->num_rows > 0) {
         // Output table headers
         $output .= '<div class="table-responsive">';
-        $output .= '<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search">';
         $output .= '<table class="table table-striped">';
         $output .= '<thead><tr><th>Note Title</th><th>Note Description</th><th>Date</th><th>URL</th></tr></thead>';
         $output .= '<tbody>';
@@ -124,7 +123,6 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
      $result = $conn->query($sql);
      if ($result->num_rows > 0) {
          $output .= '<div class="table-responsive">';
-         $output .= '<input type="text" id="tutorialSearchInput" class="form-control mb-3" placeholder="Search">';
          $output .= '<table class="table table-striped">';
          $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>Download</th><th>Submits</th></tr></thead>';
          $output .= '<tbody>';
@@ -234,25 +232,6 @@ echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Include jQuery -->
 <script>
-
-$(document).ready(function() {
-    $('#searchInput').on('keyup', function() {
-        var value = $(this).val().toLowerCase();
-        $('tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
-    });
-});
-
-$(document).ready(function() {
-    $('#tutorialSearchInput').on('keyup', function() {
-        var value = $(this).val().toLowerCase();
-        $('#uploadedTutorialFiles tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
-    });
-});
-
    $(document).ready(function() {
     // Function to load the addCourseStudent component
     function loadAddCourseStudent(courseId) {

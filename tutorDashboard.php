@@ -37,7 +37,6 @@ $last_login_time = ""; // Initialize the variable to avoid errors
 if ($result_check_user && $result_check_user->num_rows > 0) {
     // User exists in the database
     $row = $result_check_user->fetch_assoc();
-    $user_fullname = $row['FName'] . " " . $row['LName']; //18,4
     
     // Check if it's the user's first login (last login time is NULL)
     if ($row['last_login'] === null) {
@@ -91,10 +90,6 @@ $conn->close();
     color: #ffffff;
 }
 
-body{ /* whole body colouring 18,4 */
-    background-color: #FFF6D9;
-}
-
 .custom-div {
     background-color: #FFF6D9;
     padding: 20px;
@@ -131,11 +126,11 @@ body{ /* whole body colouring 18,4 */
     color: #8fc8bd;
 }
 
-.bi-chat-dots-fill{
+.bi-table{
     color: #8fc8bd;
 }
 
-.bi-calendar-day-fill{
+.bi-book{
     color: #8fc8bd;
 }
 
@@ -144,11 +139,7 @@ body{ /* whole body colouring 18,4 */
 }
 
 
-.bi-calendar2-check-fill{
-    color: #8fc8bd;
-}
-
-.bi-people{
+.bi-envelope{
     color: #8fc8bd;
 }
 
@@ -160,7 +151,6 @@ body{ /* whole body colouring 18,4 */
 
 .bg-secondary{
     background-color: #1F8A70!important;
-    background-image: linear-gradient(to left, #28a989, #025f47);
 }
 
 .login-logo{
@@ -170,34 +160,6 @@ body{ /* whole body colouring 18,4 */
     transform: translateY(32px);
 }
 
-.footer { /* footer styling added 18/4 */
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    z-index: 1000; /* Ensure it's above other content */
-}
-
-.footer .nav-link {
-    padding-top: 1px;
-    padding-right: 2px;
-    padding-bottom: 1px;
-    padding-left: 5px;
-    margin-right: 7px;
-
-}
-
-.welcome-message {
-    position: fixed;
-    top: 0;
-    right: 0;
-    padding: 5px;
-    background-color: transparent; 
-    z-index: 1;
-    font-size: 8px; 
-    color: #333;
-}
-
   </style>
 </head>
 
@@ -205,7 +167,7 @@ body{ /* whole body colouring 18,4 */
     
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary d-none d-sm-block"> <!-- 'd-none d-sm-block'-18,4 edits -->
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                     <a href="#" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                         
@@ -231,24 +193,36 @@ body{ /* whole body colouring 18,4 */
 
                         <li class="nav-item">
                           <a href="#" class="nav-link align-middle px-10 chat-link">
-                              <i class="fs-4 bi-chat-dots-fill"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
+                              <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
                           </a>
                       </li>
                       
                       <li>
                           <a href="#" class="nav-link px-10 align-middle meeting-link">
-                              <i class="fs-4 bi-calendar-day-fill"></i> <span class="ms-1 d-none d-sm-inline">Meetings</span></a>
+                              <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">Meetings</span></a>
                       </li>
                       
                       <li>
                           <a href="#" class="nav-link px-10 align-middle meetings-list-link">
-                              <i class="fs-4 bi-calendar2-check-fill"></i> <span class="ms-1 d-none d-sm-inline">View my meeting</span></a>
+                              <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">View my meeting</span></a>
                       </li>
+
+
+                      <li>
+                        <a href="#" class="nav-link px-10 align-middle">
+                            <i class="fs-4 bi-book"></i> <span class="ms-1 d-none d-sm-inline">Tutorial</span> </a>
+                    </li>
 
                     <li>
                       <a href="#" class="nav-link align-middle px-10 blogs-link">
                           <i class="fs-4 bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Blog</span> </a>
                     </li>
+
+                    <li>
+                      <a href="#" class="nav-link px-10 align-middle">
+                          <i class="fs-4 bi-envelope"></i> <span class="ms-1 d-none d-sm-inline">Email</span> </a>
+                    </li>
+
 
                     <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 student-link">
@@ -267,8 +241,6 @@ body{ /* whole body colouring 18,4 */
                     <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
                 </div>
             </div>
-
-
             <script>
         $(document).ready(function() {
     
@@ -443,16 +415,6 @@ $(document).ready(function() {
                 
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
-                    <!-- Welcome message container -->
-                    <div class="row">
-                            <div class="col-md-12">
-                                <div class="welcome-message">
-                                <h4 style="font-size: 12px; color: #1F8A70 ; font-weight: normal;">Tutor: <?php echo $user_fullname; ?></h4>
-
-                                </div>
-                            </div>
-                        </div>
-
                       <div class="row">
                       <div class="col-md-12" id="componentContainer">
                         </div>
@@ -462,69 +424,6 @@ $(document).ready(function() {
             </div>
         </div>
     </div>
-
-<!-- footer added for mobile breakpoint 8/3 -->
-<footer class="footer d-sm-none">
-        <div class="container-fluid">
-            <!-- Start of your footer content -->
-            <div class="row justify-content-center">
-                <div class="col">
-                    <div class="d-flex flex-row justify-content-between align-items-center px-3 py-2 text-white">
-                        
-                        <ul class="nav nav-pills flex-row mb-0">
-                        <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-10 dashboard-link" data-tid="<?php echo $_SESSION['TID']; ?>">
-                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
-                        </a>
-                    </li>
-
-                    
-                    <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 courses-link">
-                            <i class="fs-4 bi-journal-text"></i> <span class="ms-1 d-none d-sm-inline">Courses</span>
-                        </a>
-                    </li>
-
-                        <li class="nav-item">
-                          <a href="#" class="nav-link align-middle px-10 chat-link">
-                              <i class="fs-4 bi-chat-dots-fill"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
-                          </a>
-                      </li>
-                      
-                      <li>
-                          <a href="#" class="nav-link px-10 align-middle meeting-link">
-                              <i class="fs-4 bi-calendar-day-fill"></i> <span class="ms-1 d-none d-sm-inline">Meetings</span></a>
-                      </li>
-                      
-                      <li>
-                          <a href="#" class="nav-link px-10 align-middle meetings-list-link">
-                              <i class="fs-4 bi-calendar2-check-fill"></i> <span class="ms-1 d-none d-sm-inline">View my meeting</span></a>
-                      </li>
-
-                    <li>
-                      <a href="#" class="nav-link align-middle px-10 blogs-link">
-                          <i class="fs-4 bi-newspaper"></i> <span class="ms-1 d-none d-sm-inline">Blog</span> </a>
-                    </li>
-
-                    <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 student-link">
-                            <i class="fs-4 bi bi-people"></i> <span class="ms-1 d-none d-sm-inline">Students</span>
-                        </a>
-                    </li>
-
-                    
-
-                      <li>
-                          <a href="logout.php" class="nav-link px-10 align-middle">
-                              <i class="fs-4 bi-box-arrow-left"></i> <span class="ms-1 d-none d-sm-inline">Logout</span> </a>
-                      </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- End of your footer content -->
-        </div>
-    </footer>
 
 
     <script>

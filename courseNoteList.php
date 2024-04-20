@@ -20,8 +20,7 @@ function courseNotes($courseId) {
     // Check if notes found
     if ($result->num_rows > 0) {
         $output .= '<div class="table-responsive">';
-        $output .= '<input type="text" id="searchInput"  placeholder="Search notes..." class="form-control mb-3">'; // Add search input field
-        $output .= '<table class="table table-striped" id="notesTable">'; 
+        $output .= '<table class="table table-striped">';
         $output .= '<thead><tr><th>Note</th><th>Download</th><th>Comment</th><th>Uploaded On</th></tr></thead>';
         $output .= '<tbody>';
         while ($row = $result->fetch_assoc()) {
@@ -48,15 +47,4 @@ $courseId = isset($_SESSION['courseId']) ? $_SESSION['courseId'] : '';
 
 // Fetch notes for the given course ID
 echo courseNotes($courseId);
-?>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#searchInput').on('keyup', function() {
-        var searchText = $(this).val().toLowerCase();
-        $('#notesTable tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
-        });
-    });
-});
-</script>
+
