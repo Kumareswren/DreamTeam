@@ -56,6 +56,7 @@ function submitForm() {
                 tutorComment: tutorComment
             },
             success: function(response) {
+                console.log(response);
                 var responseObject = JSON.parse(response);
                 $('#messageBox').html('<div class="alert alert-success" role="alert">' + responseObject.message + '</div>');
                 $('#tutorComment').val(''); // Clear comment textarea

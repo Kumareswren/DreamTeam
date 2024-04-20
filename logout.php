@@ -53,5 +53,4 @@ if(isset($_COOKIE['token'])) {
     header("Location: index.php?error=Token%20not%20provided");
     exit();
 }
-?>
 
