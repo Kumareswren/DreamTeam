@@ -6,7 +6,7 @@ $output = '';
 $tutorialID = isset($_POST['tutorialID']) ? $_POST['tutorialID'] : '';// Check if tutorialID is provided via POST
 
 
-//$output .= "Received tutorial ID: " . $tutorialID . "<br>"; // Print out tutorialID to check if it's correctly received
+$output .= "Received tutorial ID: " . $tutorialID . "<br>";// Print out tutorialID to check if it's correctly received
 
 
 if (!empty($tutorialID)) {// Proceed only if tutorialID is provided
@@ -43,7 +43,7 @@ WHERE ta.tutorialID = $tutorialID";
             $output .= '<td>' . $row['StudentName'] . '</td>';
             $output .= '<td>' . $row['tutorialAnswerTitle'] . '</td>';
             $output .= '<td>' . $row['uploadDate'] . '</td>';
-            $output .= '<td><a href="' . $row['tutorialAnswerFilePath'] . '" class="btn btn-primary" download>Download</a></td>';
+            $output .= '<td><a href="' . $row['tutorialAnswerFilePath'] . '" class="btn btn-primary" download onclick="downloadClicked(\'' . $row['tutorialAnswerTitle'] . '_' . $row['StudentName'] . '\')">Download</a></td>';
             $output .= '<td>' . $row['tutorComment'] . '</td>';
             /* $output .= '<button class="btn btn-success btn-add-remark" data-tutorial-answer-id="' . $tutorialAnswerID . '">Add Remark</button>'; */
             $output .= '<td><button class="btn btn-success btn-add-remark" data-tutorial-answer-id="' . $row['tutorialAnswerID'] . '">Add Remark</button></td>';
@@ -88,4 +88,19 @@ $(document).ready(function() { //Comment button component when clicked
         });
     });
 });
+
+function downloadClicked(noteTitle) {
+    // Make AJAX call to insert record into trail table
+    $.ajax({
+        type: "POST",
+        url: "noteTitle.php", // PHP script to handle insertion into trail table
+        data: { actionPerformed: noteTitle + " tutorial answer have been downloaded" },
+        success: function(response) {
+            console.log("Trail record inserted successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error inserting trail record:", error);
+        }
+    });
+}
 </script>

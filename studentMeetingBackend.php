@@ -57,8 +57,6 @@ try {
         $row = $result->fetch_assoc();
         $SID = $row['SID'];
 
-
-
         // Retrieve TID (assigned tutor ID) from StudentAssignment table using SID
         $sql = "SELECT TID FROM StudentAssignment WHERE SID = ?";
         $stmt = $conn->prepare($sql);
@@ -69,57 +67,67 @@ try {
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $TID = $row['TID'];
-
+        
             // Retrieve assigned tutor's email using TID
-            $sql = "SELECT Email FROM Tutor WHERE TID = ?";
+            $sql = "SELECT Email, FName, LName FROM Tutor WHERE TID = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $TID);
             $stmt->execute();
             $result = $stmt->get_result();
-
+        
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 $assignedTutorEmail = $row['Email'];
-
+                $tutorName = $row['FName'] . ' ' . $row['LName'];
+        
                 // Now you have the assigned tutor's email, you can use it to send an email
                 // Send email to $assignedTutorEmail informing about the meeting request
                 $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) // Replace with your SMTP server details
-            ->setUsername('venturesrsk@gmail.com')
-            ->setPassword('zohh take gpri knhn');
+                    ->setUsername('venturesrsk@gmail.com')
+                    ->setPassword('zohh take gpri knhn');
+        
+                $mailer = new Swift_Mailer($transport);
+        
+                $message = (new Swift_Message('New Meeting Request'))
+                    ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
+                    ->setTo([$assignedTutorEmail])
+                    ->setBody("You have a new meeting request! Please login to the dashboard to view more details.");
+        
+                // Send the message
+                $result = $mailer->send($message);
 
-            //*here************************* */
-        $mailer = new Swift_Mailer($transport);
-
-        $message = (new Swift_Message('New Meeting Request'))
-            ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
-            ->setTo([$assignedTutorEmail])
-            ->setBody("You have a new meeting request! Please login to the dashboard to view more details.");
-
-        // Send the message
-        $result = $mailer->send($message);
-            }
-
-        // Insert the meeting request into the database
-        $sql = "INSERT INTO MeetingStudent (courseTitle, meetingDate, meetingTime, meetingLocation, meetingDesc, TID, SID) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssii", $courseTitle, $meetingDate, $meetingTime, $meetingLocation, $meetingDesc, $TID, $SID);
-
-
-
-        if ($stmt->execute()) {
-            // Inform user about successful meeting request
-            echo "<script>alert('Request meeting successfully.');</script>";
-            unset($_SESSION['error_message_type']);
-            unset($_SESSION['request_meeting_error']);
-            echo "<script>clearForm();</script>";
-            exit();
-        } else {
-            // Meeting request insertion failed, display error message
-            echo "<script>alert('Failed to request meeting. Please try again later.');</script>";
-            exit();
-                        }
-                    }
+                $userRole = 'student';
+                $ipAddress = $_SERVER['REMOTE_ADDR'];
+        
+                // Insert a record into the Trail table
+                $actionPerformed = 'Requested meeting with tutor ' . $tutorName;
+                $sql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed)
+                        VALUES (?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("isss", $SID, $userRole, $ipAddress, $actionPerformed);
+                $stmt->execute();
+        
+                // Insert the meeting request into the database
+                $sql = "INSERT INTO MeetingStudent (courseTitle, meetingDate, meetingTime, meetingLocation, meetingDesc, TID, SID)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssssii", $courseTitle, $meetingDate, $meetingTime, $meetingLocation, $meetingDesc, $TID, $SID);
+        
+                if ($stmt->execute()) {
+                    // Inform user about successful meeting request
+                    echo "<script>alert('Request meeting successfully.');</script>";
+                    unset($_SESSION['error_message_type']);
+                    unset($_SESSION['request_meeting_error']);
+                    echo "<script>clearForm();</script>";
+                    exit();
+                } else {
+                    // Meeting request insertion failed, display error message
+                    echo "<script>alert('Failed to request meeting. Please try again later.');</script>";
+                    exit();
                 }
+            }
+        }
+    }
         } catch (Exception $e) {
             // JWT token is invalid or expired
             echo "<script>alert('Invalid JWT token. Please login again.');</script>";
