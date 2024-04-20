@@ -112,6 +112,24 @@ function displayDashboardComponent($conn) {
                         console.error("An error occurred:", error);
                     }
                 });
+
+                var action;
+                if (userType === "student") {
+                    action = "Viewed dashboard for student with ID: " + id;
+                } else if (userType === "tutor") {
+                    action = "Viewed dashboard for tutor with ID: " + id;
+                }
+                $.ajax({
+                    url: "noteTitle.php", // URL pointing to the same file
+                    type: "POST",
+                    data: { actionPerformed: action },
+                    success: function(response) {
+                        console.log("Trail record inserted successfully.");
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error inserting trail record:", error);
+                    }
+                });
             });
         });
     </script>

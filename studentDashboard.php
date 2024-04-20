@@ -225,6 +225,11 @@ $conn->close();
                           <i class="fs-4 bi-envelope"></i> <span class="ms-1 d-none d-sm-inline">Email</span> </a>
                     </li>
 
+                    <li>
+                      <a href="#" class="nav-link px-10 align-middle px-10 trail-link">
+                          <i class="fs-4 bi-envelope"></i> <span class="ms-1 d-none d-sm-inline">Activity</span> </a>
+                    </li>
+
                       <li>
                           <a href="logout.php" class="nav-link px-10 align-middle">
                               <i class="fs-4 bi-box-arrow-left"></i> <span class="ms-1 d-none d-sm-inline">Logout</span> </a>
@@ -255,7 +260,7 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- for charts? --> <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script> 
 
-    <script src="script.js"></script>
+    <!-- <script src="script.js"></script> -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script> 
     $(document).ready(function() {
@@ -272,6 +277,20 @@ $conn->close();
                 }
             });      
         });
+
+                $('.trail-link').click(function(event) {
+                    //event.preventDefault();
+                    $.ajax({
+                        url: 'selectUserTrailStudent.php',
+                        success: function(data) {
+                                $('#componentContainer').html(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('An error occurred:', error);
+                            }
+                    });
+                
+                    });
 
         // AJAX request for 'studentMeeting.php'
         $('.meetings-link').click(function(event) {
@@ -332,6 +351,8 @@ $conn->close();
                 url: 'studentMeetingList.php',
                 success: function(data) {
                     $('#componentContainer').html(data);
+                    $actionPerformed = 'Checked upcoming meeting'
+                    meetingClicked($actionPerformed);
                 },
                 error: function(xhr, status, error) {
                     console.error('An error occurred:', error);
@@ -346,6 +367,8 @@ $conn->close();
                 url: 'studentMeetingHistory.php',
                 success: function(data) {
                     $('#componentContainer').html(data);
+                    $actionPerformed = 'Checked meeting history'
+                    meetingClicked($actionPerformed);
                 },
                 error: function(xhr, status, error) {
                     console.error('An error occurred:', error);
@@ -353,6 +376,21 @@ $conn->close();
             });
         });
 });
+
+function meetingClicked(noteTitle) {
+    // Make AJAX call to insert record into trail table
+    $.ajax({
+        type: "POST",
+        url: "noteTitle.php", // PHP script to handle insertion into trail table
+        data: { actionPerformed: noteTitle },
+        success: function(response) {
+            console.log("Trail record inserted successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error inserting trail record:", error);
+        }
+    });
+}
     </script>
 
 <script>
@@ -377,14 +415,14 @@ $(document).ready(function() {
                     // Add auto-resizing functionality after loading the chat
                     var textarea = $('#chatInput');
                     
-                    textarea.on('input', function() {
-                        this.style.height = 'auto';
-                        this.style.height = (this.scrollHeight) + 'px';
-                    });
+                    // textarea.on('input', function() {
+                    //     this.style.height = 'auto';
+                    //     this.style.height = (this.scrollHeight) + 'px';
+                    // });
 
-                    // Adjust initial height to fit one line
-                    textarea.css('height', 'auto');
-                    textarea.css('height', textarea[0].scrollHeight + 'px');
+                    // // Adjust initial height to fit one line
+                    // textarea.css('height', 'auto');
+                    // textarea.css('height', textarea[0].scrollHeight + 'px');
                 },
                 error: function(xhr, status, error) {
                     console.error('An error occurred:', error);
@@ -494,7 +532,6 @@ $(document).ready(function() {
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             if (xhr.status === 200) {
-                console.log(xhr.responseText);
                 getStudentBlog(); // Reload the blog posts after deletion
             } else {
                 console.error('Request failed. Status:', xhr.status);

@@ -29,9 +29,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['PostID'], $_POST['Titl
         die("Error executing SQL query: " . $stmt->error);
     }
 
+    $token = $_COOKIE['token'];
+    $secretKey = 'your_secret_key'; // Change to your actual secret key
+    $decoded = JWT::decode($token, $secretKey, array('HS256'));
+  
+    $userId = $decoded->userId;
+    $userRole = $decoded->role;
+    $ipAddress = $_SERVER['REMOTE_ADDR'];
+    $actionPerformed = "Updated blog post : $title";
+
+    // Prepare and execute the SQL query to insert into the trail table
+    $trailQuery = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+    $trailStmt = $conn->prepare($trailQuery);
+    if (!$trailStmt) {
+        die("Error preparing trail statement: " . $conn->error);
+    }
+    $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $actionPerformed);
+    if (!$trailStmt->execute()) {
+        die("Error inserting into trail table: " . $trailStmt->error);
+    } else {
+        echo "Trail record inserted successfully!";
+    }
+
     // Redirect to viewBlog.php
     header('Location: viewBlog.php?id=' . $postID);
     exit;
+
 } else if (isset($_GET['id'])) {
     // Get the PostID from the URL parameter
     $postID = $_GET['id'];

@@ -58,7 +58,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
             $output .= '<td>' . $row['tutorialTitle'] . '</td>';
             $output .= '<td>' . $row['tutorialDescription'] . '</td>';
             $output .= '<td>' . $row['uploadDate'] . '</td>';
-            $output .= '<td><a href="' . $tutorialFilePath . '" class="btn btn-primary" download>Download</a></td>';
+            $output .= '<td><a href="' . $tutorialFilePath . '" class="btn btn-primary" download onclick="downloadClicked(\'' . $row['tutorialTitle'] . '\')">Download</a></td>';
             $output .= '<td>';
             $output .= '<input type="file" id="fileInput_' . $row['tutorialTitle'] . '" style="display: none;" onchange="uploadAnswer(this.files, \'' . $tutorialFilePath . '\')">';
             $output .= '<button class="btn btn-success submit-tutorial" data-tutorial-id="' . $tutorialID . '">Submit</button>';
@@ -195,5 +195,23 @@ $(document).on('click', '.submit-tutorial', function() {
     $(document).on('click', '#tab3-tab', reloadStudentList);
 
 
+</script>
+
+<script>
+// Function to handle download button click
+function downloadClicked(noteTitle) {
+    // Make AJAX call to insert record into trail table
+    $.ajax({
+        type: "POST",
+        url: "noteTitle.php", // PHP script to handle insertion into trail table
+        data: { actionPerformed: noteTitle + " tutorial have been downloaded" },
+        success: function(response) {
+            console.log("Trail record inserted successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error inserting trail record:", error);
+        }
+    });
+}
 </script>
 

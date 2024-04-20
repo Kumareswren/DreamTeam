@@ -74,7 +74,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
             $output .= '<td>' . $row['noteTitle'] . '</td>';
             $output .= '<td>' . $row['noteDescription'] . '</td>';
             $output .= '<td>' . $row['uploadDate'] . '</td>';
-            $output .= '<td><a href="' . $noteFilePath . '" class="btn btn-primary" download>Download</a></td>';
+            $output .= '<td><a href="' . $noteFilePath . '" class="btn btn-primary" download onclick="downloadClicked(\'' . $row['noteTitle'] . '\')">Download</a></td>';
             $output .= '</tr>';
         }
         $output .= '</tbody>';
@@ -134,7 +134,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
              $output .= '<td>' . $row['tutorialTitle'] . '</td>';
              $output .= '<td>' . $row['tutorialDescription'] . '</td>';
              $output .= '<td>' . $row['uploadDate'] . '</td>';
-             $output .= '<td><a href="' . $tutorialFilePath . '" class="btn btn-primary" download>Download</a></td>';
+             $output .= '<td><a href="' . $tutorialFilePath . '" class="btn btn-primary" download onclick="downloadTutorialClicked(\'' . $row['tutorialTitle'] . '\')">Download</a></td>';
              $output .= '<td><button class="btn btn-success btn-see-answers" data-tutorial-id="' . $tutorialID . '" >See Answers</button></td>'; // on click -> ajaxcomponent that displays matching tutorialAnswers
              $output .= '</tr>';
          }
@@ -428,25 +428,35 @@ $(document).ready(function(){
     });
 });
 
-//jQuery for answers tab - tab4 - hidden
-/* $(document).ready(function() { 
-    $('.btn-comment').click(function(event) {
-        event.preventDefault(); 
-
-        var tutorialAnswerID = $(this).data('tutorial-answer-id');
-        $.ajax({
-            url: 'tutorCommentForm.php', 
-            type: 'POST',
-            data: { tutorialAnswerID: tutorialAnswerID },
-            success: function(response) {
-                $('#commentFormContainer').html(response);
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-            }
-        });
+function downloadClicked(noteTitle) {
+    // Make AJAX call to insert record into trail table
+    $.ajax({
+        type: "POST",
+        url: "noteTitle.php", // PHP script to handle insertion into trail table
+        data: { actionPerformed: noteTitle + " notes have been downloaded" },
+        success: function(response) {
+            console.log("Trail record inserted successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error inserting trail record:", error);
+        }
     });
-}); */
+}
+
+function downloadTutorialClicked(noteTitle) {
+    // Make AJAX call to insert record into trail table
+    $.ajax({
+        type: "POST",
+        url: "noteTitle.php", // PHP script to handle insertion into trail table
+        data: { actionPerformed: noteTitle + " tutorial have been downloaded" },
+        success: function(response) {
+            console.log("Trail record inserted successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error inserting trail record:", error);
+        }
+    });
+}
 
 </script>
 

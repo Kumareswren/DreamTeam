@@ -1,6 +1,8 @@
 {
     "require": {
         "firebase/php-jwt": "^5.4",
-        "swiftmailer/swiftmailer": "^6.3"
+        "swiftmailer/swiftmailer": "^6.3",
+        "phpoffice/phpexcel": "^1.8",
+        "phpoffice/phpspreadsheet": "^2.0"
     }
 }
