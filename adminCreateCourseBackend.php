@@ -19,28 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $endDate = $_POST["end_date"] . '-01';
     $tutorID = $_POST["tutor_id"];
 
-    $AID = $_SESSION['AID']; // Retrieve admin ID from session
-    // Prepare SQL query to log system activity
-$activity_type = "Create Course";
-$page_name = "adminDashboard.php";
-
-$full_user_agent = $_SERVER['HTTP_USER_AGENT'];
-// Regular expression to extract the browser name
-if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
-   $browser_name = 'Edge';
-} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
-   $browser_name = $matches[1];
-} else {
-   $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
-}
-
-$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
-                 VALUES ('$AID', 'admin', '$activity_type', '$page_name', '$browser_name')";
-if ($conn->query($insert_query) !== TRUE) {
-    // Handle error if insert query fails
-    echo "<script>alert('Error inserting system activity: " . $conn->error . "');</script>";
-    exit();
-}
     // Server-side validation
     $regex = '/^[A-Za-z\s]+$/'; // Regular expression to match letters and spaces
     if (!preg_match($regex, $courseName)) {
@@ -66,7 +44,21 @@ if ($conn->query($insert_query) !== TRUE) {
     $stmtCourse->bind_param("ssssi", $courseName, $startDate, $endDate, $courseDescription, $tutorID);
 
     if ($stmtCourse->execute()) {
-        // Fetch the tutor's email address from the database
+        
+        $token = $_COOKIE['token'];
+        $secretKey = 'your_secret_key';
+        $decoded = JWT::decode($token, $secretKey, array('HS256'));
+        $userId = $decoded->userId;
+        $userRole = $decoded->role;
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+
+        $trailAction = "Created course: $courseName";
+        $trailSql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+        $trailStmt = $conn->prepare($trailSql);
+        $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $trailAction);
+        $trailStmt->execute();
+        $trailStmt->close();
+
         $getTutorEmailSQL = "SELECT email FROM Tutor WHERE TID = ?";
         $getTutorEmailStmt = $conn->prepare($getTutorEmailSQL);
         $getTutorEmailStmt->bind_param("i", $tutorID);

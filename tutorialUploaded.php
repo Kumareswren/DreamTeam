@@ -5,25 +5,6 @@ require_once('vendor/autoload.php');
 
 use \Firebase\JWT\JWT;
 
-try {
-    // Create the Transport instance (using SMTP transport for example)
-    $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) 
-    ->setUsername('venturesrsk@gmail.com')
-    ->setPassword('zohh take gpri knhn');
-
-    //****************here************************** */
-$mailer = new Swift_Mailer($transport);
-} catch (Exception $e) {
-    // Handle any errors that occur during transport/mail creation
-    echo "Error creating mailer: " . $e->getMessage();
-    exit(); // Exit the script if mailer creation fails
-}
-
-function sendResponse($statusCode, $message) {
-    http_response_code($statusCode);
-    echo $message;
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Define the directory where you want to save the uploaded files
     $uploadDir = "upload_tutorial/";
@@ -93,45 +74,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             
                             // Execute the SQL statement
                             if ($stmtInsert->execute()) {
-                                // Retrieve student email associated with the matching course ID
-                                $sqlStudentEmail = "SELECT Student.Email
-                                                    FROM Student
-                                                    INNER JOIN CourseStudent ON Student.SID = CourseStudent.SID
-                                                    WHERE CourseStudent.courseID = ?";
-                                $stmtStudentEmail = $conn->prepare($sqlStudentEmail);
-                                $stmtStudentEmail->bind_param("i", $courseId);
-                                $stmtStudentEmail->execute();
-                                $resultStudentEmail = $stmtStudentEmail->get_result();
-
-                                if ($resultStudentEmail->num_rows > 0) {
-                                    $rowStudentEmail = $resultStudentEmail->fetch_assoc();
-                                    $student_email = $rowStudentEmail['Email'];
-
-                                    // Send email notification to students
-                                    $mailer = new Swift_Mailer($transport);
-
-                                    $message = (new Swift_Message('New Tutorial Uploaded'))
-                                        ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
-                                        ->setTo([$student_email])
-                                        ->setBody("Dear student, your tutor has uploaded new tutorial. You can access and submit your answer in the website. Thanks.");
-
-                                    // Send the message
-                                    $result = $mailer->send($message);
-                                    if ($result) {
-                                        // Email sent successfully
-                                        header("HTTP/1.1 200 OK");
-                                        echo "Tutorial uploaded successfully";
-                                        /* echo '<script>alert("Notes uploaded successfully. Check your email for notification.");'; */
-                                        /* echo 'window.location.href = "tutorDashboard.php";</script>'; */
-                                        exit();
-                                    } else {
-                                        // Error sending email
-                                        /* header("Location: notesUploaded.php?error=Error%20sending%20email.%20Please%20try%20again."); */
-                                        exit();
-                                    }
-                                } else {
-                                    echo "No student found for the given course ID.";
+                                $actionPerformed = "Uploaded tutorial: $tutorialTitle";
+                                $sqlTrail = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+                                $stmtTrail = $conn->prepare($sqlTrail);
+                                if (!$stmtTrail) {
+                                    // Send internal server error response
+                                    http_response_code(500);
+                                    echo "Error preparing trail statement: " . $conn->error;
+                                    exit;
                                 }
+                                // Retrieve userID and userRole from decoded token
+                                $userId = $decoded->userId;
+                                $userRole = $decoded->role;
+                                $ipAddress = $_SERVER['REMOTE_ADDR'];
+                                $stmtTrail->bind_param("isss", $userId, $userRole, $ipAddress, $actionPerformed);
+                                if (!$stmtTrail->execute()) {
+                                    // Send internal server error response
+                                    http_response_code(500);
+                                    echo "Error inserting into trail table: " . $stmtTrail->error;
+                                    exit;
+                                }
+                                header("HTTP/1.1 200 OK");
+                                echo "Tutorial uploaded successfully";
                             } else {
                                 // Set HTTP status code for error
                                 header("HTTP/1.1 500 Internal Server Error");
