@@ -22,7 +22,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $output .= '<a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Tutorial</a>';
     $output .= '</li>';
     $output .= '<li class="nav-item">';
-    $output .= '<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false">Students</a>';
+    $output .= '<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false">Answers</a>';
     $output .= '</li>';
     /* $output .= '<li class="nav-item">'; 
     $output .= '<a class="nav-link" id="tab4-tab" data-toggle="tab" href="#tab4" role="tab" aria-controls="tab4" aria-selected="false">Your Submissions</a>';
@@ -32,7 +32,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
       // Tab content
       $output .= '<div class="tab-content mt-3" id="myTabContent">';
       $output .= '<div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">';
-      $output .= '<h3>Notes Content here</h3>';
+      $output .= '<h3>Available Notes</h3>';
       $output .= '<div id="noteList"></div>'; // Placeholder for notes list
       $output .= '</div>';
 
@@ -45,9 +45,10 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $sql = "SELECT tutorialTitle, tutorialID, tutorialDescription, uploadDate, tutorialFilePath FROM Tutorial WHERE courseId = $courseId";
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
-        // Output table headers
+
+        $output .= '<input type="text" id="tutorialSearchInput" placeholder="Search tutorials..." class="form-control mb-3">';
         $output .= '<div class="table-responsive">';
-        $output .= '<table class="table table-striped">';
+        $output .= '<table class="table table-striped" id="tutorialTable">';
         $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>View</th><th>Answer</th></tr></thead>';
         $output .= '<tbody>';
         // Output data of each row
@@ -79,8 +80,9 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
       $output .= '</div>';
 
       $output .= '<div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">';
-      $output .= '<h3>Students</h3>';
+      $output .= '<h3>Your Submitted Tutorials for this Course</h3>';
       $output .= '<div id="studentList"></div>';
+      $output .= '<div id="studentSubList"></div>';
       $output .= '</div>';
 
         /* $output .= '<div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">';
@@ -109,6 +111,14 @@ echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Include jQuery -->
 <script>
+    $(document).ready(function() {
+    $('#tutorialSearchInput').on('keyup', function() {
+        var searchText = $(this).val().toLowerCase();
+        $('#tutorialTable tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+        });
+    });
+});
 /* $(document).on('click', '#tab1-tab', reloadNotesList); */
 
     // Function to reload the student list after successful insertion
@@ -192,7 +202,30 @@ $(document).on('click', '.submit-tutorial', function() {
     
 
     // Event listener for the Students tab
-    $(document).on('click', '#tab3-tab', reloadStudentList);
+    $(document).on('click', '#tab3-tab', reloadStudentList, loadSubmissionList);
+
+    function loadSubmissionList() {
+    // Retrieve course ID from the hidden input
+    var courseId = $('#courseId').val();
+
+
+
+    // Make an AJAX request to fetch submissions for the course
+    $.ajax({
+        url: 'remarkView.php', // Adjust the URL to your PHP script for fetching submissions
+        type: 'POST',
+        data: { courseId: courseId}, // Send both courseId and studentId
+        success: function(response) {
+            // Populate the submissions list container with fetched data
+            $('#studentSubList').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            // Display error message to the user
+            $('#studentSubList').html('<p>Error loading submissions. Please try again later.</p>');
+        }
+    });
+}
 
 
 </script>

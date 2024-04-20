@@ -37,6 +37,7 @@ function displayDashboardComponent($conn) {
         <div class="tab-content" id="dashboardTabsContent">
             <div class="tab-pane fade show active pt-4" id="student" role="tabpanel" aria-labelledby="student-tab">
                 <h4>Students</h4>
+                <input type="text" id="studentSearchInput" placeholder="Search students..." class="form-control mb-3">
                 <table class="table">
                     <thead>
                         <tr>
@@ -63,7 +64,9 @@ function displayDashboardComponent($conn) {
     // Tutor tab content
     echo '<div class="tab-pane fade pt-4" id="tutor" role="tabpanel" aria-labelledby="tutor-tab">
             <h4>Tutors</h4>
-            <table class="table">
+            <input type="text" id="tutorSearchInput" placeholder="Search tutors..." class="form-control mb-3">'; 
+    echo '<table class="table">
+            
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -115,6 +118,30 @@ function displayDashboardComponent($conn) {
             });
         });
     </script>
+
+    <script>
+        $(document).ready(function() {
+            // Search function for students
+            $("#studentSearchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#studentList tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            // Your existing code for opening dashboard on button click
+        });
+    </script>
+
+    <script>
+    $("#tutorSearchInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#tutorList tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    </script>
+
 </body>
 </html>';
 }
