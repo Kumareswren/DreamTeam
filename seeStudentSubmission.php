@@ -6,7 +6,7 @@ $output = '';
 $tutorialID = isset($_POST['tutorialID']) ? $_POST['tutorialID'] : '';// Check if tutorialID is provided via POST
 
 
-$output .= "Received tutorial ID: " . $tutorialID . "<br>";// Print out tutorialID to check if it's correctly received
+//$output .= "Received tutorial ID: " . $tutorialID . "<br>"; // Print out tutorialID to check if it's correctly received
 
 
 if (!empty($tutorialID)) {// Proceed only if tutorialID is provided

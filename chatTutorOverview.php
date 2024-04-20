@@ -26,6 +26,7 @@ $result_fetch_students = $conn->query($sql_fetch_students);
 // Generate the table
 $output = '<h3>Overview of your Conversations</h3>';
 $output .= '<div class="table-responsive">';
+$output .= '<input type="text" id="searchInput" placeholder="Search for student" class="form-control mb-3">'; // Add the search input field
 $output .= '<table class="table table-striped table-hover">';
 $output .= '<thead>';
 $output .= '<tr>';
@@ -192,5 +193,22 @@ $(document).ready(function(){
     });
 });
 
+$(document).ready(function() {
+    // Add an event listener to the search input field
+    $('#searchInput').on('input', function() {
+        // Get the search term
+        var searchTerm = $(this).val().toLowerCase();
+
+        // Filter the table rows based on the search term
+        $('tbody tr').each(function() {
+            var studentName = $(this).find('td:first').text().toLowerCase();
+            if (studentName.includes(searchTerm)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+});
 
 </script>

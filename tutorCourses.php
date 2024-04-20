@@ -9,6 +9,10 @@ header("Content-Type: text/html"); // Set content type to HTML
 
 function generateCourseList($conn, $result) {
     $output = '<h2 class="mt-5 mb-4">Courses List</h2>'; // Add the heading
+    
+    // Add the search input field
+     $output .= '<input type="text" id="searchInput" placeholder="Search for courses" class="form-control mb-3">';
+    
     $output .= '<table class="table">';
     $output .= '<thead>';
     $output .= '<tr>';
@@ -127,6 +131,22 @@ if ($conn->query($insert_query) !== TRUE) {
 
 <script>
     $(document).ready(function() {
+        // Add an event listener to the search input field
+        $('#searchInput').on('input', function() {
+            // Get the search term
+            var searchTerm = $(this).val().toLowerCase();
+
+            // Filter the table rows based on the search term
+            $('.course-row').each(function() {
+                var courseName = $(this).data('coursename').toLowerCase();
+                if (courseName.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
         // Add click event listener to course rows
         $(document).on('click', '.course-row', function() {
             console.log('Course row clicked');
