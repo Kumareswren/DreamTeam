@@ -20,23 +20,17 @@ $mailer = new Swift_Mailer($transport);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Extract the assignments array from the form data
     if (isset($_POST['assignments']) && is_array($_POST['assignments'])) {
-        // Prepare an array to store valid student-tutor assignments
-        $validAssignments = array();
-
         // Loop through the submitted assignments
         foreach ($_POST['assignments'] as $studentID => $tutorID) {
             // Check if a tutor is selected for the student
             if (!empty($tutorID)) {
-                // Add the student-tutor pair to the valid assignments array
-                $validAssignments[] = array('studentID' => $studentID, 'tutorID' => $tutorID);
-
-                // Perform insertion of valid assignments into the database
+                // Update the student-tutor assignment in the database
                 // Prepare the SQL statement
-                $insertQuery = "INSERT INTO StudentAssignment (SID, TID) VALUES (?, ?)";
+                $updateQuery = "UPDATE StudentAssignment SET TID = ? WHERE SID = ?";
                 // Prepare the statement
-                $stmt = mysqli_prepare($conn, $insertQuery);
-                // Bind parameters and execute the statement for each valid assignment
-                mysqli_stmt_bind_param($stmt, "ii", $studentID, $tutorID);
+                $stmt = mysqli_prepare($conn, $updateQuery);
+                // Bind parameters and execute the statement
+                mysqli_stmt_bind_param($stmt, "ii", $tutorID, $studentID);
                 mysqli_stmt_execute($stmt);
                 // Close the statement
                 mysqli_stmt_close($stmt);
@@ -60,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 mysqli_stmt_close($tutorNameStmt);
 
                 // Construct the trail action with first names
-                $trailAction = "Assigned student $studentFName to tutor $tutorFName";
+                $trailAction = "Re-assigned student $studentFName to tutor $tutorFName";
                 $token = $_COOKIE['token'];
                 $secretKey = 'your_secret_key';
                 $decoded = JWT::decode($token, $secretKey, array('HS256'));
@@ -104,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $tutorMessage = (new Swift_Message('New Assignment'))
                     ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
                     ->setTo([$tutorEmail])
-                    ->setBody("Dear Tutor, You have a new assignment. Please check your account for details.");
+                    ->setBody("Dear Tutor, You have been reassigned to a new student. Please check your account for details.");
                 $mailer->send($tutorMessage);
         
                 // Close the statement
@@ -117,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     } else {
         // No valid assignments to insert, handle accordingly (e.g., show error message)
-        echo "No valid assignments to insert.";
+        echo "No valid assignments to update.";
         exit();
     }
 }

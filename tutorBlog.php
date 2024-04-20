@@ -63,19 +63,49 @@ function getTutorBlog() {
                     if (isset($_POST['postID'])) {
                         $postID = $_POST['postID'];
                 
+                        // Retrieve the title of the blog post before deletion
+                        $titleQuery = "SELECT Title FROM BlogPost WHERE PostID = ?";
+                        $titleStmt = $conn->prepare($titleQuery);
+                        $titleStmt->bind_param("i", $postID);
+                        if (!$titleStmt->execute()) {
+                            die("Error executing title query: " . $titleStmt->error);
+                        }
+                        $titleResult = $titleStmt->get_result();
+                        $row = $titleResult->fetch_assoc();
+                        $title = $row['Title'];
+                
                         // Prepare SQL query to delete blog post
-                        $sql = "DELETE FROM BlogPost WHERE PostID = ?";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("s", $postID);
+                        $deleteQuery = "DELETE FROM BlogPost WHERE PostID = ?";
+                        $deleteStmt = $conn->prepare($deleteQuery);
+                        $deleteStmt->bind_param("i", $postID);
                 
                         // Execute the SQL query
-                        if (!$stmt->execute()) {
-                            die("Error executing SQL query: " . $stmt->error);
+                        if (!$deleteStmt->execute()) {
+                            die("Error executing delete query: " . $deleteStmt->error);
                         }
                 
                         // Check if any rows were affected
-                        if ($stmt->affected_rows > 0) {
-                            echo "Blog post deleted successfully.";
+                        if ($deleteStmt->affected_rows > 0) {
+                            $token = $_COOKIE['token'];
+                            $secretKey = 'your_secret_key';
+                            $decoded = JWT::decode($token, $secretKey, array('HS256'));
+                            $userId = $decoded->userId;
+                            $userRole = $decoded->role;
+                            $ipAddress = $_SERVER['REMOTE_ADDR'];
+                            $actionPerformed = "Deleted blog post: $title";
+                
+                            // Prepare and execute the SQL query to insert into the trail table
+                            $trailQuery = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+                            $trailStmt = $conn->prepare($trailQuery);
+                            if (!$trailStmt) {
+                                die("Error preparing trail statement: " . $conn->error);
+                            }
+                            $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $actionPerformed);
+                            if (!$trailStmt->execute()) {
+                                die("Error inserting into trail table: " . $trailStmt->error);
+                            } else {
+                                echo "Blog post deleted successfully.";
+                            }
                         } else {
                             echo "Error deleting blog post.";
                         }

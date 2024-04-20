@@ -230,7 +230,11 @@ $conn->close();
                         </a>
                     </li>
 
-                    
+                    <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 trail-link">
+                            <i class="fs-4 bi bi-people"></i> <span class="ms-1 d-none d-sm-inline">Activity</span>
+                        </a>
+                    </li>
 
                       <li>
                           <a href="logout.php" class="nav-link px-10 align-middle">
@@ -258,6 +262,20 @@ $conn->close();
         
             });
         });
+
+                $('.trail-link').click(function(event) {
+                    //event.preventDefault();
+                    $.ajax({
+                        url: 'selectUserTrailTutor.php',
+                        success: function(data) {
+                                $('#componentContainer').html(data);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('An error occurred:', error);
+                            }
+                    });
+                
+                    });
 
     </script>
 
@@ -359,16 +377,8 @@ function handleMeetingFormSubmission() {
                 alert("An error occurred: " + error);
             }
         });
-    });
-
-    
+    });   
 }
-
-
-
-
-
-
 });
 
     </script>
@@ -396,9 +406,6 @@ $(document).ready(function() {
                     this.style.height = (this.scrollHeight) + 'px';
                 });
 
-                // Adjust initial height to fit one line
-                textarea.css('height', 'auto');
-                textarea.css('height', textarea[0].scrollHeight + 'px');
             },
             error: function(xhr, status, error) {
                 console.error('An error occurred:', error);
@@ -443,8 +450,7 @@ $(document).ready(function() {
                     url: 'tutorMeetingListBackend.php', // Update with the correct backend URL
                     method: 'GET', // Assuming you're using GET method to fetch meeting data
                     success: function(response) {
-                        // Process the meeting data here (e.g., display in a table)
-                        console.log(response); // For testing, you can log the response to the console
+
                     },
                     error: function(xhr, status, error) {
                         console.error('An error occurred while fetching meeting data:', error);

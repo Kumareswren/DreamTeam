@@ -7,6 +7,23 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
+function insertIntoTrail($userID, $userRole, $actionPerformed) {
+  global $conn; // Declare $conn as global
+
+  // Get the user's IP address
+  $ip_address = $_SERVER['REMOTE_ADDR'];
+
+  // Prepare the INSERT statement
+  $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)");
+
+  // Bind parameters and execute the statement
+  $stmt->bind_param("isss", $userID, $userRole, $ip_address, $actionPerformed);
+  if (!$stmt->execute()) {
+      die("Error executing SQL query: " . $stmt->error);
+  }
+  $stmt->close();
+}
+
 // Function to create a new blog post
 function createTutorBlog() {
   global $conn; // Declare $conn as global
@@ -63,6 +80,9 @@ function createTutorBlog() {
 
                     // Move uploaded image to desired directory
                     move_uploaded_file($_FILES['upload-image']['tmp_name'], $imagePath);
+
+                    $actionPerformed = $title . " blog has been created";
+                    insertIntoTrail($userID, $userRole, $actionPerformed);
 
                     // Redirect to some page after successful submission
                     header("Location: tutorDashboard.php");

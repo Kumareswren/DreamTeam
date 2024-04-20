@@ -2,6 +2,11 @@
 // Include database connection
 require_once('db.php');
 session_start();
+
+// Include JWT library
+require_once('vendor/autoload.php');
+use \Firebase\JWT\JWT;
+
 // Function to fetch students assigned to a course
 function courseStudents($courseId) {
     global $conn;
@@ -16,6 +21,21 @@ function courseStudents($courseId) {
     $stmt->bind_param("i", $courseId);
     $stmt->execute();
     $result = $stmt->get_result();
+
+    // Retrieve userId from JWT token
+    $token = $_COOKIE['token'];
+    $secretKey = 'your_secret_key';
+    $decoded = JWT::decode($token, $secretKey, array('HS256'));
+    $userId = $decoded->userId;
+    $userRole = $decoded->role;
+    $userIP = $_SERVER['REMOTE_ADDR'];
+    $actionPerformed = 'Checking student list';
+    
+    $sql_insert = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+    $stmt_insert = $conn->prepare($sql_insert);
+    $stmt_insert->bind_param("isss", $userId, $userRole, $userIP, $actionPerformed);
+    $stmt_insert->execute();
+    $stmt_insert->close();
 
     // Check if students found
     if ($result->num_rows > 0) {
@@ -34,6 +54,19 @@ function courseStudents($courseId) {
     }
 
     return $output;
+}
+
+// Function to retrieve userId from JWT token
+function getUserIdFromToken() {
+    $token = $_COOKIE['token'];
+    $secretKey = 'your_secret_key';
+    try {
+        $decoded = JWT::decode($token, $secretKey, array('HS256'));
+        return $decoded->userId;
+    } catch (Exception $e) {
+        // Handle invalid token or other errors
+        return null;
+    }
 }
 
 // Retrieve course ID from AJAX request

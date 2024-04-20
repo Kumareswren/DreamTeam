@@ -171,4 +171,13 @@ CREATE TABLE Messages (
     FOREIGN KEY (SID) REFERENCES Student(SID) ON DELETE CASCADE
 );
 
+CREATE TABLE Trail ( 
+    trailID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    userRole TEXT,
+    ip_address TEXT,
+    actionPerformed TEXT,
+    actionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
