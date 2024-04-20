@@ -26,10 +26,10 @@ $output .= '<div class="form-group mt-3">';
 $output .= '<input type="hidden" id="tid" name="tid" value="' . $tid . '">'; // Include TID as a hidden input field
 $output .= '</div>';
 $output .= '<div class="form-group text-center mt-3">';
-$output .= '<label for="tutorLabel" class="mb-3" style="color: #1F8A70;">To: ' . $fullName . '</label>'; // Dynamically generate the label content with tutor's full name
+$output .= '<label class="mb-3" style="color: #1F8A70;">To: ' . $fullName . '</label>'; // Dynamically generate the label content with tutor's full name
 $output .= '</div>';
 $output .= '<div class="form-group mt-1">';
-$output .= '<label for="tutorReplyContent" class="mb-3">Your Reply:</label>';
+$output .= '<label class="mb-3">Your Reply:</label>';
 $output .= '<textarea class="form-control" id="tutorReplyContent" name="tutorReplyContent" rows="3" placeholder="Enter your reply"></textarea>';
 $output .= '</div>';
 $output .= '<div class="form-group mt-4">';
@@ -68,6 +68,7 @@ $(document).ready(function(){
                 // Handle success response
                 $("#alertBox").html(response);
                 $("#tutorReplyContent").val('');
+                replyClicked('<?php echo $fullName; ?>');
             },
             error: function(xhr, status, error) {
                 // Handle error response
@@ -77,5 +78,20 @@ $(document).ready(function(){
         });
     });
 });
+
+function replyClicked(tutorName) {
+    // Make AJAX call to insert record into trail table
+    $.ajax({
+        type: "POST",
+        url: "noteTitle.php", // PHP script to handle insertion into trail table
+        data: { actionPerformed: "Replied message to " + tutorName },
+        success: function(response) {
+            console.log("Trail record inserted successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error inserting trail record:", error);
+        }
+    });
+}
 </script>
 

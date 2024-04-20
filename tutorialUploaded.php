@@ -74,7 +74,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             
                             // Execute the SQL statement
                             if ($stmtInsert->execute()) {
-                                // Set HTTP status code for success
+                                $actionPerformed = "Uploaded tutorial: $tutorialTitle";
+                                $sqlTrail = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+                                $stmtTrail = $conn->prepare($sqlTrail);
+                                if (!$stmtTrail) {
+                                    // Send internal server error response
+                                    http_response_code(500);
+                                    echo "Error preparing trail statement: " . $conn->error;
+                                    exit;
+                                }
+                                // Retrieve userID and userRole from decoded token
+                                $userId = $decoded->userId;
+                                $userRole = $decoded->role;
+                                $ipAddress = $_SERVER['REMOTE_ADDR'];
+                                $stmtTrail->bind_param("isss", $userId, $userRole, $ipAddress, $actionPerformed);
+                                if (!$stmtTrail->execute()) {
+                                    // Send internal server error response
+                                    http_response_code(500);
+                                    echo "Error inserting into trail table: " . $stmtTrail->error;
+                                    exit;
+                                }
                                 header("HTTP/1.1 200 OK");
                                 echo "Tutorial uploaded successfully";
                             } else {

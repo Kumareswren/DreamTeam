@@ -24,14 +24,31 @@ if (isset($_GET['id'])) {
     // Get the result
     $result = $stmt->get_result();
 
-    // Check if any rows were affected
     if ($result->num_rows > 0) {
-        $post = $result->fetch_assoc();
-    } else {
-        // Post not found
-        echo "Post not found.";
-        exit; // Stop further execution
-    }
+      $post = $result->fetch_assoc();
+  
+      $token = $_COOKIE['token'];
+      $secretKey = 'your_secret_key'; // Change to your actual secret key
+      $decoded = JWT::decode($token, $secretKey, array('HS256'));
+  
+      $userId = $decoded->userId;
+      $userRole = $decoded->role;
+      $ipAddress = $_SERVER['REMOTE_ADDR'];
+      $actionPerformed = 'Viewed blog ' . $post['Title']; // Concatenation corrected
+  
+      // Insert into trail table
+      $trailQuery = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?,?,?,?)";
+      $trailStmt = $conn->prepare($trailQuery);
+      $trailStmt->bind_param("ssss", $userId, $userRole, $ipAddress, $actionPerformed); // Binding all parameters
+      if (!$trailStmt->execute()) {
+          die("Error inserting into trail table: " . $trailStmt->error);
+      }
+  } else {
+      // Post not found
+      echo "Post not found.";
+      exit; // Stop further execution
+  }
+
 } else {
     // PostID not passed in the URL
     echo "PostID not passed in the URL.";

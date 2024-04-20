@@ -78,6 +78,10 @@ if (isset($_COOKIE['token'])) {
             $stmt->execute();
             $result = $stmt->get_result();
 
+            // Insert record into trail table
+            $trailAction = "Checked student list assigned to him/her";
+            insertTrailRecord($conn, $trailAction);
+
             // Generate student list
             $studentListHTML = generateStudentList($conn, $result);
 
@@ -95,6 +99,28 @@ if (isset($_COOKIE['token'])) {
     }
 } else {
     // Token not found
-    echo "Token not found.";
+    echo "Token not found.";
+}
+
+function insertTrailRecord($conn, $trailAction) {
+    $token = $_COOKIE['token'];
+    $secretKey = 'your_secret_key';
+    $decoded = JWT::decode($token, $secretKey, array('HS256'));
+    $userId = $decoded->userId;
+    $userRole = $decoded->role;
+    $ipAddress = $_SERVER['REMOTE_ADDR'];
+
+    // Prepare and execute the SQL query to insert into trail table
+    $trailSql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
+    $trailStmt = $conn->prepare($trailSql);
+    $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $trailAction);
+    if ($trailStmt->execute()) {
+        // Trail record inserted successfully
+        // You can handle success here if needed
+    } else {
+        // Error inserting into trail table
+        echo "Error inserting into trail table: " . $trailStmt->error;
+    }
+    $trailStmt->close();
 }
 ?>
