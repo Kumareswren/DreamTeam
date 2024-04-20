@@ -1,5 +1,33 @@
 <?php
+session_start();
 require_once 'db.php';
+// Log system activity
+$user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
+$activity_type = "View Student and Tutor Dashboard";
+$page_name = "adminDashboard.php";
+$full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+ // Regular expression to extract the browser name
+ if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+$user_type = "Admin";
+
+$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES (?, ?, ?, ?, ?)";
+$insert_stmt = $conn->prepare($insert_query);
+$insert_stmt->bind_param("issss", $user_id, $user_type, $activity_type, $page_name, $browser_name);
+
+if ($insert_stmt->execute()) {
+    echo "success";
+} else {
+    // Handle error if insert query fails
+    echo "Error inserting system activity: " . $conn->error;
+    exit(); // Exit script if system activity logging fails
+}
 function displayDashboardComponent($conn) {
     echo '<!DOCTYPE html>
             <html lang="en">
@@ -37,6 +65,7 @@ function displayDashboardComponent($conn) {
         <div class="tab-content" id="dashboardTabsContent">
             <div class="tab-pane fade show active pt-4" id="student" role="tabpanel" aria-labelledby="student-tab">
                 <h4>Students</h4>
+                <input type="text" id="studentSearchInput" placeholder="Search students..." class="form-control mb-3">
                 <table class="table">
                     <thead>
                         <tr>
@@ -63,7 +92,9 @@ function displayDashboardComponent($conn) {
     // Tutor tab content
     echo '<div class="tab-pane fade pt-4" id="tutor" role="tabpanel" aria-labelledby="tutor-tab">
             <h4>Tutors</h4>
-            <table class="table">
+            <input type="text" id="tutorSearchInput" placeholder="Search tutors..." class="form-control mb-3">'; 
+    echo '<table class="table">
+            
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -112,27 +143,33 @@ function displayDashboardComponent($conn) {
                         console.error("An error occurred:", error);
                     }
                 });
-
-                var action;
-                if (userType === "student") {
-                    action = "Viewed dashboard for student with ID: " + id;
-                } else if (userType === "tutor") {
-                    action = "Viewed dashboard for tutor with ID: " + id;
-                }
-                $.ajax({
-                    url: "noteTitle.php", // URL pointing to the same file
-                    type: "POST",
-                    data: { actionPerformed: action },
-                    success: function(response) {
-                        console.log("Trail record inserted successfully.");
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error inserting trail record:", error);
-                    }
-                });
             });
         });
     </script>
+
+    <script>
+        $(document).ready(function() {
+            // Search function for students
+            $("#studentSearchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#studentList tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            // Your existing code for opening dashboard on button click
+        });
+    </script>
+
+    <script>
+    $("#tutorSearchInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#tutorList tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    </script>
+
 </body>
 </html>';
 }

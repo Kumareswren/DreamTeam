@@ -96,35 +96,10 @@ $stmtMessages = $conn->prepare($sqlMessages);
 $stmtMessages->bind_param("i", $sid);
 $stmtMessages->execute();
 $resultMessages = $stmtMessages->get_result();
-
-// Fetch student name from the Student table
-$sqlStudentName = "SELECT FName FROM Student WHERE SID = ?";
-$stmtStudentName = $conn->prepare($sqlStudentName);
-$stmtStudentName->bind_param("i", $sid);
-$stmtStudentName->execute();
-$resultStudentName = $stmtStudentName->get_result();
-$rowStudentName = $resultStudentName->fetch_assoc();
-$studentName = $rowStudentName['FName'];
-
-$trailAction = "Fetched message history for student: $studentName";
-
-$token = $_COOKIE['token'];
-$secretKey = 'your_secret_key';
-$decoded = JWT::decode($token, $secretKey, array('HS256'));
-$userId = $decoded->userId;
-$userRole = $decoded->role;
-$ipAddress = $_SERVER['REMOTE_ADDR'];
-
-// Prepare and execute the SQL query to insert into trail table
-$trailSql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
-$trailStmt = $conn->prepare($trailSql);
-$trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $trailAction);
-$trailStmt->execute();
-
 $previousMessages = [];
 while ($row = $resultMessages->fetch_assoc()) {
     $previousMessages[] = $row;
-}
+} 
 
     $output = '<style>';
     $output .= '.chat-container {';

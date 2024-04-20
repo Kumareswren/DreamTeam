@@ -37,22 +37,59 @@ $last_login_time = ""; // Initialize the variable to avoid errors
 if ($result_check_user && $result_check_user->num_rows > 0) {
     // User exists in the database
     $row = $result_check_user->fetch_assoc();
+    $user_fullname = $row['FName'] . " " . $row['LName']; //18,4
     
-    // Check if it's the user's first login (last login time is NULL)
-    if ($row['last_login'] === null) {
+    if ($row['last_login'] === null || empty($row['last_login'])) {
         // Update last login time
         date_default_timezone_set('Asia/Kuala_Lumpur');
         $current_time = date('Y-m-d H:i:s');
         $update_query = "UPDATE Admin SET last_login = '$current_time' WHERE Email = '$user_email'";
-        $conn->query($update_query);
-
-        // Display welcome message for the first login
-        $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
+        if ($conn->query($update_query) !== TRUE) {
+            // Handle error if update query fails
+            echo "Error updating last login time: " . $conn->error;
+        } else {
+            // Set flag for first login
+            $is_first_login = true;
+            // Set the welcome message for the first login
+            $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
+        }
     } else {
-        // User has logged in before, fetch the last login time
-        $last_login_time = $row['last_login'];
+        // User has logged in before, fetch the last login time from SystemActivity table
+        $sql_last_login = "SELECT Timestamp FROM SystemActivity WHERE UserID = '{$row['AID']}' AND PageName = 'adminDashboard.php' ORDER BY Timestamp DESC LIMIT 1";
+        $result_last_login = $conn->query($sql_last_login);
+        if ($result_last_login && $result_last_login->num_rows > 0) {
+            $row_last_login = $result_last_login->fetch_assoc();
+            $last_login_time = $row_last_login['Timestamp'];
+        }
+        
         $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
     }
+    $_SESSION['AID'] = $row['AID'];
+    /* echo $_SESSION['SID']; */
+    
+ // Insert record into SystemActivity table
+ $activity_type = "Access Dashboard";
+ $page_name = "adminDashboard.php";
+ $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+ // Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+
+ $user_id = $row['AID'];
+ $user_type = "Admin";
+
+ $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+ if ($conn->query($insert_query) !== TRUE) {
+     // Handle error if insert query fails
+     echo "Error inserting system activity: " . $conn->error;
+ }
 } else {
     // User doesn't exist in the database
     $welcome_message = "Unknown User";
@@ -86,6 +123,10 @@ $conn->close();
 
 /* Styling for Sidebar items */  #menu .nav-link .d-none.d-sm-inline {
     color: #ffffff;
+}
+
+body{ /* whole body colouring 18,4 */
+    background-color: #FFF6D9;
 }
 
 .custom-div {
@@ -124,7 +165,7 @@ $conn->close();
     color: #8fc8bd;
 }
 
-.bi-journal-text{
+.bi-pencil-square{
     color: #8fc8bd;
 }
 
@@ -132,8 +173,19 @@ $conn->close();
     color: #8fc8bd;
 }
 
+.bi-binoculars{
+    color: #8fc8bd;
+}
 
 .bi-person-vcard{
+    color: #8fc8bd;
+}
+
+.bi-person-workspace{
+    color: #8fc8bd;
+}
+
+.bi-person-plus-fill{
     color: #8fc8bd;
 }
 
@@ -144,6 +196,7 @@ $conn->close();
 
 .bg-secondary{
     background-color: #1F8A70!important;
+    background-image: linear-gradient(to left, #28a989, #025f47);
 }
 
 .login-logo{
@@ -151,6 +204,34 @@ $conn->close();
     width: 40px;
     height: 40px;
     transform: translateY(32px);
+}
+
+.footer { /* footer styling added 18/4 */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+.footer .nav-link {
+    padding-top: 1px;
+    padding-right: 2px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    margin-right: 10px;
+
+}
+
+.welcome-message {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    background-color: transparent; 
+    z-index: 1;
+    font-size: 8px; 
+    color: #333;
 }
 
 .custom-div {
@@ -164,7 +245,7 @@ $conn->close();
     
 <div class="container-fluid">
     <div class="row flex-nowrap">
-        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary">
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-secondary d-none d-sm-block">
             <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                 <a href="#" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                     <span class="fs-5 d-none d-sm-inline">
@@ -180,7 +261,7 @@ $conn->close();
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-10 viewDashboard-link">
-                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
+                            <i class="fs-4 bi-binoculars"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -191,39 +272,26 @@ $conn->close();
                         <ul class="submenu nav flex-column ms-4">
                             <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 assignment-link">
-                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">New Assignment</span>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul class="submenu nav flex-column ms-4">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 reassignment-link">
-                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Re-assignment</span>
+                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Assignment</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-10">
-                            <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
+                            <i class="fs-4 bi-person-workspace"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 register-link">
-                                    <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
+                                    <i class="fs-4 bi-person-plus-fill"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
                                 </a>
                             </li>
 
                     <li class="nav-item">
                                 <a href="#" class="nav-link align-middle px-10 course-link">
-                                <i class="fs-4 bi bi-journal-text"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a href="#" class="nav-link align-middle px-10 trail-link">
-                                <i class="fs-4 bi bi-journal-text"></i><span class="ms-1 d-none d-sm-inline">Activities</span>
+                                <i class="fs-4 bi bi-pencil-square"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
                                 </a>
                             </li>
 
@@ -233,7 +301,13 @@ $conn->close();
                         </a>
                     </li>
                 </ul>
-                <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
+                <p><?php
+                if (!empty($last_login_time)) {
+                    echo "Last Login: " . $last_login_time;
+                } else {
+                    echo "Welcome new user!";
+                }
+                ?></p>
             </div>
         </div>
         <script>
@@ -263,6 +337,7 @@ $conn->close();
                         event.preventDefault();
                         $.ajax({
                             url: 'viewDashboardAdmin.php',
+                            data: { 'AID': <?php echo isset($_SESSION['AID']) ? $_SESSION['AID'] : 'null'; ?> }, // Pass the admin ID as a parameter
                             success: function(data) {
                                 $('#componentContainer').html(data);
                             },
@@ -312,59 +387,6 @@ $conn->close();
                                     alert("Assignment successful.");
                                     // Reload the component
                                     $.get('assStudentTutorComp.php', function(data) {
-                                        $('.container').replaceWith(data); // Replace the container content with the updated one
-                                    });
-                                    
-                                } else {
-                                    $('<div id="alertMessageAssign" class="alert alert-danger" role="alert">' + response + '</div>').insertBefore('form').show();
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                // Handle errors
-                                alert("An error occurred: " + error);
-                            }
-                        });
-                    });
-                }
-
-                $(document).ready(function() {
-                    $('.reassignment-link').click(function(event) {
-                        event.preventDefault();
-                        $.ajax({
-                            url: 'reAssStudentTutorComp.php',
-                            success: function(data) {
-                                $('#componentContainer').html(data);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('An error occurred:', error);
-                            }
-                        });
-                        $('#componentContainer').off('submit', 'form');
-                        handleReAssignmentFormSubmission();
-                    });
-                });
-
-                function handleReAssignmentFormSubmission() {
-                    // Attach event listener to form submission
-                    $('#alertMessageAssign').hide();
-                    $('#componentContainer').on('submit', 'form', function(event) {
-                        // Prevent default form submission
-                        event.preventDefault();
-                        // Collect form data
-                        var formData = $(this).serialize();
-                        
-                        // Send form data to backend using AJAX
-                        $.ajax({
-                            type: 'POST',
-                            url: 'reAssStudentTutorBackend.php',
-                            data: formData,
-                            success: function(response) {
-                                // Handle the response
-                                $('.alert').remove();
-                                if (response === 'success') {
-                                    alert("Assignment successful.");
-                                    // Reload the component
-                                    $.get('reAssStudentTutorComp.php', function(data) {
                                         $('.container').replaceWith(data); // Replace the container content with the updated one
                                     });
                                     
@@ -490,29 +512,19 @@ $conn->close();
                     });
                 }
             </script>
-            <script>
-            $(document).ready(function() {
-                $('.trail-link').click(function(event) {
-                    //event.preventDefault();
-                    $.ajax({
-                        url: 'selectUserTrail.php',
-                        success: function(data) {
-                                $('#componentContainer').html(data);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('An error occurred:', error);
-                            }
-                    });
-                
-                    });
-                });
-
-            </script>
 
             <div class="col py-3 custom-div">
                 
                 <main class="mt-5 pt-3">
                     <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="welcome-message">
+                                <h4 style="font-size: 12px; color: #1F8A70 ; font-weight: normal;">Admin: <?php echo $user_fullname; ?></h4>
+
+                                </div>
+                            </div>
+                        </div>
                       <div class="row">
                         <div class="col-md-12" id="componentContainer">
 
@@ -524,7 +536,68 @@ $conn->close();
         </div>
     </div>
 
-    
+    <!-- footer added for mobile breakpoint 8/3 -->
+<footer class="footer d-sm-none">
+        <div class="container-fluid">
+            <!-- Start of your footer content -->
+            <div class="row justify-content-center">
+                <div class="col">
+                    <div class="d-flex flex-row justify-content-between align-items-center px-3 py-2 text-white">
+                        
+                        <ul class="nav nav-pills flex-row mb-0">
+                        <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10 dashboard-link" data-aid="<?php echo $_SESSION['AID']; ?>">
+                            <i class="fs-4 bi-house-fill"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10 viewDashboard-link">
+                            <i class="fs-4 bi-binoculars"></i> <span class="ms-1 d-none d-sm-inline">View Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10">
+                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Students</span>
+                        </a>
+                        <!-- Submenu for Student tab -->
+                        
+                            <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 assignment-link">
+                                    <i class="fs-4 bi-person-vcard"></i> <span class="ms-1 d-none d-sm-inline">Assignment</span>
+                                </a>
+                            </li>
+                        
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-10">
+                            <i class="fs-4 bi-person-workspace"></i> <span class="ms-1 d-none d-sm-inline">Tutors</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 register-link">
+                                    <i class="fs-4 bi-person-plus-fill"></i> <span class="ms-1 d-none d-sm-inline">Register User</span>
+                                </a>
+                            </li>
+
+                    <li class="nav-item">
+                                <a href="#" class="nav-link align-middle px-10 course-link">
+                                <i class="fs-4 bi bi-pencil-square"></i><span class="ms-1 d-none d-sm-inline">Create Course</span>
+                                </a>
+                            </li>
+
+                    <li class="nav-item">
+                        <a href="logout.php" class="nav-link align-middle px-10">
+                            <i class="fs-4 bi-box-arrow-left"></i> <span class="ms-1 d-none d-sm-inline">Logout</span>
+                        </a>
+                    </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- End of your footer content -->
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

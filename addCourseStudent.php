@@ -124,7 +124,7 @@ function getTutorIdFromToken($jwtToken) {
 function addSelectedStudents($courseId, $selectedStudents) {
     global $conn;
 
-    // Prepare the SQL statement for inserting into CourseStudent table
+    // Prepare the SQL statement
     $sql = "INSERT INTO CourseStudent (courseID, SID) VALUES ";
     $values = array();
     foreach ($selectedStudents as $studentId) {
@@ -132,36 +132,23 @@ function addSelectedStudents($courseId, $selectedStudents) {
     }
     $sql .= implode(",", $values);
 
-    // Execute the SQL query for inserting into CourseStudent table
+    // Execute the SQL query
     if ($conn->query($sql) === TRUE) {
         $courseName = $_SESSION['courseName']; // Set your course name here
         
-        // Fetch students' email addresses and insert into Trail table for each student
+        // Fetch students' email addresses
+        $studentEmails = array();
         foreach ($selectedStudents as $studentId) {
-            // Fetch student details
-            $sqlStudent = "SELECT FName, Email FROM Student WHERE SID = $studentId";
-            $resultStudent = $conn->query($sqlStudent);
-            if ($resultStudent && $rowStudent = $resultStudent->fetch_assoc()) {
-                $studentName = $rowStudent['FName'];
-                $studentEmail = $rowStudent['Email'];
-                
-                // Send email to the student
-                sendEmailToStudent($studentEmail, $courseName);
-                
-                // Insert into trail table for this student
-                $trailAction = "Added $studentName to course: $courseName";
-                $token = $_COOKIE['token'];
-                $secretKey = 'your_secret_key';
-                $decoded = JWT::decode($token, $secretKey, array('HS256'));
-                $userId = $decoded->userId;
-                $userRole = $decoded->role;
-                $ipAddress = $_SERVER['REMOTE_ADDR'];
-
-                $trailSql = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
-                $trailStmt = $conn->prepare($trailSql);
-                $trailStmt->bind_param("isss", $userId, $userRole, $ipAddress, $trailAction);
-                $trailStmt->execute();
+            $sql = "SELECT Email FROM Student WHERE SID = $studentId";
+            $result = $conn->query($sql);
+            if ($result && $row = $result->fetch_assoc()) {
+                $studentEmails[] = $row['Email'];
             }
+        }
+
+        // Send email to each student
+        foreach ($studentEmails as $email) {
+            sendEmailToStudent($email, $courseName);
         }
 
         return true; // Insertion successful
