@@ -64,6 +64,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     if ($result->num_rows > 0) {
         // Output table headers
         $output .= '<div class="table-responsive">';
+        $output .= '<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search">';
         $output .= '<table class="table table-striped">';
         $output .= '<thead><tr><th>Note Title</th><th>Note Description</th><th>Date</th><th>URL</th></tr></thead>';
         $output .= '<tbody>';
@@ -123,6 +124,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
      $result = $conn->query($sql);
      if ($result->num_rows > 0) {
          $output .= '<div class="table-responsive">';
+         $output .= '<input type="text" id="tutorialSearchInput" class="form-control mb-3" placeholder="Search">';
          $output .= '<table class="table table-striped">';
          $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>Download</th><th>Submits</th></tr></thead>';
          $output .= '<tbody>';
@@ -157,56 +159,6 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $output .= '<button id="addStudentBtn">Add Student</button>';
     $output .= '</div>';
 
-      // New tab for Answers
-    /* $output .= '<div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">';
-    $output .= '<div id="commentFormContainer">';
-    $output .= '<h3>Answers</h3>';
-    $output .= '<div class="table-responsive">';
-    $output .= '<table class="table table-striped">';
-    $output .= '<thead>';
-    $output .= '<tr>';
-    $output .= '<th>Student Name</th>';
-    $output .= '<th>Submission Title</th>';
-    $output .= '<th>Your Comment</th>';
-    $output .= '<th>Upload Date</th>';
-    $output .= '<th>Download</th>';
-    $output .= '<th>Remarks</th>';
-    $output .= '</tr>';
-    $output .= '</thead>';
-    $output .= '<tbody>';
-    
-    include 'db.php'; 
-    $sql = "SELECT ta.tutorialAnswerID, ta.tutorialAnswerTitle, ta.SID, CONCAT(s.FName, ' ', s.LName) AS StudentName, ta.tutorComment, ta.uploadDate, ta.tutorialAnswerFilePath
-        FROM TutorialAnswer AS ta
-        INNER JOIN Student AS s ON ta.SID = s.SID
-        WHERE ta.tutorialAnswerID = $courseId";
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $tutorialAnswerID = $row['tutorialAnswerID'];
-            $output .= '<tr>';
-            $output .= '<td>' . $row['StudentName'] . '</td>';
-            $output .= '<td>' . $row['tutorialAnswerTitle'] . '</td>';
-            $output .= '<td style="display: none;">' . $row['SID'] . '</td>';
-            $output .= '<td>' . $row['tutorComment'] . '</td>';
-            $output .= '<td>' . $row['uploadDate'] . '</td>';
-            $output .= '<td><a href="' . $row['tutorialAnswerFilePath'] . '" class="btn btn-primary" download>Download</a></td>';
-            $output .= '<td>'; // Remarks column
-            $output .= '<button class="btn btn-success btn-comment" data-tutorial-answer-id="' . $tutorialAnswerID . '">Comment</button>';
-            $output .= '</td>';
-            $output .= '</tr>';
-        }
-    } else {
-        $output .= '<tr><td colspan="7">No answers found.</td></tr>';
-    }
-    $conn->close();
-    
-    $output .= '</tbody>';
-    $output .= '</table>';
-    $output .= '</div>'; 
-    $output .= '</div>';
-    $output .= '</div>'; */  //end of tab-pane
-
     $output .= '</div>'; //end of tab content
 
     $output .= '</div>'; //end of container
@@ -232,6 +184,25 @@ echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Include jQuery -->
 <script>
+
+$(document).ready(function() {
+    $('#searchInput').on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        $('tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+});
+
+$(document).ready(function() {
+    $('#tutorialSearchInput').on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        $('#uploadedTutorialFiles tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+});
+
    $(document).ready(function() {
     // Function to load the addCourseStudent component
     function loadAddCourseStudent(courseId) {

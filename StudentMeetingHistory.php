@@ -10,6 +10,7 @@ header("Content-Type: text/html"); // Set content type to HTML
     
     function generateMeetingList($conn, $resultList) {
         $output = '<h2 class="mt-5 mb-4">My Meeting History</h2>'; // Add the heading
+        $output .= '<input type="text" id="meetingSearchInput" placeholder="Search meetings..." class="form-control mb-3">'; 
         $output .= '<table class="table">';
         $output .= '<thead>';
         $output .= '<tr>';
@@ -139,3 +140,14 @@ if ($conn->query($insert_query) !== TRUE) {
     echo "Token not found.";
 }
 ?>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#meetingSearchInput').on('keyup', function() {
+        var searchText = $(this).val().toLowerCase();
+        $('tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+        });
+    });
+});
+</script>

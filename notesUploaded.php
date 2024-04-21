@@ -4,6 +4,20 @@ include 'tutorUploadSession.php';
 require_once('vendor/autoload.php');
 
 use \Firebase\JWT\JWT;
+
+try {
+    // Create the Transport instance (using SMTP transport for example)
+    $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) 
+    ->setUsername('venturesrsk@gmail.com')
+    ->setPassword('zohh take gpri knhn');
+
+    //****************here************************** */
+$mailer = new Swift_Mailer($transport);
+} catch (Exception $e) {
+    // Handle any errors that occur during transport/mail creation
+    echo "Error creating mailer: " . $e->getMessage();
+    exit(); // Exit the script if mailer creation fails
+}
 function sendResponse($statusCode, $message) {
     http_response_code($statusCode);
     echo $message;
@@ -83,6 +97,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         
                         // Execute the SQL statement
                         if ($stmtInsert->execute()) {
+                            // Retrieve student email associated with the matching course ID
+                            $sqlStudentEmail = "SELECT Student.Email
+                            FROM Student
+                            INNER JOIN CourseStudent ON Student.SID = CourseStudent.SID
+                            WHERE CourseStudent.courseID = ?";
+                        $stmtStudentEmail = $conn->prepare($sqlStudentEmail);
+                        $stmtStudentEmail->bind_param("i", $courseId);
+                        $stmtStudentEmail->execute();
+                        $resultStudentEmail = $stmtStudentEmail->get_result();
+
+                        if ($resultStudentEmail->num_rows > 0) {
+                            $rowStudentEmail = $resultStudentEmail->fetch_assoc();
+                            $student_email = $rowStudentEmail['Email'];
+
+                            // Send email notification to students
+                            $mailer = new Swift_Mailer($transport);
+
+                            $message = (new Swift_Message('New Notes Uploaded'))
+                                ->setFrom(['venturesrsk@gmail.com' => 'System bot'])
+                                ->setTo([$student_email])
+                                ->setBody("Dear student, your tutor has uploaded new notes. You can now access them using the website.");
+
+                            // Send the message
+                            $result = $mailer->send($message);
                             // Insertion into Note table successful, now insert into Trail table
                             $actionPerformed = "Uploaded notes: $noteTitle";
                             $sqlTrail = "INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, ?)";
@@ -115,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         // Send not found response
                         http_response_code(404);
                         echo "Tutor not found.";
-                    }
+                    }}
                 } catch (Exception $e) {
                     // Send bad request response
                     http_response_code(400);
