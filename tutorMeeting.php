@@ -40,7 +40,7 @@ if (isset($_COOKIE['token'])) {
         if ($resultTutor->num_rows > 0) {
             $rowTutor = $resultTutor->fetch_assoc();
             $tid = $rowTutor['TID'];
-
+            $tutor_TID = $rowTutor['TID'];
                         // Set the TID in session
                         $_SESSION['TID'] = $tutor_TID;
 

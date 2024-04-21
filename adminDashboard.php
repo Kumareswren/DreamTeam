@@ -270,7 +270,13 @@ $conn->close();
                         </a>
                     </li>
                 </ul>
-                <p>Last Login: <?php echo $last_login_time; ?></p> <!-- Display the last login time here -->
+                <p><?php
+                if (!empty($last_login_time)) {
+                    echo "Last Login: " . $last_login_time;
+                } else {
+                    echo "Welcome new user!";
+                }
+                ?></p>
             </div>
         </div>
         <script>
