@@ -39,19 +39,56 @@ if ($result_check_user && $result_check_user->num_rows > 0) {
     $row = $result_check_user->fetch_assoc();
     
     // Check if it's the user's first login (last login time is NULL)
-    if ($row['last_login'] === null) {
+    if ($row['last_login'] === null || empty($row['last_login'])) {
         // Update last login time
         date_default_timezone_set('Asia/Kuala_Lumpur');
         $current_time = date('Y-m-d H:i:s');
         $update_query = "UPDATE Admin SET last_login = '$current_time' WHERE Email = '$user_email'";
-        $conn->query($update_query);
-
+        if ($conn->query($update_query) !== TRUE) {
+   // Handle error if update query fails
+   echo "Error updating last login time: " . $conn->error;
+} else {
+    // Set flag for first login
+    $is_first_login = true;
+    // Set the welcome message for the first login
         // Display welcome message for the first login
         $welcome_message = "Welcome to your Dashboard, " . $row['FName'] . "! This is your first login.";
+}
     } else {
-        // User has logged in before, fetch the last login time
-        $last_login_time = $row['last_login'];
+    // User has logged in before, fetch the last login time from SystemActivity table
+    $sql_last_login = "SELECT Timestamp FROM SystemActivity WHERE UserID = '{$row['AID']}' AND PageName = 'adminDashboard.php' ORDER BY Timestamp DESC LIMIT 1";
+    $result_last_login = $conn->query($sql_last_login);
+    if ($result_last_login && $result_last_login->num_rows > 0) {
+        $row_last_login = $result_last_login->fetch_assoc();
+        $last_login_time = $row_last_login['Timestamp'];
+    }
         $welcome_message = "Welcome back to your Dashboard, " . $row['FName'] . "!";
+    }
+    $_SESSION['AID'] = $row['AID'];
+    /* echo $_SESSION['SID']; */
+    
+ // Insert record into SystemActivity table
+ $activity_type = "Access Dashboard";
+ $page_name = "adminDashboard.php";
+ $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+ // Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+
+ $user_id = $row['AID'];
+ $user_type = "Admin";
+
+ $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+ if ($conn->query($insert_query) !== TRUE) {
+     // Handle error if insert query fails
+     echo "Error inserting system activity: " . $conn->error;
     }
 } else {
     // User doesn't exist in the database

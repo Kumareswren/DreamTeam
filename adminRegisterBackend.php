@@ -110,7 +110,34 @@ $rowCount = 0;
         // Send the message
         $mailer->send($message);
         echo "success";
+    
+         // Log system activity
+         $user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
+         $activity_type = "Register user";
+         $page_name = "adminDashboard.php";
+   
+$full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+// Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+   $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+   $browser_name = $matches[1];
+} else {
+   $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+         $user_type = "Admin";
 
+         $insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                          VALUES (?, ?, ?, ?, ?)";
+         $insert_stmt = $conn->prepare($insert_query);
+         $insert_stmt->bind_param("issss", $user_id, $user_type, $activity_type, $page_name, $browser_name);
+
+         if ($insert_stmt->execute()) {
+             echo "success";
+         } else {
+             // Handle error if insert query fails
+             echo "Error inserting system activity: " . $conn->error;
+         }
         exit();
     } else {
         // Registration failed, handle the error (e.g., duplicate email)
