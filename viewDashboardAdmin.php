@@ -22,7 +22,7 @@ $insert_stmt = $conn->prepare($insert_query);
 $insert_stmt->bind_param("issss", $user_id, $user_type, $activity_type, $page_name, $browser_name);
 
 if ($insert_stmt->execute()) {
-    echo "success";
+    
 } else {
     // Handle error if insert query fails
     echo "Error inserting system activity: " . $conn->error;

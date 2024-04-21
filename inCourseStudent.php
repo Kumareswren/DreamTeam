@@ -22,7 +22,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $output .= '<a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Tutorial</a>';
     $output .= '</li>';
     $output .= '<li class="nav-item">';
-    $output .= '<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false">Students</a>';
+    $output .= '<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false">Answers</a>';
     $output .= '</li>';
     /* $output .= '<li class="nav-item">'; 
     $output .= '<a class="nav-link" id="tab4-tab" data-toggle="tab" href="#tab4" role="tab" aria-controls="tab4" aria-selected="false">Your Submissions</a>';
@@ -79,8 +79,9 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
       $output .= '</div>';
 
       $output .= '<div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">';
-      $output .= '<h3>Students</h3>';
+      $output .= '<h3>Your Answers</h3>';
       $output .= '<div id="studentList"></div>';
+      $output .= '<div id="studentSubList"></div>';
       $output .= '</div>';
 
         /* $output .= '<div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">';
@@ -192,7 +193,30 @@ $(document).on('click', '.submit-tutorial', function() {
     
 
     // Event listener for the Students tab
-    $(document).on('click', '#tab3-tab', reloadStudentList);
+    $(document).on('click', '#tab3-tab', reloadStudentList, loadSubmissionList);
+
+    function loadSubmissionList() {
+    // Retrieve course ID from the hidden input
+    var courseId = $('#courseId').val();
+
+
+
+    // Make an AJAX request to fetch submissions for the course
+    $.ajax({
+        url: 'remarkView.php', // Adjust the URL to your PHP script for fetching submissions
+        type: 'POST',
+        data: { courseId: courseId}, // Send both courseId and studentId
+        success: function(response) {
+            // Populate the submissions list container with fetched data
+            $('#studentSubList').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            // Display error message to the user
+            $('#studentSubList').html('<p>Error loading submissions. Please try again later.</p>');
+        }
+    });
+}
 
 
 </script>

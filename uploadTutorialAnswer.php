@@ -5,6 +5,25 @@ require_once('vendor/autoload.php');
 
 use \Firebase\JWT\JWT;
 
+try {
+    // Create the Transport instance (using SMTP transport for example)
+    $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) 
+    ->setUsername('venturesrsk@gmail.com')
+    ->setPassword('zohh take gpri knhn');
+
+    //****************here************************** */
+$mailer = new Swift_Mailer($transport);
+} catch (Exception $e) {
+    // Handle any errors that occur during transport/mail creation
+    echo "Error creating mailer: " . $e->getMessage();
+    exit(); // Exit the script if mailer creation fails
+}
+
+function sendResponse($statusCode, $message) {
+    http_response_code($statusCode);
+    echo $message;
+}
+
 //collect email from jwt token , select SID from Student where email = $email
 // Retrieve the token from the cookie - change to student table stuff
 if (isset($_COOKIE['token'])) {
@@ -85,6 +104,39 @@ if (isset($_FILES["tutorialFile"])) {
 
                 // Execute the SQL statement
                 if ($stmtInsert->execute()) {
+                    // Retrieve the tutor's email
+    $sqlGetTutorEmail = "SELECT Tutor.Email
+    FROM Tutor
+    INNER JOIN StudentAssignment ON Tutor.TID = StudentAssignment.TID
+    WHERE StudentAssignment.SID = ?";
+$stmtGetTutorEmail = $conn->prepare($sqlGetTutorEmail);
+if (!$stmtGetTutorEmail) {
+// Handle SQL error
+header("HTTP/1.1 500 Internal Server Error");
+echo "SQL Error: " . $conn->error;
+exit();
+}
+$stmtGetTutorEmail->bind_param("i", $SID);
+if (!$stmtGetTutorEmail->execute()) {
+// Handle execution error
+header("HTTP/1.1 500 Internal Server Error");
+echo "Failed to execute query: " . $stmtGetTutorEmail->error;
+exit();
+}
+$resultTutorEmail = $stmtGetTutorEmail->get_result();
+
+if ($resultTutorEmail->num_rows > 0) {
+$rowTutorEmail = $resultTutorEmail->fetch_assoc();
+$tutorEmail = $rowTutorEmail['Email'];
+
+// Compose and send email notification to the tutor
+$message = (new Swift_Message('New Tutorial Answer Uploaded'))
+->setFrom(['venturesrsk@gmail.com' => 'System bot'])
+->setTo([$tutorEmail])
+->setBody("Dear tutor, a new tutorial answer has been uploaded by a student. You can review it on the website.");
+
+// Send the message
+$result = $mailer->send($message);
                     // Set HTTP status code for success
                     header("HTTP/1.1 200 OK");
                     echo "File uploaded successfully.";
@@ -122,4 +174,4 @@ if (isset($_FILES["tutorialFile"])) {
     header("HTTP/1.1 400 Bad Request");
     echo "No file uploaded.";
 }
-} 
+} }

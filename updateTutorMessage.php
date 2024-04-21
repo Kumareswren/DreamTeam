@@ -5,7 +5,24 @@ use \Firebase\JWT\JWT;
 require_once('vendor/autoload.php'); 
 session_start();
 
+try {
+    // Create the Transport instance (using SMTP transport for example)
+    $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls')) 
+    ->setUsername('venturesrsk@gmail.com')
+    ->setPassword('zohh take gpri knhn');
 
+    //****************here************************** */
+$mailer = new Swift_Mailer($transport);
+} catch (Exception $e) {
+    // Handle any errors that occur during transport/mail creation
+    echo "Error creating mailer: " . $e->getMessage();
+    exit(); // Exit the script if mailer creation fails
+}
+
+function sendResponse($statusCode, $message) {
+    http_response_code($statusCode);
+    echo $message;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"]) && isset($_POST["sid"])) {
     // Retrieve message and SID from POST data
@@ -47,7 +64,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"]) && isset($_
                         $stmt_insert_message->bind_param("iisss", $tid, $sid, $message, $sender_type, $receiver_type);
                         if ($stmt_insert_message->execute()) {
                             // Message inserted successfully
+                            http_response_code(200);
+            echo "Message sent successfully.";
 
+            // Retrieve student's email based on SID
+            $sql_student_email = "SELECT Email FROM Student WHERE SID = ?";
+            $stmt_student_email = $conn->prepare($sql_student_email);
+            $stmt_student_email->bind_param("i", $sid);
+            $stmt_student_email->execute();
+            $result_student_email = $stmt_student_email->get_result();
+
+            if ($result_student_email->num_rows > 0) {
+                $row_student_email = $result_student_email->fetch_assoc();
+                $student_email = $row_student_email['Email'];
+
+                // Send email notification to the student
+                $message = (new Swift_Message('Dear student, you have received a new message from your tutor'))
+                    ->setFrom(['venturesrsk@gmail.com' => 'e-Tutor'])
+                    ->setTo([$student_email])
+                    ->setBody('Dear student, you have received a new message from your tutor. You can view it in the website. Thanks.');
+
+                // Send the message
+                $result = $mailer->send($message);
                             // Prepare the trail action
                             $trailAction = "Sent message to student $student_fname";
 
@@ -106,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"]) && isset($_
         echo "Error executing check user query: " . $stmt_check_user->error;
     }
     $stmt_check_user->close();
-} else {
+}} else {
     // Invalid request or missing parameters
     http_response_code(400);
     echo "Error occurred: No message found.";
