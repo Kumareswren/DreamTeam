@@ -340,6 +340,66 @@ if(isset($_POST['user_role'])) {
         echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />';
         echo "<h2>Dashboard</h2><br/>";
     
+        
+    // Query to get the most viewed pages with their activity types
+echo "<h4>Most Viewed Pages</h4>";
+$sqlMostViewedPages = "SELECT PageName, ActivityType, COUNT(*) as ViewCount
+                       FROM SystemActivity
+                       GROUP BY PageName, ActivityType
+                       ORDER BY ViewCount DESC";
+$resultMostViewedPages = $conn->query($sqlMostViewedPages);
+
+// Display results for most viewed pages with activity types
+echo '<div class="table-responsive">';
+echo '<table class="table table-bordered">';
+echo "<thead><tr><th>Page Name</th><th>Activity Type</th><th>View Count</th></tr></thead><tbody>";
+while ($row = $resultMostViewedPages->fetch_assoc()) {
+    echo "<tr><td>" . $row['PageName'] . "</td><td>" . $row['ActivityType'] . "</td><td>" . $row['ViewCount'] . "</td></tr>";
+}
+echo "</tbody></table></div>";
+    
+// Query to get the most active users
+echo "<h4>Most Active Users</h4>";
+$sqlMostActiveUsers = "SELECT SA.UserType, 
+                            CASE
+                                WHEN SA.UserType = 'Student' THEN S.FName
+                                WHEN SA.UserType = 'Tutor' THEN T.FName
+                                WHEN SA.UserType = 'Admin' THEN A.FName
+                            END AS FirstName,
+                           COUNT(*) as ActivityCount
+                       FROM SystemActivity SA
+                       LEFT JOIN Student S ON SA.UserID = S.SID AND SA.UserType = 'Student'
+                       LEFT JOIN Tutor T ON SA.UserID = T.TID AND SA.UserType = 'Tutor'
+                       LEFT JOIN Admin A ON SA.UserID = A.AID AND SA.UserType = 'Admin'
+                       GROUP BY SA.UserID, SA.UserType
+                       ORDER BY ActivityCount DESC";
+
+$resultMostActiveUsers = $conn->query($sqlMostActiveUsers);
+
+// Display results for most active users
+echo '<div class="table-responsive">';
+echo '<table class="table table-bordered">';
+echo "<thead><tr><th>User Type</th><th>Name</th><th>Activity Count</th></tr></thead><tbody>";
+while ($row = $resultMostActiveUsers->fetch_assoc()) {
+    echo "<tr><td>" . $row['UserType'] . "</td><td>" . $row['FirstName'] . "</td><td>" . $row['ActivityCount'] . "</td></tr>";
+}
+echo "</tbody></table></div>";
+    
+    // Query to get the browsers being used
+    echo "<h4>Browsers Being Used</h4>";
+    $sqlBrowsersBeingUsed = "SELECT BrowserName, COUNT(*) as BrowserUsageCount
+                             FROM SystemActivity
+                             GROUP BY BrowserName
+                             ORDER BY BrowserUsageCount DESC";
+    $resultBrowsersBeingUsed = $conn->query($sqlBrowsersBeingUsed);
+    
+    // Display results for browsers being used
+    echo '<div class="table-responsive">';
+    echo '<table class="table table-bordered">';
+    echo "<thead><tr><th>Browser Name</th><th>Usage Count</th></tr></thead><tbody>";
+    while ($row = $resultBrowsersBeingUsed->fetch_assoc()) {
+        echo "<tr><td>" . $row['BrowserName'] . "</td><td>" . $row['BrowserUsageCount'] . "</td></tr>";
+    }
         $currentDate = date("Y-m-d");
     
         // Calculate the date 7 days ago

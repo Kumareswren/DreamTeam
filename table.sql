@@ -180,4 +180,13 @@ CREATE TABLE Trail (
     actionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
+/*Adam changes---Last_Login table*/
+CREATE TABLE SystemActivity (
+    ActivityID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    UserID int,
+    UserType ENUM('Student', 'Tutor', 'Admin'),
+    ActivityType varchar(255),
+    PageName varchar(255),
+    BrowserName varchar(255),
+    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

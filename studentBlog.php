@@ -280,6 +280,28 @@ function getStudentBlog() {
 // Output HTML markup for blog component
  
 
+// Prepare SQL query to log system activity
+$activity_type = "Blog";
+$page_name = "studentDashboard.php";
+$full_user_agent = $_SERVER['HTTP_USER_AGENT'];
+// Regular expression to extract the browser name
+if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+    $browser_name = 'Edge';
+} elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+    $browser_name = $matches[1];
+} else {
+    $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+}
+
+$user_id = $userID; // Assuming $userID holds the student's ID
+$user_type = "Student";
+
+$insert_query = "INSERT INTO SystemActivity (UserID, UserType, ActivityType, PageName, BrowserName) 
+                 VALUES ('$user_id', '$user_type', '$activity_type', '$page_name', '$browser_name')";
+if ($conn->query($insert_query) !== TRUE) {
+    // Handle error if insert query fails
+    echo "Error inserting system activity: " . $conn->error;
+}
 echo '<div class="swiper-container">';
 echo '<div class="swiper-wrapper">';
 foreach ($blogPosts as $post) {
