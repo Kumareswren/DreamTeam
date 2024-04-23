@@ -63,7 +63,32 @@ function createStudentBlog() {
                     // Retrieve data from the form
                     $title = $_POST['blog-title'];
                     $content = $_POST['blog-description'];
+                    if (!empty($_FILES['upload-image']['name'])) {
                     $imagePath = "media/" . $_FILES['upload-image']['name']; // Constructing image path
+ // Add the code here to check file size
+ $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+ if ($_FILES['upload-image']['size'] > $maxFileSize) {
+     echo "<script>alert('Error: File size exceeds the limit of 5MB.');</script>";
+     echo "<script>window.location.href = 'studentDashboard.php';</script>";
+     exit();
+ }
+ 
+ // Check if the uploaded file is an image
+ $imageInfo = getimagesize($_FILES['upload-image']['tmp_name']);
+ if (!$imageInfo) {
+     echo "<script>alert('Error: Uploaded file is not a valid image.');</script>";
+     echo "<script>window.location.href = 'studentDashboard.php';</script>";
+     exit();
+ }
+ 
+ // Check if the uploaded image has an allowed extension
+ $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+ $fileExtension = strtolower(pathinfo($_FILES['upload-image']['name'], PATHINFO_EXTENSION));
+ if (!in_array($fileExtension, $allowedExtensions)) {
+     echo "<script>alert('Error: Only JPG, JPEG, PNG, and GIF files are allowed.');</script>";
+     echo "<script>window.location.href = 'studentDashboard.php';</script>";
+     exit();
+ }
 
                     // Insert data into the database
                     if ($userRole === 'student') {
@@ -81,6 +106,10 @@ function createStudentBlog() {
 
                     // Move uploaded image to desired directory
                     move_uploaded_file($_FILES['upload-image']['tmp_name'], $imagePath);
+                } else {
+                    // No file uploaded, set image path to null or handle as needed
+                    $imagePath = null; // Set image path to null or handle as needed
+                }
         // Insert record into SystemActivity table
         $activity_type = "Create Blog Post";
         $page_name = "studentDashboard.php";
