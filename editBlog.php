@@ -13,12 +13,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['PostID'], $_POST['Titl
     $postID = $_POST['PostID'];
     $title = $_POST['Title'];
     $content = $_POST['Content'];
-
+// File size check
+if (!empty($_FILES['ImagePath']['name'])) {
+    $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+    if ($_FILES['ImagePath']['size'] > $maxFileSize) {
+        echo "<script>alert('Error: File size exceeds the limit of 5MB.');</script>";
+        echo "<script>window.location.href = 'viewBlog.php?id=$postID';</script>";
+        exit();
+    }
+   
+    // Check if the uploaded file is an image
+    $imageInfo = getimagesize($_FILES['ImagePath']['tmp_name']);
+    if (!$imageInfo) {
+        echo "<script>alert('Error: Uploaded file is not a valid image.');</script>";
+        echo "<script>window.location.href = 'viewBlog.php?id=$postID';</script>";
+        exit();
+    }
+   
+    // Check if the uploaded image has an allowed extension
+    $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+    $fileExtension = strtolower(pathinfo($_FILES['ImagePath']['name'], PATHINFO_EXTENSION));
+    if (!in_array($fileExtension, $allowedExtensions)) {
+        echo "<script>alert('Error: Only JPG, JPEG, PNG, and GIF files are allowed.');</script>";
+        echo "<script>window.location.href = 'viewBlog.php?id=$postID';</script>";
+        exit();
+    }
     // Handle the file upload
     $target_dir = "media/"; // Specify the directory where you want to save the uploaded files
     $target_file = $target_dir . basename($_FILES["ImagePath"]["name"]);
     move_uploaded_file($_FILES["ImagePath"]["tmp_name"], $target_file);
-
+} else {
+    // No file uploaded, handle as needed
+    // For example, you might want to set a default image or skip uploading
+    // Here, we'll simply set $target_file to null
+    $target_file = null;
+}
     // Prepare SQL query to update the blog post
     $sql = "UPDATE BlogPost SET Title = ?, Content = ?, ImagePath = ? WHERE PostID = ?";
     $stmt = $conn->prepare($sql);
@@ -197,7 +226,7 @@ button.publish:hover {
                 <!-- Display the current image -->
                 <img src="<?php echo $post['ImagePath']; ?>" alt="Current Image" style="width: 100px; height: 100px;">
                 <label for="upload-image">Upload Image</label>
-                <input id="upload-image" type="file" name="ImagePath" accept="image/*" required>
+                <input id="upload-image" type="file" name="ImagePath" accept="image/*">
             </div>
         <?php else: ?>
             <!-- Your existing code for when $_GET['id'] is not set -->
@@ -212,7 +241,7 @@ button.publish:hover {
             </div>
             <div class="form-field">
                 <label for="upload-image">Upload Image</label>
-                <input id="upload-image" type="file" name="ImagePath" accept="image/*" required>
+                <input id="upload-image" type="file" name="ImagePath" accept="image/*">
             </div>
         <?php endif; ?>
         <!-- Hidden fields for user role and email -->

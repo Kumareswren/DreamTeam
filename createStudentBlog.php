@@ -89,7 +89,12 @@ function createStudentBlog() {
      echo "<script>window.location.href = 'studentDashboard.php';</script>";
      exit();
  }
-
+                // Move uploaded image to desired directory
+                move_uploaded_file($_FILES['upload-image']['tmp_name'], $imagePath);
+            } else {
+                // No file uploaded, set image path to null or handle as needed
+                $imagePath = null; // Set image path to null or handle as needed
+            }
                     // Insert data into the database
                     if ($userRole === 'student') {
                         $stmt = $conn->prepare("INSERT INTO BlogPost (Title, Content, StudentID, ImagePath, UserRole) VALUES (?, ?, ?, ?, ?)");
@@ -104,12 +109,7 @@ function createStudentBlog() {
                     }
                     $stmt->close();
 
-                    // Move uploaded image to desired directory
-                    move_uploaded_file($_FILES['upload-image']['tmp_name'], $imagePath);
-                } else {
-                    // No file uploaded, set image path to null or handle as needed
-                    $imagePath = null; // Set image path to null or handle as needed
-                }
+    
         // Insert record into SystemActivity table
         $activity_type = "Create Blog Post";
         $page_name = "studentDashboard.php";
@@ -266,7 +266,7 @@ button.publish:hover {
         </div>
         <div>
             <label for="upload-image">Upload Image</label>
-            <input id="upload-image" type="file" name="upload-image" accept="image/*" required>
+            <input id="upload-image" type="file" name="upload-image" accept="image/*">
         </div>
         <!-- Hidden fields for user role and email -->
         <input type="hidden" name="user-role" value="<?php echo $userRole; ?>">
