@@ -97,6 +97,8 @@ $stmtMessages->bind_param("i", $sid);
 $stmtMessages->execute();
 $resultMessages = $stmtMessages->get_result();
 
+
+
 // Fetch student name from the Student table
 $sqlStudentName = "SELECT FName FROM Student WHERE SID = ?";
 $stmtStudentName = $conn->prepare($sqlStudentName);
@@ -180,6 +182,8 @@ while ($row = $resultMessages->fetch_assoc()) {
         $output .= '  border-radius: 20px;';
         $output .= '  color: #fff;';
         $output .= '  word-wrap: break-word;';
+        $output .= '  overflow-wrap: break-word;';
+        $output .= '  word-break: break-all;';
         $output .= '}';
         
         $output .= '.you {';
@@ -273,7 +277,9 @@ if ($resultFullName->num_rows > 0) {
             $senderClass = 'you'; // 'you' if sender is student
         }
         $output .= '<div class="chat-message">';
-        $output .= "<div class='chat-bubble $senderClass'>{$message['messageContent']}";
+        /* $output .= "<div class='chat-bubble $senderClass'>{$message['messageContent']}"; */
+        /* $output .= "<div class='chat-bubble $senderClass'>" . htmlspecialchars_decode($message['messageContent']); */
+        $output .= "<div class='chat-bubble $senderClass'>" . htmlspecialchars_decode($message['messageContent'], ENT_QUOTES);
         $output .= "<div class='sent-time'>$message[sent_at]</div>"; // Include sent_at timestamp within the chat-bubble div
         $output .= '</div>';
         $output .= '</div>';

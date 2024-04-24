@@ -137,6 +137,14 @@ echo generateInCourseDetails($courseId, $courseName, $startDate, $endDate);
             }
         });
     }
+
+    $(document).ready(function() {
+    // Call reloadNotesList() when the document is ready
+    reloadNotesList();
+
+    
+});
+
         // Function to reload the notes list after successful insertion
     function reloadNotesList() {
         // Retrieve course ID from the hidden input

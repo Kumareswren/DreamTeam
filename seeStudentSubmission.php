@@ -6,7 +6,7 @@ $output = '';
 $tutorialID = isset($_POST['tutorialID']) ? $_POST['tutorialID'] : '';// Check if tutorialID is provided via POST
 
 
-$output .= "Received tutorial ID: " . $tutorialID . "<br>";// Print out tutorialID to check if it's correctly received
+
 
 
 if (!empty($tutorialID)) {// Proceed only if tutorialID is provided
@@ -28,7 +28,7 @@ WHERE ta.tutorialID = $tutorialID";
         $output .= '<thead>';
         $output .= '<tr>';
         $output .= '<th>Student Name</th>';
-        $output .= '<th>Submission Title</th>';
+        $output .= '<th>Title</th>';
         $output .= '<th>Upload Date</th>';
         $output .= '<th>Download</th>';
         $output .= '<th>Remarks</th>'; // Added Remarks column
@@ -45,8 +45,18 @@ WHERE ta.tutorialID = $tutorialID";
             $output .= '<td>' . $row['uploadDate'] . '</td>';
             $output .= '<td><a href="' . $row['tutorialAnswerFilePath'] . '" class="btn btn-primary" download onclick="downloadClicked(\'' . $row['tutorialAnswerTitle'] . '_' . $row['StudentName'] . '\')">Download</a></td>';
             $output .= '<td>' . $row['tutorComment'] . '</td>';
-            /* $output .= '<button class="btn btn-success btn-add-remark" data-tutorial-answer-id="' . $tutorialAnswerID . '">Add Remark</button>'; */
-            $output .= '<td><button class="btn btn-success btn-add-remark" data-tutorial-answer-id="' . $row['tutorialAnswerID'] . '">Add Remark</button></td>';
+
+            // Check if tutorComment is not empty
+            if (!empty($row['tutorComment'])) {
+                // If tutorComment is not empty, hide the "Add Remark" button and display placeholder text
+                $output .= '<td><i>Remarks Added</i></td>';
+                $output .= '<td><button class="btn btn-success btn-add-remark" data-tutorial-answer-id="' . $row['tutorialAnswerID'] . '" style="display: none;">Add Remark</button></td>';
+            } else {
+                // If tutorComment is empty, display an empty cell for remarks and show the "Add Remark" button
+               
+                $output .= '<td><button class="btn btn-success btn-add-remark" data-tutorial-answer-id="' . $row['tutorialAnswerID'] . '">Add Remark</button></td>';
+            }
+            
             $output .= '</tr>';
         }
 
