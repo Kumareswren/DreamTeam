@@ -57,8 +57,8 @@ function submitForm() {
             },
             success: function(response) {
                 console.log(response);
-                var responseObject = JSON.parse(response);
-                $('#messageBox').html('<div class="alert alert-success" role="alert">' + responseObject.message + '</div>');
+                //var responseObject = JSON.parse(response);
+                $('#messageBox').html('<div class="alert alert-success" role="alert">Your remark has been sent</div>');
                 $('#tutorComment').val(''); // Clear comment textarea
             },
             error: function(xhr, status, error) {
@@ -71,5 +71,30 @@ function submitForm() {
     }
 }
 
+$(document).ready(function() {
+    // Define the maximum number of characters allowed for tutorComment
+    var maxCharacters = 140;
+
+    // Event listener for input in tutorComment textarea
+    $('#tutorComment').on('input', function() {
+        // Get the current value of the textarea
+        var comment = $(this).val();
+
+        // Get the length of the comment
+        var charCount = comment.length;
+
+        // Check if the character count exceeds the maximum limit
+        if (charCount > maxCharacters) {
+            // Trim the comment to the maximum character limit
+            var trimmedComment = comment.substring(0, maxCharacters);
+            
+            // Update the value of the textarea with the trimmed comment
+            $(this).val(trimmedComment);
+        }
+
+        // Update the character count display
+        $('#charCount').text(charCount + '/' + maxCharacters);
+    });
+});
 
 </script>

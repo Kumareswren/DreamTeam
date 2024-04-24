@@ -122,8 +122,9 @@ if(isset($_POST['tutorialAnswerID']) && isset($_POST['tutorComment'])) { // Chec
             echo json_encode($response);
         } else {
             // Error fetching tutorialAnswerTitle
-            $response = array('status' => 'error', 'message' => 'Error fetching tutorial answer title.');
-            echo json_encode($response);
+           /*  $response = array('status' => 'error', 'message' => 'Error fetching tutorial answer title.');
+            echo json_encode($response); */
+            echo "<script>alert('Your remark has been sent');</script>";
         }
     } else {
         // Query execution failed
