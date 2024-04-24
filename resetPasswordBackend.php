@@ -47,9 +47,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Generate a random password (6 characters)
     $new_password = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
+    $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
 
     // Update password in the respective table
-    $update_sql = "UPDATE $table SET $passwordAttribute = '$new_password' WHERE Email = '$email'";
+    $update_sql = "UPDATE $table SET $passwordAttribute = '$hashedPassword' WHERE Email = '$email'";
     if (mysqli_query($conn, $update_sql)) {
         // Password updated successfully
         // Send email with the new password (you need to implement email functionality)

@@ -26,55 +26,71 @@ function generateToken($email, $role, $userId, $ipAddress, $expirationTime) {
 $userIP = $_SERVER['REMOTE_ADDR'];
 
 // SQL queries to check user credentials
-$sqlStudent = "SELECT * FROM student WHERE Email='$email' AND SPass='$pass'";
-$sqlTutor = "SELECT * FROM tutor WHERE Email='$email' AND TPass='$pass'";
-$sqlAdmin = "SELECT * FROM admin WHERE Email='$email' AND APass='$pass'";
+$sqlStudent = "SELECT * FROM student WHERE Email=?";
+$sqlTutor = "SELECT * FROM tutor WHERE Email=?";
+$sqlAdmin = "SELECT * FROM admin WHERE Email=?";
 
 // Execute the queries
-$resultStudent = $conn->query($sqlStudent);
-$resultTutor = $conn->query($sqlTutor);
-$resultAdmin = $conn->query($sqlAdmin);
+$stmtStudent = $conn->prepare($sqlStudent);
+$stmtStudent->bind_param("s", $email);
+$stmtStudent->execute();
+$resultStudent = $stmtStudent->get_result();
 
-// Check if user credentials match and generate JWT token accordingly
+$stmtTutor = $conn->prepare($sqlTutor);
+$stmtTutor->bind_param("s", $email);
+$stmtTutor->execute();
+$resultTutor = $stmtTutor->get_result();
+
+$stmtAdmin = $conn->prepare($sqlAdmin);
+$stmtAdmin->bind_param("s", $email);
+$stmtAdmin->execute();
+$resultAdmin = $stmtAdmin->get_result();
+
 // Check if user credentials match and generate JWT token accordingly
 if ($resultStudent->num_rows > 0) {
     $row = $resultStudent->fetch_assoc(); // Fetch the row for the student
-    $token = generateToken($email, 'student', $row['SID'], $userIP, $expirationTime);
-    setcookie('token', $token, time() + (86400 * 30), "/");
-    // Insert record into Trail table
-    $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, 'Logged in')");
-    $role = 'student';
-    $stmt->bind_param("iss", $row['SID'], $role, $userIP); // Pass $role by value
-    $stmt->execute();
-    header("Location: studentDashboard.php");
-    exit();
+    if (password_verify($pass, $row['SPass'])) {
+        $token = generateToken($email, 'student', $row['SID'], $userIP, $expirationTime);
+        setcookie('token', $token, time() + (86400 * 30), "/");
+        // Insert record into Trail table
+        $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, 'Logged in')");
+        $role = 'student';
+        $stmt->bind_param("iss", $row['SID'], $role, $userIP); // Pass $role by value
+        $stmt->execute();
+        header("Location: studentDashboard.php");
+        exit();
+    }
 } elseif ($resultTutor->num_rows > 0) {
     $row = $resultTutor->fetch_assoc(); // Fetch the row for the tutor
-    $token = generateToken($email, 'tutor', $row['TID'], $userIP, $expirationTime);
-    setcookie('token', $token, time() + (86400 * 30), "/");
-    // Insert record into Trail table
-    $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, 'Logged in')");
-    $role = 'tutor';
-    $stmt->bind_param("iss", $row['TID'], $role, $userIP); // Pass $role by value
-    $stmt->execute();
-    header("Location: tutorDashboard.php");
-    exit();
+    if (password_verify($pass, $row['TPass'])) {
+        $token = generateToken($email, 'tutor', $row['TID'], $userIP, $expirationTime);
+        setcookie('token', $token, time() + (86400 * 30), "/");
+        // Insert record into Trail table
+        $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, 'Logged in')");
+        $role = 'tutor';
+        $stmt->bind_param("iss", $row['TID'], $role, $userIP); // Pass $role by value
+        $stmt->execute();
+        header("Location: tutorDashboard.php");
+        exit();
+    }
 } elseif ($resultAdmin->num_rows > 0) {
     $row = $resultAdmin->fetch_assoc(); // Fetch the row for the admin
-    $token = generateToken($email, 'admin', $row['AID'], $userIP, $expirationTime);
-    setcookie('token', $token, time() + (86400 * 30), "/");
-    // Insert record into Trail table
-    $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, 'Logged in')");
-    $role = 'admin';
-    $stmt->bind_param("iss", $row['AID'], $role, $userIP); // Pass $role by value
-    $stmt->execute();
-    header("Location: adminDashboard.php");
-    exit();
-} else {
-    // User not found or invalid credentials
-    header("Location: index.php?error=Invalid%20email%20or%20password.%20Please%20try%20again");
-    exit();
-}
+    if ($pass === $row['APass']) {
+        $token = generateToken($email, 'admin', $row['AID'], $userIP, $expirationTime);
+        setcookie('token', $token, time() + (86400 * 30), "/");
+        // Insert record into Trail table
+        $stmt = $conn->prepare("INSERT INTO Trail (userID, userRole, ip_address, actionPerformed) VALUES (?, ?, ?, 'Logged in')");
+        $role = 'admin';
+        $stmt->bind_param("iss", $row['AID'], $role, $userIP); // Pass $role by value
+        $stmt->execute();
+        header("Location: adminDashboard.php");
+        exit();
+    }
+} 
+
+// User not found or invalid credentials
+header("Location: index.php?error=Invalid%20email%20or%20password.%20Please%20try%20again");
+exit();
 
 $conn->close();
 ?>

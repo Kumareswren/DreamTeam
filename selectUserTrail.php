@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+
 function displayUsersComponent($conn) {
     echo '<!DOCTYPE html>
             <html lang="en">
@@ -18,14 +19,14 @@ function displayUsersComponent($conn) {
     echo "<h2>Select user to check activity</h2><br/>";
 
     // SQL query to fetch student data
-    $sqlStudent = "SELECT SID, FName FROM Student";
+    $sqlStudent = "SELECT SID, FName, LName FROM Student";
     $resultStudent = $conn->query($sqlStudent);
 
     // SQL query to fetch tutor data
-    $sqlTutor = "SELECT TID, FName FROM Tutor";
+    $sqlTutor = "SELECT TID, FName, LName FROM Tutor";
     $resultTutor = $conn->query($sqlTutor);
 
-    $sqlAdmin = "SELECT AID, FName FROM Admin";
+    $sqlAdmin = "SELECT AID, FName, LName FROM Admin";
     $resultAdmin = $conn->query($sqlAdmin);
 
     // Student tab content
@@ -46,24 +47,52 @@ function displayUsersComponent($conn) {
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Name</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="studentList">';
+
+    // Define how many results you want per page for students
+    $results_per_page_student = 5;
+
+    // Calculate the total number of pages for students
+    $sql = "SELECT COUNT(*) AS total FROM Student";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    $total_pages_student = ceil($row["total"] / $results_per_page_student);
+
     // Populate student table
-    if ($resultStudent->num_rows > 0) {
-        while ($row = $resultStudent->fetch_assoc()) {
-            echo '<tr>
-                    <td>' . $row['FName'] . '</td>
-                    <td><button class="btn btn-primary openActivity" data-id="' . $row['SID'] . '" data-type ="student">View Activity</button></td>
-                </tr>';
+    function displayStudentTable($page, $results_per_page_student, $conn) {
+        $sqlStudent = "SELECT SID, FName, LName FROM Student LIMIT " . (($page - 1) * $results_per_page_student) . ", $results_per_page_student";
+        $resultStudent = $conn->query($sqlStudent);
+
+        if ($resultStudent->num_rows > 0) {
+            while ($row = $resultStudent->fetch_assoc()) {
+                echo '<tr>
+                        <td>' . $row['SID'] . '</td>
+                        <td>' . $row['FName'] . ' ' . $row['LName'] . '</td>
+                        <td><button class="btn btn-primary openActivity" data-id="' . $row['SID'] . '" data-type ="student">View Activity</button></td>
+                    </tr>';
+            }
+        } else {
+            echo '<tr><td colspan="3">No students found</td></tr>';
         }
-    } else {
-        echo '<tr><td colspan="2">No students found</td></tr>';
     }
+
+    displayStudentTable(1, $results_per_page_student, $conn);
+
     echo '</tbody>
         </table>
+        <div class="pagination" id="studentPagination">';
+
+    // Pagination for students
+    for ($i = 1; $i <= $total_pages_student; $i++) {
+        echo '<a href="#" class="page-link studentPageLink" data-page="' . $i . '">' . $i . '</a>';
+    }
+
+    echo '</div>
     </div>';
 
     // Tutor tab content
@@ -72,24 +101,52 @@ function displayUsersComponent($conn) {
             <table class="table">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="tutorList">';
+
+    // Define how many results you want per page for tutors
+    $results_per_page_tutor = 5;
+
+    // Calculate the total number of pages for tutors
+    $sql = "SELECT COUNT(*) AS total FROM Tutor";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    $total_pages_tutor = ceil($row["total"] / $results_per_page_tutor);
+
     // Populate tutor table
-    if ($resultTutor->num_rows > 0) {
-        while ($row = $resultTutor->fetch_assoc()) {
-            echo '<tr>
-                    <td>' . $row['FName'] . '</td>
-                    <td><button class="btn btn-primary openActivity" data-id="' . $row['TID'] . '" data-type ="tutor">View Activity</button></td>
-                </tr>';
+    function displayTutorTable($page, $results_per_page_tutor, $conn) {
+        $sqlTutor = "SELECT TID, FName, LName FROM Tutor LIMIT " . (($page - 1) * $results_per_page_tutor) . ", $results_per_page_tutor";
+        $resultTutor = $conn->query($sqlTutor);
+
+        if ($resultTutor->num_rows > 0) {
+            while ($row = $resultTutor->fetch_assoc()) {
+                echo '<tr>
+                        <td>' . $row['TID'] . '</td>
+                        <td>' . $row['FName'] . ' ' . $row['LName'] . '</td>
+                        <td><button class="btn btn-primary openActivity" data-id="' . $row['TID'] . '" data-type ="tutor">View Activity</button></td>
+                    </tr>';
+            }
+        } else {
+            echo '<tr><td colspan="3">No tutors found</td></tr>';
         }
-    } else {
-        echo '<tr><td colspan="2">No tutors found</td></tr>';
     }
+
+    displayTutorTable(1, $results_per_page_tutor, $conn);
+
     echo '</tbody>
         </table>
+        <div class="pagination" id="tutorPagination">';
+
+    // Pagination for tutors
+    for ($i = 1; $i <= $total_pages_tutor; $i++) {
+        echo '<a href="#" class="page-link tutorPageLink" data-page="' . $i . '">' . $i . '</a>';
+    }
+
+    echo '</div>
     </div>';
 
     echo '<div class="tab-pane fade pt-4" id="admin" role="tabpanel" aria-labelledby="admin-tab">
@@ -97,6 +154,7 @@ function displayUsersComponent($conn) {
             <table class="table">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Action</th>
                     </tr>
@@ -106,12 +164,13 @@ function displayUsersComponent($conn) {
     if ($resultAdmin->num_rows > 0) {
         while ($row = $resultAdmin->fetch_assoc()) {
             echo '<tr>
-                    <td>' . $row['FName'] . '</td>
+                    <td>' . $row['AID'] . '</td>
+                    <td>' . $row['FName'] . ' ' . $row['LName'] . '</td>
                     <td><button class="btn btn-primary openActivity" data-id="' . $row['AID'] . '" data-type ="admin">View Activity</button></td>
                 </tr>';
         }
     } else {
-        echo '<tr><td colspan="2">No admins found</td></tr>';
+        echo '<tr><td colspan="3">No admins found</td></tr>';
     }
     echo '</tbody>
         </table>
@@ -138,6 +197,38 @@ function displayUsersComponent($conn) {
                 data: { userID: id, userRole: userType }, // Use userID and userRole
                 success: function(data) {
                     $("#componentContainer").html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("An error occurred:", error);
+                }
+            });
+        });
+
+        $(".studentPageLink").click(function(event) {
+            event.preventDefault();
+            var page = $(this).data("page");
+            $.ajax({
+                url: "studentActivityPagination.php",
+                type: "POST",
+                data: { page: page },
+                success: function(data) {
+                    $("#studentList").html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("An error occurred:", error);
+                }
+            });
+        });
+
+        $(".tutorPageLink").click(function(event) {
+            event.preventDefault();
+            var page = $(this).data("page");
+            $.ajax({
+                url: "tutorActivityPagination.php",
+                type: "POST",
+                data: { page: page },
+                success: function(data) {
+                    $("#tutorList").html(data);
                 },
                 error: function(xhr, status, error) {
                     console.error("An error occurred:", error);
