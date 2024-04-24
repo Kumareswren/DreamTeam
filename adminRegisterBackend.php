@@ -25,6 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contact = $_POST['contact'];
     $password = $_POST['password'];
 
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
     // Check if the email already exists in Student or Tutor table
     $checkSql = "SELECT COUNT(*) as count FROM Student WHERE Email = ? UNION SELECT COUNT(*) as count FROM Tutor WHERE Email = ?";
     $checkStmt = $conn->prepare($checkSql);
@@ -36,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $checkStmt->bind_param("ss", $email, $email);
     $checkStmt->execute();
     $checkResult = $checkStmt->get_result();
-$rowCount = 0;
+    $rowCount = 0;
 
     while ($row = $checkResult->fetch_assoc()) {
         $rowCount += $row['count'];
@@ -65,7 +68,8 @@ $rowCount = 0;
     }
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssss", $firstName, $lastName, $email, $contact, $password);
+    $stmt->bind_param("sssss", $firstName, $lastName, $email, $contact, $hashedPassword);
+
 
     if ($stmt->execute()) {
 

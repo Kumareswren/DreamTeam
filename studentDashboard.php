@@ -24,6 +24,10 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $_SESSION['SID'] = $row['SID'];
 }
+else {
+    header("Location: index.php?error=Invalid%20credentials");
+    exit();
+}
 
 // Check if the user exists in the database
 $sql_check_user = "SELECT * FROM Student WHERE Email = '$user_email'";

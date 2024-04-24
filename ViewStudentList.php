@@ -7,19 +7,20 @@ use \Firebase\JWT\JWT;
 
 header("Content-Type: text/html"); // Set content type to HTML
     
-    function generateStudentList($conn, $result) {
-        $output = '<h2 class="mt-5 mb-4">My Student List</h2>'; // Add the heading
-        $output .= '<input type="text" id="searchInput" placeholder="Search for student" class="form-control mb-3">'; 
-        $output .= '<table class="table">';
-        $output .= '<thead>';
-        $output .= '<tr>';
-        $output .= '<th>First Name</th>';
-        $output .= '<th>Last Name</th>';
-        $output .= '<th>Email</th>';
-        $output .= '<th>Contact</th>';
-        $output .= '</tr>';
-        $output .= '</thead>';
-        $output .= '<tbody>';
+function generateStudentList($conn, $result, $limit, $offset) {
+    $output = '<h2 class="mt-5 mb-4">My Student List</h2>'; // Add the heading
+    $output .= '<input type="text" id="searchInput" placeholder="Search for student" class="form-control mb-3">'; 
+    $output .= '<div id="studentList">';
+    $output .= '<table class="table">';
+    $output .= '<thead>';
+    $output .= '<tr>';
+    $output .= '<th>First Name</th>';
+    $output .= '<th>Last Name</th>';
+    $output .= '<th>Email</th>';
+    $output .= '<th>Contact</th>';
+    $output .= '</tr>';
+    $output .= '</thead>';
+    $output .= '<tbody>';
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -36,6 +37,17 @@ header("Content-Type: text/html"); // Set content type to HTML
 
     $output .= '</tbody>';
     $output .= '</table>';
+    $output .= '</div>'; // Close #studentList
+
+    // Pagination
+    $output .= '<div class="pagination">';
+    if ($offset > 0) {
+        $output .= '<button class="prev-btn" data-offset="' . ($offset - $limit) . '">Prev</button>';
+    }
+    if ($result->num_rows == $limit) {
+        $output .= '<button class="next-btn" data-offset="' . ($offset + $limit) . '">Next</button>';
+    }
+    $output .= '</div>';
 
     return $output;
 }
@@ -73,14 +85,13 @@ if (isset($_COOKIE['token'])) {
 
             $full_user_agent = $_SERVER['HTTP_USER_AGENT'];
             // Regular expression to extract the browser name
-           if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
-               $browser_name = 'Edge';
-           } elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
-               $browser_name = $matches[1];
-           } else {
-               $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
-           }
-           
+            if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
+                $browser_name = 'Edge';
+            } elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
+                $browser_name = $matches[1];
+            } else {
+                $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
+            }
            
             $user_id = $tid; // Assuming $tid holds the tutor's ID
             $user_type = "Tutor";
@@ -93,25 +104,30 @@ if (isset($_COOKIE['token'])) {
                 // Handle error if insert query fails
                 echo "Error inserting system activity: " . $conn->error;
             }
-            // Query to get the students assigned to the tutor's TID
+
+            // Pagination variables
+            $limit = 4; // Limit of students per page
+            $offset = isset($_GET['offset']) ? $_GET['offset'] : 0; // Offset for pagination
+
+            // Query to get the students assigned to the tutor's TID with pagination
             $sql = "SELECT Student.* FROM Student 
                     INNER JOIN StudentAssignment ON Student.SID = StudentAssignment.SID 
-                    WHERE StudentAssignment.TID = ?";
+                    WHERE StudentAssignment.TID = ?
+                    LIMIT ?, ?";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 die("Error in SQL query: " . $conn->error);
             }
 
-            $stmt->bind_param("i", $tid);
+            $stmt->bind_param("iii", $tid, $offset, $limit);
             $stmt->execute();
             $result = $stmt->get_result();
 
-            // Insert record into trail table
+            // Generate student list with pagination
+            $studentListHTML = generateStudentList($conn, $result, $limit, $offset);
+
             $trailAction = "Checked student list assigned to him/her";
             insertTrailRecord($conn, $trailAction);
-
-            // Generate student list
-            $studentListHTML = generateStudentList($conn, $result);
 
             // Close the database connection
             $conn->close();
@@ -151,6 +167,7 @@ function insertTrailRecord($conn, $trailAction) {
     }
     $trailStmt->close();
 }
+
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
 <script>
@@ -173,5 +190,37 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Pagination
+    $(document).on('click', '.prev-btn', function() {
+        var offset = $(this).data("offset");
+        loadPage(offset);
+    });
+
+    $(document).on('click', '.next-btn', function() {
+        var offset = $(this).data("offset");
+        loadPage(offset);
+        $(this).hide();
+    });
+
+    $(document).on('click', '.studentPageLink', function(event) {
+        event.preventDefault();
+        var page = $(this).data("page");
+        loadPage(page);
+    });
+
+    function loadPage(offset) {
+        $.ajax({
+            url: "studentListPagination.php",
+            type: "POST",
+            data: { offset: offset },
+            success: function(data) {
+                $("#studentList").html(data);
+            },
+            error: function(xhr, status, error) {
+                console.error("An error occurred:", error);
+            }
+        });
+    }
 });
 </script>
