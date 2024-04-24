@@ -30,12 +30,12 @@ if ($result->num_rows > 0) {
 $courseId = isset($_POST['courseId']) ? intval($_POST['courseId']) : 0;
 
 // Prepare SQL query to fetch data
-$sql = "SELECT ta.tutorialAnswerTitle, ta.uploadDate, ta.tutorComment, ta.tutorialAnswerFilePath
+$sql = "SELECT ta.tutorialAnswerID, ta.tutorialAnswerTitle, ta.uploadDate, ta.tutorComment, ta.tutorialAnswerFilePath
         FROM TutorialAnswer ta
         INNER JOIN Tutorial t ON ta.tutorialID = t.tutorialID
         WHERE ta.SID = $studentId 
         AND t.courseID = $courseId
-        AND ta.tutorComment IS NOT NULL";
+        ";
 
 // Execute the query
 $result = $conn->query($sql);
@@ -60,9 +60,18 @@ if (!$result) {
             $output .= '<tr>';
             $output .= '<td>' . $row['tutorialAnswerTitle'] . '</td>';
             $output .= '<td>' . $row['uploadDate'] . '</td>';
-            $output .= '<td>' . $row['tutorComment'] . '</td>';
+
+            // Check if tutorComment is null
+            if ($row['tutorComment'] === null) {
+                $output .= '<td style="font-style: italic;">Waiting for tutor feedback</td>';// $output .= '<td style="color: blue;">Waiting for tutor feedback</td>';
+            } else {
+                $output .= '<td>' . $row['tutorComment'] . '</td>';
+            }
             // Add a button to download the file associated with tutorialFilePath
             $output .= '<td><a href="' . $row['tutorialAnswerFilePath'] . '" class="btn btn-primary" download>View</a></td>';
+
+            $output .= '<td><button class="btn btn-danger delete-tutorial-btn" data-tutorial-answer-id="' . $row['tutorialAnswerID'] . '">Delete</button></td>';
+
             $output .= '</tr>';
         }
 
@@ -101,4 +110,29 @@ $(document).ready(function() {
         });
     });
 });
+
+$(document).on("click", ".delete-tutorial-btn", function() {
+    var tutorialAnswerId = $(this).data("tutorial-answer-id"); // Retrieve tutorialAnswerID
+    var row = $(this).closest("tr"); // Get the row of the deleted tutorial answer
+
+    if (confirm("Are you sure you want to delete this submission?")) {
+        $.ajax({
+            url: "answerDelete.php",
+            type: "POST",
+            data: { tutorialAnswerId: tutorialAnswerId }, // Include tutorialAnswerID in the POST data
+            success: function(response) {
+                
+                row.remove();
+                
+            },
+            error: function(xhr, status, error) {
+                // Handle error
+                console.error(xhr.responseText);
+            }
+        });
+    }
+});
+
+
+
 </script>

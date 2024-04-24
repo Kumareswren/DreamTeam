@@ -237,6 +237,7 @@ $(document).ready(function() {
 
         var message = $("#chatInput").val(); // take user.input from chatInput textarea
 
+        message = $('<h1/>').text(message).html();
         // Retrieve the SID from the send button data attribute
         var sid = $(this).data("sid");
 

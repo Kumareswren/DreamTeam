@@ -110,6 +110,8 @@ $rowCount = 0;
         // Send the message
         $mailer->send($message);
         echo "success";
+        
+        
     
          // Log system activity
          $user_id = isset($_SESSION['AID']) ? $_SESSION['AID'] : null;
@@ -133,7 +135,7 @@ if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
          $insert_stmt->bind_param("issss", $user_id, $user_type, $activity_type, $page_name, $browser_name);
 
          if ($insert_stmt->execute()) {
-             echo "success";
+             
          } else {
              // Handle error if insert query fails
              echo "Error inserting system activity: " . $conn->error;

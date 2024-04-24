@@ -59,14 +59,14 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
     $output .= '<h3>Uploaded Notes</h3>';
     // Fetch data from the 'note' table
     include 'db.php'; // Include database connection
-    $sql = "SELECT noteTitle, noteDescription, uploadDate, noteFilePath FROM Note WHERE courseID = $courseId"; 
+    $sql = "SELECT noteID, noteTitle, noteDescription, uploadDate, noteFilePath FROM Note WHERE courseID = $courseId"; 
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
         // Output table headers
         $output .= '<div class="table-responsive">';
         $output .= '<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search">';
         $output .= '<table class="table table-striped">';
-        $output .= '<thead><tr><th>Note Title</th><th>Note Description</th><th>Date</th><th>URL</th></tr></thead>';
+        $output .= '<thead><tr><th>Note Title</th><th>Note Description</th><th>Date</th><th>URL</th><th>Delete</th></tr></thead>';
         $output .= '<tbody>';
         // Output data of each row
         while ($row = $result->fetch_assoc()) {
@@ -76,6 +76,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
             $output .= '<td>' . $row['noteDescription'] . '</td>';
             $output .= '<td>' . $row['uploadDate'] . '</td>';
             $output .= '<td><a href="' . $noteFilePath . '" class="btn btn-primary" download onclick="downloadClicked(\'' . $row['noteTitle'] . '\')">Download</a></td>';
+            $output .= '<td><button class="btn btn-danger delete-note" data-note-id="' . $row['noteID'] . '">Delete</button></td>';
             $output .= '</tr>';
         }
         $output .= '</tbody>';
@@ -138,6 +139,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
              $output .= '<td>' . $row['uploadDate'] . '</td>';
              $output .= '<td><a href="' . $tutorialFilePath . '" class="btn btn-primary" download onclick="downloadTutorialClicked(\'' . $row['tutorialTitle'] . '\')">Download</a></td>';
              $output .= '<td><button class="btn btn-success btn-see-answers" data-tutorial-id="' . $tutorialID . '" >See Answers</button></td>'; // on click -> ajaxcomponent that displays matching tutorialAnswers
+             $output .= '<td><button class="btn btn-danger delete-tutorial" data-tutorial-id="' . $tutorialID . '">Delete</button></td>';
              $output .= '</tr>';
          }
          $output .= '</tbody>';
@@ -428,6 +430,55 @@ function downloadTutorialClicked(noteTitle) {
         }
     });
 }
+
+$(document).ready(function(){
+    $('.delete-note').click(function(){
+        var noteID = $(this).data('note-id');
+        var rowToDelete = $(this).closest('tr'); // Identify the row to delete
+        
+        if (confirm("Are you sure you want to delete this note?")) {
+        $.ajax({
+            url: 'notesDelete.php',
+            type: 'post',
+            data: {noteID: noteID},
+            success: function(response){
+                // Handle success response
+                /* console.log(response); */
+                // Remove the deleted row from the table
+                rowToDelete.remove();
+            },
+            error: function(xhr, status, error){
+                // Handle error
+                console.error(error);
+            }
+        });
+}});
+});
+
+$(document).ready(function(){
+    $('.delete-tutorial').click(function(){
+        var tutorialID = $(this).data('tutorial-id');
+        var rowToDelete = $(this).closest('tr'); // Identify the row to delete
+        
+        if (confirm("Are you sure you want to delete this tutorial?")) {
+        $.ajax({
+            url: 'tutorialDelete.php',
+            type: 'post',
+            data: {tutorialID: tutorialID},
+            success: function(response){
+                // Handle success response
+                /* console.log(response); */
+                // Remove the deleted row from the table
+                rowToDelete.remove();
+            },
+            error: function(xhr, status, error){
+                // Handle error
+                console.error(error);
+            }
+        });
+}});
+}); 
+
 
 </script>
 

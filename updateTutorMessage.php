@@ -61,7 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"]) && isset($_
                         // Assuming the sender is a Tutor and receiver is a Student
                         $sender_type = "Tutor";
                         $receiver_type = "Student";
-                        $stmt_insert_message->bind_param("iisss", $tid, $sid, $message, $sender_type, $receiver_type);
+                        /* $stmt_insert_message->bind_param("iisss", $tid, $sid, $message, $sender_type, $receiver_type); */
+                        $sanitized_message = htmlentities($message);
+                        $stmt_insert_message->bind_param("iisss", $tid, $sid, htmlentities($message), $sender_type, $receiver_type);
                         if ($stmt_insert_message->execute()) {
                             // Message inserted successfully
                             http_response_code(200);
