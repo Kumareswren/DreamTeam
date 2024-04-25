@@ -324,7 +324,8 @@ $(document).ready(function() {
                     updateUploadedFilesList(formData.get('noteFile').name);
                 } else {
                     // Display the error message
-                    $('#uploadNoteResult').text(response);
+                    /* $('#uploadNoteResult').text(response); */
+                    $('#uploadNoteResult').html('<div class="alert alert-danger" role="alert">' + response + '</div>');
                     // Handle error
                 }
             },

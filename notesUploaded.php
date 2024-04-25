@@ -172,7 +172,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } else {
             // Send bad request response
-            http_response_code(400);
+            /* http_response_code(400); */
+            header("HTTP/1.1 200 OK");
             echo "Only PDF, DOC, and DOCX files are allowed.";
         }
     } else {

@@ -125,6 +125,8 @@ $trailStmt->execute();
 
 $previousMessages = [];
 while ($row = $resultMessages->fetch_assoc()) {
+    $messageContent = htmlentities($row['messageContent'], ENT_QUOTES);
+    $row['messageContent'] = $messageContent;
     $previousMessages[] = $row;
 }
 
@@ -279,7 +281,7 @@ if ($resultFullName->num_rows > 0) {
         $output .= '<div class="chat-message">';
         /* $output .= "<div class='chat-bubble $senderClass'>{$message['messageContent']}"; */
         /* $output .= "<div class='chat-bubble $senderClass'>" . htmlspecialchars_decode($message['messageContent']); */
-        $output .= "<div class='chat-bubble $senderClass'>" . htmlspecialchars_decode($message['messageContent'], ENT_QUOTES);
+        $output .= "<div class='chat-bubble $senderClass'>" . $message['messageContent'];
         $output .= "<div class='sent-time'>$message[sent_at]</div>"; // Include sent_at timestamp within the chat-bubble div
         $output .= '</div>';
         $output .= '</div>';
