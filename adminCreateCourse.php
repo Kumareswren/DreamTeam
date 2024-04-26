@@ -164,10 +164,10 @@ $tutorResult = mysqli_query($conn, $tutorQuery);
 
 
                         <label for="start_date">Start Date:</label>
-                        <input type="date" name="start_date" class="form-control mb-3" id="start_date" required>
+                        <input type="date" name="start_date" class="form-control mb-3" id="start_date" min="' . $minimumDate . '" required max="<?php echo date('Y-m-d', strtotime('+1 year')); ?>">
 
                         <label for="end_date">End Date:</label>
-                        <input type="date" name="end_date" class="form-control mb-3" id="end_date" required>
+                        <input type="date" name="end_date" class="form-control mb-3" id="end_date" min="' . $minimumDate . '" required max="<?php echo date('Y-m-d', strtotime('+1 year')); ?>">
 
                         <label for="course_description">Course Description:</label>
                         <textarea name="course_description" class="form-control mb-3" rows="3" required></textarea>
@@ -201,6 +201,14 @@ $tutorResult = mysqli_query($conn, $tutorQuery);
     document.getElementById("end_date").min = today;
 
 </script>
+<script>
+    // Get today's date
+    var today = new Date().toISOString().split('T')[0];
+
+    // Set the minimum value of the date input to today's date
+    document.getElementById("meeting_date").min = today;
+
+    </script>
 
 </body>
 </html>

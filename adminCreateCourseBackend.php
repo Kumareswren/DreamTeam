@@ -15,6 +15,7 @@ if (!$isAdmin) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $courseName = trim($_POST["course_name"]);
     $courseDescription = trim($_POST["course_description"]);
+    $currentYear = date("Y");
     $startDate = $_POST["start_date"] . '-01';
     $endDate = $_POST["end_date"] . '-01';
     $tutorID = $_POST["tutor_id"];
@@ -41,6 +42,14 @@ if ($conn->query($insert_query) !== TRUE) {
     exit();
 }
 
+// Calculate the minimum allowed date (one year from the current year)
+$minimumDate = strtotime(date("Y-m-d", strtotime("+1 year")));
+
+// Check if selected dates are valid
+if ($startDate < $minimumDate || $endDate < $minimumDate) {
+    echo "<script>alert('Please select start and end dates that are more than one year from the current year.');</script>";
+    exit();
+}
 
     // Server-side validation
     $regex = '/^[A-Za-z\s]+$/'; // Regular expression to match letters and spaces
