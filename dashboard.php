@@ -400,6 +400,7 @@ echo "</tbody></table></div>";
     while ($row = $resultBrowsersBeingUsed->fetch_assoc()) {
         echo "<tr><td>" . $row['BrowserName'] . "</td><td>" . $row['BrowserUsageCount'] . "</td></tr>";
     }
+    echo "</tbody></table></div>";
         $currentDate = date("Y-m-d");
     
         // Calculate the date 7 days ago
