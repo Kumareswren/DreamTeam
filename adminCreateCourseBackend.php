@@ -40,12 +40,20 @@ if ($conn->query($insert_query) !== TRUE) {
     echo "<script>alert('Error inserting system activity: " . $conn->error . "');</script>";
     exit();
 }
+
+
     // Server-side validation
     $regex = '/^[A-Za-z\s]+$/'; // Regular expression to match letters and spaces
     if (!preg_match($regex, $courseName)) {
         echo "<script>alert('Please enter a valid string without mathematical symbols in the Course Name field.');</script>";
         exit();
     }
+
+    if (!preg_match($regex, $courseDescription)) {
+        echo "<script>alert('Please enter a valid string without mathematical symbols in the Course Description field.');</script>";
+        exit();
+    }
+
 
     // Check if the course with the same name, start date, and tutor ID already exists
     $check_sqlCourse = "SELECT * FROM Course WHERE courseName = ? AND startDate = ? AND TID = ?";
