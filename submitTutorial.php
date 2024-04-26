@@ -48,6 +48,8 @@ $(document).on('submit', '#tutorialForm', function(event) {
             // Check HTTP status code for success
             if (xhr.status === 200) {
                 $('#messageBox').html('<div class="alert alert-success">' + response + '</div>');
+
+                $('#tutorialForm')[0].reset();
             } else {
                 $('#messageBox').html('<div class="alert alert-danger">Unexpected response from server</div>');
             }
