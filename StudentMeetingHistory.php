@@ -20,7 +20,6 @@ header("Content-Type: text/html"); // Set content type to HTML
         $output .= '<th>Time</th>';
         $output .= '<th>Location</th>';
         $output .= '<th>Description</th>';
-        $output .= '<th>Status</th>';
         $output .= '</tr>';
         $output .= '</thead>';
         $output .= '<tbody>';
@@ -34,11 +33,10 @@ header("Content-Type: text/html"); // Set content type to HTML
             $output .= '<td>' . (isset($row['meetingTime']) ? $row['meetingTime'] : '') . '</td>';
             $output .= '<td>' . (isset($row['meetingLocation']) ? $row['meetingLocation'] : '') . '</td>';
             $output .= '<td>' . (isset($row['meetingDesc']) ? $row['meetingDesc'] : '') . '</td>';
-            $output .= '<td>' . (isset($row['status']) ? $row['status'] : '') . '</td>';
             $output .= '</tr>';
         }
     } else {
-        $output .= '<tr><td colspan="7">No meetings history found</td></tr>';
+        $output .= '<tr><td colspan="6">No meetings history found</td></tr>';
     }
 
     $output .= '</tbody>';

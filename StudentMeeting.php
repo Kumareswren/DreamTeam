@@ -237,7 +237,7 @@ $conn->close();
                         </select>
 
                         <label for="meeting_date">Meeting Date:</label>
-                        <input type="date" name="meeting_date" class="form-control mb-3" id="meeting_date" required max="<?php echo date('Y-m-d', strtotime('+1 year')); ?>">
+                        <input type="date" name="meeting_date" class="form-control mb-3" id="meeting_date" min="' . $minimumDate . '" required max="<?php echo date('Y-m-d', strtotime('+1 year')); ?>">
 
                         <label for="meeting_time">Meeting Time:</label>
                         <input type="time" name="meeting_time" class="form-control mb-3" id="meeting_time" required min="<?php echo date('H:i'); ?>">
