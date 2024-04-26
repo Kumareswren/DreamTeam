@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         // Check if the email already exists in Student or Tutor table
-        $checkSql = "SELECT COUNT() as count FROM Student WHERE Email = ? UNION SELECT COUNT() as count FROM Tutor WHERE Email = ?";
- $checkStmt = $conn->prepare($checkSql);
+        $checkSql = "SELECT COUNT(*) as count FROM Student WHERE Email = ? UNION SELECT COUNT(*) as count FROM Tutor WHERE Email = ?";
+        $checkStmt = $conn->prepare($checkSql);
 
         if (!$checkStmt) {
             die("Error in preparing statement: " . $conn->error);
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Insert new student or tutor into the respective table
         $userType = $_POST['user_type'];
 
-if ($userType === 'student') {
+        if ($userType === 'student') {
             $sql = "INSERT INTO Student (FName, LName, Email, Contact, SPass) VALUES (?, ?, ?, ?, ?)";
         } elseif ($userType === 'tutor') {
             $sql = "INSERT INTO Tutor (FName, LName, Email, Contact, TPass) VALUES (?, ?, ?, ?, ?)";
@@ -81,7 +81,7 @@ if ($userType === 'student') {
 
             // Send registration success email
             $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
- ->setUsername('venturesrsk@gmail.com')
+                ->setUsername('venturesrsk@gmail.com')
                 ->setPassword('zohh take gpri knhn');
 
             $mailer = new Swift_Mailer($transport);
@@ -104,8 +104,7 @@ if ($userType === 'student') {
             // Regular expression to extract the browser name
             if (preg_match('/Edg\/([\d.]+)/i', $full_user_agent, $matches)) {
                 $browser_name = 'Edge';
-            } elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', 
-$full_user_agent, $matches)) {
+            } elseif (preg_match('/(Firefox|Chrome|Safari|Opera)/i', $full_user_agent, $matches)) {
                 $browser_name = $matches[1];
             } else {
                 $browser_name = "Unknown"; // Default to "Unknown" if browser name cannot be determined
@@ -128,7 +127,7 @@ $full_user_agent, $matches)) {
             // Registration failed, handle the error (e.g., duplicate email)
             echo "Registration failed";
             exit();
-}
+        }
 
         $stmt->close();
         $conn->close();
@@ -143,6 +142,6 @@ $full_user_agent, $matches)) {
 function containsSymbols($str) {
     // Regular expression to check for symbols
     $pattern = '/[!@#$%^&*(),.?":{}|<>]/';
-    return preg_match($pattern,$str);
+    return preg_match($pattern, $str);
 }
 ?>

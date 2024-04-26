@@ -164,8 +164,7 @@ if (!$isAdmin) {
                         </select>
 
                         <label for="first_name">First Name:</label>
-                        <input type="text" name="first_name" 
-id="first_name" class="form-control mb-3" required>
+                        <input type="text" name="first_name" id="first_name" class="form-control mb-3" required>
 
                         <label for="last_name">Last Name:</label>
                         <input type="text" name="last_name" id="last_name" class="form-control mb-3" required>
@@ -177,8 +176,7 @@ id="first_name" class="form-control mb-3" required>
                         <input type="number" name="contact" class="form-control mb-3" required>
 
                         <label for="password">Password:</label>
-                        <input type="password" name="password" 
-class="form-control mb-3" required>
+                        <input type="password" name="password" class="form-control mb-3" required>
 
                         <input type="hidden" name="component" value="adminRegister">
 
@@ -198,7 +196,7 @@ class="form-control mb-3" required>
 
             if (containsSymbols(firstName) || containsSymbols(lastName)) {
                 alert("First name and last name cannot contain symbols.");
- return false;
+                return false;
             }
             return true;
         }
