@@ -154,7 +154,8 @@ if (!$isAdmin) {
                     <img src="icons/online-learning.png" alt="Education Logo" class="logo">
                     <h2 class="text-center mb-4">Registration</h2>
 
-                    <form method="post" action="adminRegisterBackend.php" class="form" name="adminRegistrationForm">
+                    <form method="post" action="adminRegisterBackend.php" class="form" name="adminRegistrationForm"
+                        onsubmit="return validateForm()">
                         <label for="user_type">User Type:</label>
                         <select name="user_type" id="user_type" class="form-control mb-3" required>
                             <option value="" disabled selected>Select User Type</option>
@@ -163,10 +164,10 @@ if (!$isAdmin) {
                         </select>
 
                         <label for="first_name">First Name:</label>
-                        <input type="text" name="first_name" class="form-control mb-3" required>
+                        <input type="text" name="first_name" id="first_name" class="form-control mb-3" required>
 
                         <label for="last_name">Last Name:</label>
-                        <input type="text" name="last_name" class="form-control mb-3" required>
+                        <input type="text" name="last_name" id="last_name" class="form-control mb-3" required>
 
                         <label for="email">Email:</label>
                         <input type="email" name="email" class="form-control mb-3" required>
@@ -188,5 +189,24 @@ if (!$isAdmin) {
 
     <!-- Bootstrap JavaScript (optional, for certain components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function validateForm() {
+            var firstName = document.getElementById('first_name').value;
+            var lastName = document.getElementById('last_name').value;
+
+            if (containsSymbols(firstName) || containsSymbols(lastName)) {
+                alert("First name and last name cannot contain symbols.");
+                return false;
+            }
+            return true;
+        }
+
+        function containsSymbols(str) {
+            // Regular expression to check for symbols
+            var pattern = /[!@#$%^&*(),.?":{}|<>]/;
+            return pattern.test(str);
+        }
+    </script>
 </body>
+
 </html>
