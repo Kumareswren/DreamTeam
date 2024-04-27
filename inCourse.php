@@ -127,7 +127,7 @@ function generateInCourseDetails($courseId, $courseName, $startDate, $endDate) {
          $output .= '<div class="table-responsive">';
          $output .= '<input type="text" id="tutorialSearchInput" class="form-control mb-3" placeholder="Search">';
          $output .= '<table class="table table-striped">';
-         $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>Download</th><th>Submits</th></tr></thead>';
+         $output .= '<thead><tr><th>Tutorial Title</th><th>Tutorial Description</th><th>Date</th><th>Download</th><th>Submits</th><th>Remove</th></tr></thead>';
          $output .= '<tbody>';
          // Output data of each row
          while ($row = $result->fetch_assoc()) {
@@ -322,6 +322,22 @@ $(document).ready(function() {
                     $('#uploadNoteResult').html('<div class="alert alert-success" role="alert">' + response + '</div>');
                     // Update the list of uploaded files
                     updateUploadedFilesList(formData.get('noteFile').name);
+                    /* $('#uploadedNotesFiles').append(response); */
+
+                    var uploadDate = new Date().toISOString().slice(0, 19).replace('T', ' '); 
+                    var newRowHTML = '<tr>' +
+                                        '<td>' + formData.get('noteTitle') + '</td>' +
+                                        '<td>' + formData.get('noteDescription') + '</td>' +
+                                        '<td>' + uploadDate + '</td>' + // '<td>' + new Date().toLocaleDateString() + '</td>'
+                                        '<td><a href="' + response.noteFilePath + '" class="btn btn-primary" download>Download</a></td>' +
+                                        '<td><button class="btn btn-danger delete-note" data-note-id="' + response.noteID + '">Delete</button></td>' +
+                                     '</tr>';
+
+                    // Append the new row to the table body
+                    $('#uploadedNotesFiles table tbody').append(newRowHTML);
+                    // Clear the form content
+                    $('#noteForm')[0].reset();
+
                 } else {
                     // Display the error message
                     /* $('#uploadNoteResult').text(response); */
@@ -364,10 +380,26 @@ $(document).ready(function() {
             success: function(response, textStatus, xhr) {
                 // Check the HTTP status code in the response
                 if (xhr.status === 200) {
+                    $('#tutorialForm')[0].reset();
                     // Success
                     $('#uploadMessage').html('<div class="alert alert-success" role="alert">' + response + '</div>');
                     /* $('#uploadResult').html(response); */
                     updateUploadedFilesList(response.fileNames);
+
+                    
+        /* var uploadDate = new Date().toISOString().slice(0, 19).replace('T', ' ');  */
+        var newRowHTML = '<tr>' +
+            '<td>' + formData.get('tutorialTitle') + '</td>' +
+            '<td>' + formData.get('tutorialDescription') + '</td>' +
+            '<td>' + new Date().toLocaleDateString() + '</td>' + //'<td>' + new Date().toLocaleDateString() + '</td>' +
+            '<td><a href="' + response.tutorialFilePath + '" class="btn btn-primary" download>Download</a></td>' +
+            '<td><button class="btn btn-success btn-see-answers" data-tutorial-id="' + response.tutorialID + '">See Answers</button></td>' +
+            '<td><button class="btn btn-danger delete-tutorial" data-tutorial-id="' + response.tutorialID + '">Delete</button></td>' +
+            '</tr>';
+        
+        // Append the new row to the table body
+        $('#uploadedTutorialFiles table tbody').append(newRowHTML);
+                    
                 } else {
                     // Error
                     $('#uploadMessage').html('<div class="alert alert-danger" role="alert">Error: ' + response + '</div>');
