@@ -12,10 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($component === 'requestMeeting') {
         // Retrieve form data
         $courseTitle = $_POST['course_title'];
+        $currentYear = date("Y");
         $meetingDate = $_POST['meeting_date'];
         $meetingTime = $_POST['meeting_time'];
         $meetingLocation = $_POST['meeting_location'];
         $meetingDesc = $_POST['meeting_desc']; // Add this line to retrieve meeting description
+
+        // Calculate the minimum allowed date (one year from the current year)
+        $minimumDate = strtotime(date("Y-m-d", strtotime("+1 year")));
+
+        // Check if selected dates are valid
+        if ($meetingDate < $minimumDate) {
+        echo "<script>alert('Please select a dates that are less than one year from the current year.');</script>";
+        exit();
+        }
 
         // Validate based on meeting location
 if ($meetingLocation === 'Online Meeting') {
